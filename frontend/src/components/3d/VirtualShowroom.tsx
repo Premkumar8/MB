@@ -5,6 +5,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Center, Environment, Stars } from "@react-three/drei";
 import * as THREE from "three";
 import { X, ArrowRight, Compass, ShieldCheck } from "lucide-react";
+import Link from "next/link";
 
 // Showroom Stone Pillar Component
 interface PillarProps {
@@ -74,7 +75,7 @@ function ShowroomPillar({
         {/* Tall slab pillar structure */}
         <boxGeometry args={[0.8, 2.4, 0.15]} />
         {texture ? (
-          <meshStandardMaterial
+          <meshPhysicalMaterial
             map={texture}
             roughness={0.15}
             metalness={0.05}

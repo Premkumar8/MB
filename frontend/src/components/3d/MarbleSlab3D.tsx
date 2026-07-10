@@ -50,7 +50,7 @@ function SlabMesh({
       {/* Slab Dimensions: 3m Width x 1.8m Height x 0.03m (3cm) Thickness */}
       <boxGeometry args={[3, 1.8, 0.03]} />
       {texture ? (
-        <meshStandardMaterial
+        <meshPhysicalMaterial
           map={texture}
           roughness={roughness}
           metalness={metalness}

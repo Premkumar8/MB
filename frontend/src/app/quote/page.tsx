@@ -287,7 +287,9 @@ export default function QuotePage() {
           <div className="space-y-2 md:col-span-2">
             <label className="text-[10px] uppercase tracking-widest text-black/60 dark:text-white/50 font-semibold flex items-center space-x-1">
               <span>Architectural Drawings / Blueprints</span>
-              <HelpCircle className="w-3.5 h-3.5 text-gold-500" title="PDF or image of elevations" />
+              <span title="PDF or image of elevations">
+                <HelpCircle className="w-3.5 h-3.5 text-gold-500" />
+              </span>
             </label>
             <div className="border border-dashed border-black/20 dark:border-white/10 p-4 text-center cursor-pointer relative hover:border-gold-500 transition-colors">
               <input
