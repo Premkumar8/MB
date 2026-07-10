@@ -1,0 +1,161 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: var(--font-playfair), Georgia, serif;
+  --font-sans: var(--font-poppins), var(--font-inter), sans-serif;
+  
+  --color-gold-50: #f5f7ff;
+  --color-gold-100: #e0e7ff;
+  --color-gold-200: #c7d2fe;
+  --color-gold-300: #a5b4fc;
+  --color-gold-400: #818cf8;
+  --color-gold-500: #6366f1; /* Highlighting Indigo Blue */
+  --color-gold-600: #4f46e5;
+  --color-gold-700: #4338ca;
+  --color-gold-800: #3730a3;
+  --color-gold-900: #312e81;
+  --color-gold-950: #1e1b4b;
+  
+  --color-onyx: #0f0f11;
+  --color-emerald-accent: #1b4d3e;
+}
+
+:root {
+  --background-light: #ffffff;
+  --foreground-light: #000000;
+  --background-dark: #070708;
+  --foreground-dark: #fbfbfb;
+}
+
+/* Custom base elements */
+body {
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* Premium utility classes */
+.glass-premium {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(20px) saturate(190%);
+  -webkit-backdrop-filter: blur(20px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.dark .glass-premium,
+.dark.glass-premium {
+  background: rgba(15, 15, 17, 0.7);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.glass-premium-light {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(20px) saturate(190%);
+  -webkit-backdrop-filter: blur(20px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.glass-premium-dark {
+  background: rgba(15, 15, 17, 0.7);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Gold Glow button class */
+.btn-gold-glow {
+  @apply relative overflow-hidden transition-all duration-300 rounded-none tracking-widest uppercase text-xs sm:text-sm font-bold px-9 py-4 border-2 border-gold-500 bg-gold-500/10 hover:bg-gold-500 hover:text-black hover:shadow-[0_0_25px_rgba(212,175,55,0.55)];
+}
+
+.btn-gold-solid {
+  @apply relative overflow-hidden transition-all duration-300 rounded-none tracking-widest uppercase text-xs sm:text-sm font-bold px-9 py-4 bg-gold-500 text-black hover:bg-white hover:text-black hover:shadow-[0_0_25px_rgba(255,255,255,0.5)];
+}
+
+.btn-luxury-outline {
+  @apply relative overflow-hidden transition-all duration-300 rounded-none tracking-widest uppercase text-xs sm:text-sm font-bold px-9 py-4 border-2 border-black/20 dark:border-white/10 hover:border-gold-500 hover:text-gold-500;
+}
+
+/* Custom text gradients */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 50%, #1e1b4b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-silver-gradient {
+  background: linear-gradient(135deg, #71717a 0%, #3f3f46 50%, #18181b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-emerald-gradient {
+  background: linear-gradient(135deg, #059669 0%, #10b981 50%, #064e3b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Custom Scrollbar for Luxury Aesthetics */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-black/10 dark:bg-white/5;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gold-500/40 hover:bg-gold-500 transition-colors duration-300;
+  border-radius: 3px;
+}
+
+/* Selection style */
+::selection {
+  @apply bg-gold-500/30 text-white;
+}
+
+/* Skeleton Loading Shimmer */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer-bg {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 25%,
+    rgba(255, 255, 255, 0.08) 37%,
+    rgba(255, 255, 255, 0.03) 63%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Cursor follow lighting element */
+.mouse-light-glow {
+  background: radial-gradient(
+    600px circle at var(--x, 0px) var(--y, 0px),
+    rgba(212, 175, 55, 0.06),
+    transparent 40%
+  );
+}
+
+/* Luxury page transition animation */
+.page-fade-in {
+  animation: pageFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

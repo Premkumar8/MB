@@ -1,0 +1,47 @@
+# Next.js / Node
+node_modules/
+frontend/node_modules/
+.next/
+frontend/.next/
+out/
+build/
+
+# Python / Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+backend/.venv/
+backend/venv/
+.pytest_cache/
+.eggs/
+*.egg-info/
+
+# Local Databases
+*.db
+backend/aurelia_marmi.db
+
+# User Uploads / Media (prevent committing uploaded client drawings)
+backend/static/uploads/
+static/uploads/
+
+# Environment Variables & Secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+frontend/.env.local
+
+# IDEs & System files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+desktop.ini
