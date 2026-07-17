@@ -32,30 +32,27 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Aurelia Marmi | Premium Luxury Marble & Natural Stone",
-    template: "%s | Aurelia Marmi",
+    default: "Sharma Marble | Premium Tiles & Natural Stone",
+    template: "%s | Sharma Marble",
   },
   description:
-    "Immerse yourself in world-class natural stone craftsmanship. Explore our interactive 3D showroom, procedural marble slab configurators, and AI room visuals. Quarried in Italy, Spain, and Brazil.",
+    "Explore our vast collection of premium tiles, granites, and natural stone. Featuring top brands like Somany Ceramics and world-class craftsmanship for your home and business.",
   keywords: [
     "Luxury Marble",
     "Italian Carrara",
-    "RK Marble",
+    "Sharma Marble",
     "Somany Ceramics",
-    "Nero Marquina",
-    "Emerald Onyx",
-    "Calacatta Viola",
-    "Taj Mahal Quartzite",
-    "3D Showroom",
+    "Tiles",
+    "Granites",
     "Architectural Stone",
   ],
   metadataBase: new URL("http://localhost:3000"),
   openGraph: {
-    title: "Aurelia Marmi | Premium Luxury Marble & Natural Stone",
+    title: "Sharma Marble | Premium Tiles & Natural Stone",
     description:
-      "Immerse yourself in world-class natural stone craftsmanship. Explore our interactive 3D showroom, procedural marble slab configurators, and AI room visuals.",
-    url: "https://aureliamarmi.com",
-    siteName: "Aurelia Marmi",
+      "Explore our vast collection of premium tiles, granites, and natural stone.",
+    url: "https://sharmamarble.com",
+    siteName: "Sharma Marble",
     locale: "en_US",
     type: "website",
   },
