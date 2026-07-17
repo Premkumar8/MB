@@ -619,7 +619,7 @@ export default function AdminPage() {
                   <div className="w-full shrink-0 p-8 space-y-4 bg-gradient-to-br from-[#1c1c20] to-[#0d0d0f] flex flex-col justify-center min-h-[180px]">
                     <span className="text-[10px] text-white/40 uppercase tracking-[0.2em] font-bold">Total Quotes Submitted</span>
                     <div>
-                      <p className="text-4xl font-serif font-bold text-gold-gradient">142 Inquiries</p>
+                      <p className="text-3xl font-serif font-bold text-gold-gradient">142 Inquiries</p>
                       <p className="text-xs text-green-400 font-semibold mt-2.5 flex items-center space-x-1">
                         <span>↑ +12.4%</span>
                         <span className="text-white/40 font-normal">increase vs last month</span>
@@ -631,7 +631,7 @@ export default function AdminPage() {
                   <div className="w-full shrink-0 p-8 space-y-4 bg-gradient-to-br from-[#1c1c20] to-[#0d0d0f] flex flex-col justify-center min-h-[180px]">
                     <span className="text-[10px] text-white/40 uppercase tracking-[0.2em] font-bold">AI Room Visualizer Runs</span>
                     <div>
-                      <p className="text-4xl font-serif font-bold text-gold-gradient">2,845 Generations</p>
+                      <p className="text-3xl font-serif font-bold text-gold-gradient">2,845 Generations</p>
                       <p className="text-xs text-green-400 font-semibold mt-2.5 flex items-center space-x-1">
                         <span>↑ +44.1%</span>
                         <span className="text-white/40 font-normal">accelerated user engagement</span>
@@ -643,7 +643,7 @@ export default function AdminPage() {
                   <div className="w-full shrink-0 p-8 space-y-4 bg-gradient-to-br from-[#1c1c20] to-[#0d0d0f] flex flex-col justify-center min-h-[180px]">
                     <span className="text-[10px] text-white/40 uppercase tracking-[0.2em] font-bold">3D Showroom Hotspots Clicked</span>
                     <div>
-                      <p className="text-4xl font-serif font-bold text-gold-gradient">1,902 Inspections</p>
+                      <p className="text-3xl font-serif font-bold text-gold-gradient">1,902 Inspections</p>
                       <p className="text-xs text-gold-500/80 font-semibold mt-2.5 flex items-center space-x-1">
                         <span>• Stable Mappings</span>
                         <span className="text-white/40 font-normal">extended user session durations</span>

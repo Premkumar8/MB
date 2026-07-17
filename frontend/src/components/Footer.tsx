@@ -16,16 +16,14 @@ export default function Footer() {
         
         {/* Brand Column */}
         <div className="space-y-6">
-          <div className="flex items-center space-x-2">
-            <span className="font-serif text-2xl tracking-[0.2em] uppercase font-bold text-white">
-              Aurelia
+            <span className="font-serif text-2xl tracking-[0.25em] uppercase font-bold text-white">
+              Sharma
             </span>
             <span className="font-sans text-[8px] tracking-[0.4em] uppercase text-gold-500 pt-1.5 font-light">
-              Marmi
+              Marble
             </span>
-          </div>
           <p className="text-white/50 text-xs leading-relaxed max-w-sm">
-            Curators of high-fidelity Italian Carrara, exotic Brazilian Quartzites, and backlit Iranian Onyx slabs. Tailored for signature architectural landmarks and luxury residences worldwide.
+            Sharma Marble Trading Company is a leading supplier of Ceramic Tiles, Granites, and Italian marbles for architects, engineers, builders and clients. Established in 1980.
           </p>
           <div className="flex space-x-4 pt-2">
             <a
@@ -50,87 +48,79 @@ export default function Footer() {
         {/* Navigation Links Column */}
         <div className="space-y-6">
           <h4 className="text-xs uppercase tracking-[0.25em] text-gold-500 font-semibold">
-            Collections
+            Branded Products
           </h4>
           <ul className="space-y-3.5 text-xs text-white/60">
             <li>
-              <Link href="/collections?category=Marble" className="hover:text-white transition-colors duration-200 flex items-center">
-                <span>Carrara & Fine Marble</span>
-                <ArrowUpRight className="w-3 h-3 ml-1 opacity-0 hover:opacity-100 transition-opacity" />
-              </Link>
+              <span className="hover:text-white transition-colors duration-200 flex items-center">
+                Hindware & Parryware
+              </span>
             </li>
             <li>
-              <Link href="/collections?category=Onyx" className="hover:text-white transition-colors duration-200 flex items-center">
-                <span>Backlit Green Onyx</span>
-              </Link>
+              <span className="hover:text-white transition-colors duration-200 flex items-center">
+                Orient Bell & Bonzer 7
+              </span>
             </li>
             <li>
-              <Link href="/collections?category=Quartzite" className="hover:text-white transition-colors duration-200 flex items-center">
-                <span>Exotic Quartzites</span>
-              </Link>
+              <span className="hover:text-white transition-colors duration-200 flex items-center">
+                RAK & Lavish Ceramics
+              </span>
             </li>
             <li>
-              <Link href="/showroom" className="hover:text-white transition-colors duration-200 flex items-center">
-                <span>Virtual 3D Galleries</span>
-              </Link>
+              <span className="hover:text-white transition-colors duration-200 flex items-center">
+                Italian Marbles & Granites
+              </span>
             </li>
           </ul>
         </div>
 
-        {/* Showrooms Column */}
+        {/* Contact Column */}
         <div className="space-y-6">
           <h4 className="text-xs uppercase tracking-[0.25em] text-gold-500 font-semibold">
-            Locations
+            Contact Us
           </h4>
           <ul className="space-y-4 text-xs text-white/60">
             <li className="flex items-start space-x-2.5">
               <MapPin className="w-4 h-4 text-gold-500 shrink-0 mt-0.5" />
               <span>
-                <strong>Milan Atelier:</strong> Via Monte Napoleone 12, Milano, IT
+                370, Thadagam Main Road, K.N.G.Pudur, Coimbatore - 641 025
               </span>
             </li>
             <li className="flex items-start space-x-2.5">
-              <MapPin className="w-4 h-4 text-gold-500 shrink-0 mt-0.5" />
-              <span>
-                <strong>Carrara Yard:</strong> Viale Galilei 40, Carrara, IT
-              </span>
+              <Mail className="w-4 h-4 text-gold-500 shrink-0 mt-0.5" />
+              <span>sharma_marbles@yahoo.in</span>
             </li>
             <li className="flex items-start space-x-2.5">
               <Phone className="w-4 h-4 text-gold-500 shrink-0 mt-0.5" />
-              <span>+39 02 8993 1102</span>
+              <span>+91 99408 82939</span>
+            </li>
+            <li className="flex items-start space-x-2.5 pt-2">
+              <span>
+                <strong>O.P. SHARMA</strong><br/>
+                Managing Director
+              </span>
             </li>
           </ul>
         </div>
 
-        {/* Private Updates Column */}
+        {/* Sister Concern Column */}
         <div className="space-y-6">
           <h4 className="text-xs uppercase tracking-[0.25em] text-gold-500 font-semibold">
-            The Aurelia Circle
+            Our Sister Concern
           </h4>
           <p className="text-white/50 text-xs leading-relaxed">
-            Subscribe to receive private viewings of newly excavated block lots and architectural stone essays.
+            <strong>SHARMA TILES AND GRANITES</strong>
           </p>
-          <form onSubmit={handleSubscribe} className="flex">
-            <input
-              type="email"
-              required
-              placeholder="YOUR EMAIL"
-              className="bg-white/5 border border-white/10 px-4 py-2.5 text-xs text-white placeholder-white/30 focus:outline-none focus:border-gold-500/60 grow transition-colors duration-300 rounded-none"
-            />
-            <button
-              type="submit"
-              className="bg-gold-500 text-black px-4 py-2.5 text-xs uppercase tracking-widest font-semibold hover:bg-white hover:text-black transition-colors duration-300 rounded-none"
-            >
-              Join
-            </button>
-          </form>
+          <p className="text-white/50 text-xs leading-relaxed">
+            Delivering the same standard of quality and customer service across our extended enterprise.
+          </p>
         </div>
 
       </div>
 
       <div className="max-w-7xl mx-auto px-6 lg:px-12 py-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-[10px] tracking-[0.2em] text-white/40 uppercase">
         <div>
-          © 2026 Aurelia Marmi. All Rights Reserved.
+          © 2026 Sharma Marble Trading Co. All Rights Reserved.
         </div>
         <div className="flex space-x-6 mt-4 md:mt-0">
           <Link href="/privacy" className="hover:text-white transition-colors duration-200">

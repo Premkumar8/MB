@@ -14,6 +14,7 @@ export interface Product {
   price: number | null;
   availability: string;
   image_url: string;
+  images?: string[]; // Array of additional images for the gallery
   glb_url: string | null;
   texture_url: string | null;
   roughness: number;

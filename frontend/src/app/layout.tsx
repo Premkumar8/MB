@@ -8,6 +8,7 @@ import SmoothScroll from "@/components/SmoothScroll";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import AiChatbot from "@/components/AiChatbot";
+import WhatsAppWidget from "@/components/WhatsAppWidget";
 
 // Load premium fonts
 const playfair = Playfair_Display({
@@ -39,6 +40,8 @@ export const metadata: Metadata = {
   keywords: [
     "Luxury Marble",
     "Italian Carrara",
+    "RK Marble",
+    "Somany Ceramics",
     "Nero Marquina",
     "Emerald Onyx",
     "Calacatta Viola",
@@ -82,6 +85,7 @@ export default function RootLayout({
                   <main className="flex-grow pt-20">{children}</main>
                   <Footer />
                   <AiChatbot />
+                  <WhatsAppWidget />
                 </div>
               </SmoothScroll>
             </AppProvider>

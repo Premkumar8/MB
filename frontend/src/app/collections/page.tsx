@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { Search, Heart, RefreshCw, Layers, MapPin, Check, Plus, Trash2, ArrowUpRight } from "lucide-react";
 import { useApp, Product } from "@/context/AppContext";
+import { fallbackProducts } from "@/data/products";
 
 // Load 3D slab viewer dynamically - Removed as requested to keep 3D Showroom as the only 3D section.
 
@@ -37,95 +39,6 @@ export default function CollectionsPage() {
   const [active3dProduct, setActive3dProduct] = useState<Product | null>(null);
   // Show Comparison Modal
   const [showCompareModal, setShowCompareModal] = useState(false);
-
-  // Resilient Static Fallback Products (in case backend isn't started yet)
-  const fallbackProducts: Product[] = [
-    {
-      id: 1,
-      name: "Carrara Gold",
-      category: "Marble",
-      origin: "Italy",
-      finish: "Polished",
-      thickness: "2cm",
-      applications: "Countertops, Wall Cladding, Bathrooms",
-      description: "Quarried from the Apuan Alps in Carrara, Italy, this legendary marble features a striking white background with prominent gold and gray veins, offering a warm and timeless elegance.",
-      price: 185.00,
-      availability: "In Stock",
-      image_url: "/static/seed/carrara_gold.jpg",
-      glb_url: "/static/seed/carrara_gold.glb",
-      texture_url: "/static/seed/textures/carrara_gold_diff.jpg",
-      roughness: 0.15,
-      metalness: 0.05,
-    },
-    {
-      id: 2,
-      name: "Nero Marquina",
-      category: "Marble",
-      origin: "Spain",
-      finish: "Polished",
-      thickness: "2cm",
-      applications: "Flooring, Accent Walls, Fireplaces",
-      description: "A high-quality black stone marble extracted from the region of Markina, Northern Spain. The deep black color contrasts sharply with white calcite veins, embodying true architectural drama.",
-      price: 140.00,
-      availability: "In Stock",
-      image_url: "/static/seed/nero_marquina.jpg",
-      glb_url: "/static/seed/nero_marquina.glb",
-      texture_url: "/static/seed/textures/nero_marquina_diff.jpg",
-      roughness: 0.12,
-      metalness: 0.1,
-    },
-    {
-      id: 3,
-      name: "Emerald Onyx",
-      category: "Onyx",
-      origin: "Iran",
-      finish: "Polished",
-      thickness: "2cm",
-      applications: "Backlit Walls, Countertops, Decorative Panels",
-      description: "A highly translucent green stone with mesmerizing bands of mint, emerald, and golden bronze. When backlit, it emits a warm, ethereal luminescence perfect for high-end boutique designs.",
-      price: 320.00,
-      availability: "Limited",
-      image_url: "/static/seed/emerald_onyx.jpg",
-      glb_url: "/static/seed/emerald_onyx.glb",
-      texture_url: "/static/seed/textures/emerald_onyx_diff.jpg",
-      roughness: 0.08,
-      metalness: 0.15,
-    },
-    {
-      id: 4,
-      name: "Calacatta Viola",
-      category: "Marble",
-      origin: "Italy",
-      finish: "Honed",
-      thickness: "3cm",
-      applications: "Kitchen Islands, Credenzas, Vanity Tops",
-      description: "One of the oldest quarried marbles, Calacatta Viola features bold, rich purple-burgundy veins flowing through a creamy white canvas. Highly sought after by modern luxury designers.",
-      price: 245.00,
-      availability: "In Stock",
-      image_url: "/static/seed/calacatta_viola.jpg",
-      glb_url: "/static/seed/calacatta_viola.glb",
-      texture_url: "/static/seed/textures/calacatta_viola_diff.jpg",
-      roughness: 0.3,
-      metalness: 0.05,
-    },
-    {
-      id: 5,
-      name: "Taj Mahal",
-      category: "Quartzite",
-      origin: "Brazil",
-      finish: "Leathered",
-      thickness: "3cm",
-      applications: "Kitchen Countertops, Outdoor Kitchens, Floors",
-      description: "Offering the look of marble with the structural strength of granite, Taj Mahal Quartzite is quarried in Brazil and exhibits soft white background tones with delicate gold-brown veining.",
-      price: 210.00,
-      availability: "In Stock",
-      image_url: "/static/seed/taj_mahal.jpg",
-      glb_url: "/static/seed/taj_mahal.glb",
-      texture_url: "/static/seed/textures/taj_mahal_diff.jpg",
-      roughness: 0.45,
-      metalness: 0.02,
-    },
-  ];
 
   useEffect(() => {
     const fetchStones = async () => {
@@ -166,168 +79,183 @@ export default function CollectionsPage() {
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-6 lg:px-12 py-12 space-y-12">
-      {/* Header */}
-      <div className="space-y-4 text-center">
-        <span className="text-[10px] tracking-[0.3em] text-gold-500 uppercase font-bold">
-          Digital Slab Yard
-        </span>
-        <h1 className="font-serif text-4xl sm:text-5xl font-light tracking-wide">
-          Exotic Natural Stone <span className="font-bold text-gold-gradient">Collections</span>
-        </h1>
-        <p className="text-xs text-black/50 dark:text-white/40 max-w-xl mx-auto leading-relaxed">
-          Filter, compare, and request samples of our custom lots. Open our interactive WebGL canvases to inspect PBR material reflections under custom point lights.
-        </p>
-      </div>
+    <div className="max-w-7xl mx-auto px-6 lg:px-12 py-12">
+      <div className="flex flex-col lg:flex-row gap-12">
+        
+        {/* ==========================================
+            LEFT SIDEBAR FILTERS
+           ========================================== */}
+        <div className="w-full lg:w-64 shrink-0 space-y-8">
+          <div className="flex items-center justify-between border-b border-black/10 dark:border-white/10 pb-4">
+            <h2 className="text-xl font-bold font-serif">Filters</h2>
+            <Layers className="w-5 h-5 text-black/40 dark:text-white/40" />
+          </div>
 
-      {/* Advanced Filter Deck */}
-      <div className="glass-premium p-6 grid grid-cols-1 md:grid-cols-5 gap-4">
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-3 top-3.5 w-4 h-4 text-black/40 dark:text-white/30" />
-          <input
-            type="text"
-            placeholder="Search stone name or origin..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-white/5 border border-black/10 dark:border-white/10 pl-9 pr-4 py-3 text-xs focus:outline-none focus:border-gold-500/60 rounded-none text-black dark:text-white"
-          />
-        </div>
+          <div className="space-y-6">
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-3 top-3 w-4 h-4 text-black/40 dark:text-white/30" />
+              <input
+                type="text"
+                placeholder="Search..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full bg-black/5 dark:bg-white/5 pl-9 pr-4 py-2.5 text-xs focus:outline-none rounded-none text-black dark:text-white"
+              />
+            </div>
 
-        {/* Category Filter */}
-        <select
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          className="bg-transparent border border-black/10 dark:border-white/10 px-4 py-3 text-xs focus:outline-none focus:border-gold-500/60 rounded-none text-black dark:text-white"
-        >
-          <option value="All">Category: All</option>
-          <option value="Marble">Marble</option>
-          <option value="Onyx">Onyx</option>
-          <option value="Quartzite">Quartzite</option>
-        </select>
-
-        {/* Origin Filter */}
-        <select
-          value={selectedOrigin}
-          onChange={(e) => setSelectedOrigin(e.target.value)}
-          className="bg-transparent border border-black/10 dark:border-white/10 px-4 py-3 text-xs focus:outline-none focus:border-gold-500/60 rounded-none text-black dark:text-white"
-        >
-          <option value="All">Origin: All</option>
-          <option value="Italy">Italy</option>
-          <option value="Spain">Spain</option>
-          <option value="Brazil">Brazil</option>
-          <option value="Iran">Iran</option>
-        </select>
-
-        {/* Finish Filter */}
-        <select
-          value={selectedFinish}
-          onChange={(e) => setSelectedFinish(e.target.value)}
-          className="bg-transparent border border-black/10 dark:border-white/10 px-4 py-3 text-xs focus:outline-none focus:border-gold-500/60 rounded-none text-black dark:text-white"
-        >
-          <option value="All">Finish: All</option>
-          <option value="Polished">Polished</option>
-          <option value="Honed">Honed</option>
-          <option value="Leathered">Leathered</option>
-        </select>
-
-        {/* Thickness Filter */}
-        <select
-          value={selectedThickness}
-          onChange={(e) => setSelectedThickness(e.target.value)}
-          className="bg-transparent border border-black/10 dark:border-white/10 px-4 py-3 text-xs focus:outline-none focus:border-gold-500/60 rounded-none text-black dark:text-white"
-        >
-          <option value="All">Thickness: All</option>
-          <option value="2cm">2cm</option>
-          <option value="3cm">3cm</option>
-        </select>
-      </div>
-
-      {/* Grid listing */}
-      {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[1, 2, 3].map((n) => (
-            <div key={n} className="h-96 shimmer-bg border border-white/5"></div>
-          ))}
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {filteredProducts.map((stone) => {
-            const isFav = isInWishlist(stone.id);
-            const isComp = isInCompareList(stone.id);
-            const inSample = isInSampleCart(stone.id);
-
-            return (
-              <div
-                key={stone.id}
-                className="group relative border border-black/5 dark:border-white/5 bg-[#fafafa] dark:bg-[#0c0c0e] hover:border-gold-500/30 transition-all duration-500 flex flex-col"
+            {/* Category */}
+            <div>
+              <h3 className="text-sm font-semibold mb-3">Category</h3>
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="w-full bg-transparent border border-black/10 dark:border-white/10 px-3 py-2 text-xs focus:outline-none focus:border-gold-500 rounded-none text-black dark:text-white"
               >
-                {/* Photo frame */}
-                <div className="relative aspect-[4/3] w-full overflow-hidden border-b border-black/5 dark:border-white/5 bg-[#ecebeb]">
-                  <img
-                    src={stone.image_url}
-                    alt={stone.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  />
-                  <div className="absolute top-3 right-3 flex space-x-2">
-                    {/* Wishlist Button */}
-                    <button
-                      onClick={() => (isFav ? removeFromWishlist(stone.id) : addToWishlist(stone))}
-                      className="p-2 glass-premium-dark text-white hover:text-gold-500 transition-colors"
-                      title="Bookmark Slab"
-                    >
-                      <Heart className={`w-3.5 h-3.5 ${isFav ? "fill-gold-500 text-gold-500" : ""}`} />
-                    </button>
-                    {/* Compare Button */}
-                    <button
-                      onClick={() => (isComp ? removeFromCompare(stone.id) : addToCompare(stone))}
-                      className={`p-2 glass-premium-dark text-white hover:text-gold-500 transition-colors ${
-                        isComp ? "text-gold-500 bg-gold-500/20" : ""
-                      }`}
-                      title="Compare specs"
-                    >
-                      <RefreshCw className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
+                <option value="All">All Categories</option>
+                <option value="Marble">Marble</option>
+                <option value="Imported Marble">Imported Marble</option>
+                <option value="Full Body Tiles">Full Body Tiles</option>
+                <option value="Wall Tiles">Wall Tiles</option>
+                <option value="PVT">PVT</option>
+              </select>
+            </div>
 
-                {/* Specs Copy */}
-                <div className="p-6 space-y-4 flex-grow flex flex-col justify-between">
-                  <div className="space-y-1.5">
-                    <div className="flex justify-between items-center text-[9px] uppercase tracking-wider text-black/50 dark:text-white/40">
-                      <span>{stone.category} • {stone.origin}</span>
-                      <span className="font-semibold text-gold-500">{stone.thickness} • {stone.finish}</span>
-                    </div>
-                    <h3 className="font-serif text-lg text-black dark:text-white group-hover:text-gold-500 transition-colors">
-                      {stone.name}
-                    </h3>
-                    <p className="text-[11px] text-black/60 dark:text-white/60 leading-relaxed line-clamp-2">
-                      {stone.description}
-                    </p>
-                  </div>
+            {/* Finish / Design */}
+            <div>
+              <h3 className="text-sm font-semibold mb-3">Finish / Design</h3>
+              <select
+                value={selectedFinish}
+                onChange={(e) => setSelectedFinish(e.target.value)}
+                className="w-full bg-transparent border border-black/10 dark:border-white/10 px-3 py-2 text-xs focus:outline-none focus:border-gold-500 rounded-none text-black dark:text-white"
+              >
+                <option value="All">All Finishes</option>
+                <option value="Polished">Polished</option>
+                <option value="Full Polished">Full Polished</option>
+                <option value="Honed">Honed</option>
+                <option value="Matte">Matte</option>
+              </select>
+            </div>
 
-                  <div className="pt-4 border-t border-black/5 dark:border-white/5 space-y-2">
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => setActive3dProduct(stone)}
-                        className="grow py-2 text-[10px] tracking-widest uppercase font-semibold border border-black/10 dark:border-white/10 hover:border-gold-500 text-black dark:text-white transition-all text-center"
-                      >
-                        Inspect Slab
-                      </button>
-                      <button
-                        onClick={() => addToSampleCart(stone)}
-                        className="px-3.5 py-2 text-[10px] tracking-widest uppercase font-semibold bg-gold-500/10 hover:bg-gold-500 hover:text-black border border-gold-500/30 text-gold-500 transition-all text-center"
-                      >
-                        {inSample ? <Check className="w-3.5 h-3.5 mx-auto" /> : <Plus className="w-3.5 h-3.5 mx-auto" />}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+            {/* Origin (Mapping to Rooms / Origin depending on data) */}
+            <div>
+              <h3 className="text-sm font-semibold mb-3">Origin</h3>
+              <select
+                value={selectedOrigin}
+                onChange={(e) => setSelectedOrigin(e.target.value)}
+                className="w-full bg-transparent border border-black/10 dark:border-white/10 px-3 py-2 text-xs focus:outline-none focus:border-gold-500 rounded-none text-black dark:text-white"
+              >
+                <option value="All">All Origins</option>
+                <option value="India">India</option>
+                <option value="Italy">Italy</option>
+                <option value="Spain">Spain</option>
+                <option value="Brazil">Brazil</option>
+              </select>
+            </div>
+
+            {/* Thickness / Size */}
+            <div>
+              <h3 className="text-sm font-semibold mb-3">Thickness / Size</h3>
+              <select
+                value={selectedThickness}
+                onChange={(e) => setSelectedThickness(e.target.value)}
+                className="w-full bg-transparent border border-black/10 dark:border-white/10 px-3 py-2 text-xs focus:outline-none focus:border-gold-500 rounded-none text-black dark:text-white"
+              >
+                <option value="All">All Sizes</option>
+                <option value="800 X 3000 mm">800 X 3000 mm</option>
+                <option value="1200 X 1800 mm">1200 X 1800 mm</option>
+                <option value="2cm">2cm</option>
+                <option value="3cm">3cm</option>
+              </select>
+            </div>
+            
+            {/* Dummy Filters for Aesthetic (Matching screenshot) */}
+            {['Application', 'Rooms', 'Pattern', 'Colour', 'Innovation', 'Series'].map((filter) => (
+               <div key={filter} className="flex items-center justify-between py-2 border-b border-black/5 dark:border-white/5 cursor-pointer hover:text-gold-500 transition-colors">
+                 <span className="text-sm">{filter}</span>
+                 <Plus className="w-4 h-4 text-black/40 dark:text-white/40" />
+               </div>
+            ))}
+
+          </div>
         </div>
-      )}
+
+        {/* ==========================================
+            RIGHT PRODUCT GRID
+           ========================================== */}
+        <div className="flex-1">
+          {/* Header */}
+          <div className="mb-8 flex flex-col sm:flex-row justify-between items-center bg-[#f9f9f9] dark:bg-[#0c0c0e] p-4 border border-black/5 dark:border-white/5 rounded-2xl">
+            <h1 className="font-serif text-3xl font-light">
+              <span className="font-bold text-gold-gradient">Collections</span>
+            </h1>
+            <div className="text-xs text-black/50 dark:text-white/40 mt-2 sm:mt-0">
+              Showing {filteredProducts.length} Products
+            </div>
+          </div>
+
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              {[1, 2, 3, 4, 5, 6].map((n) => (
+                <div key={n} className="h-96 shimmer-bg rounded-2xl"></div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              {filteredProducts.map((stone) => {
+                const isFav = isInWishlist(stone.id);
+                return (
+                  <div
+                    key={stone.id}
+                    className="group relative bg-white dark:bg-[#121212] rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-black/5 dark:border-white/5 flex flex-col"
+                  >
+                    {/* Photo area */}
+                    <div className="relative aspect-square w-full overflow-hidden bg-[#ecebeb]">
+                      <img
+                        src={stone.image_url}
+                        alt={stone.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                      />
+                      {/* Floating Heart */}
+                      <button
+                        onClick={(e) => { e.preventDefault(); isFav ? removeFromWishlist(stone.id) : addToWishlist(stone); }}
+                        className="absolute top-4 right-4 p-2.5 bg-black/50 backdrop-blur-md rounded-full text-white hover:bg-gold-500 transition-colors z-10"
+                      >
+                        <Heart className={`w-4 h-4 ${isFav ? "fill-white" : ""}`} />
+                      </button>
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-5 flex-grow flex flex-col justify-between">
+                      <div className="space-y-3">
+                        {/* Size Pill */}
+                        <div className="inline-block px-3 py-1 bg-black/5 dark:bg-white/10 rounded-full text-[10px] text-black/60 dark:text-white/60 font-medium">
+                          {stone.thickness}
+                        </div>
+                        
+                        <div>
+                          <h3 className="font-bold text-lg text-black dark:text-white line-clamp-1 group-hover:text-gold-500 transition-colors">
+                            {stone.name}
+                          </h3>
+                          <p className="text-sm text-black/50 dark:text-white/50 mt-1">{stone.category}</p>
+                        </div>
+                      </div>
+
+                      {/* Explore Button */}
+                      <Link href={`/products/${stone.id}`} className="mt-6 block">
+                        <button className="w-full py-3.5 bg-[#1a1a1a] dark:bg-[#1a1a1a] hover:bg-gold-500 dark:hover:bg-gold-500 text-white rounded-2xl text-sm font-medium transition-colors flex items-center justify-center space-x-2">
+                          <Search className="w-4 h-4 text-gold-500 group-hover:text-white" />
+                          <span>Explore Now</span>
+                        </button>
+                      </Link>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* ==========================================
           DYNAMIC LIGHTING INSPECTOR (MODAL DIALOG)

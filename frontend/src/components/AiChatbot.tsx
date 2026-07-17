@@ -88,10 +88,10 @@ export default function AiChatbot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 50, scale: 0.95 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="w-[360px] md:w-[400px] h-[520px] rounded-none shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-gold-500/20 glass-premium flex flex-col overflow-hidden mb-4"
+            className="w-[360px] md:w-[400px] h-[520px] rounded-none shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-gold-500/20 bg-[#fcfcfc] dark:bg-[#0a0a0a] flex flex-col overflow-hidden mb-4"
           >
             {/* Header */}
-            <div className="bg-black/90 dark:bg-black/90 px-5 py-4 flex justify-between items-center border-b border-gold-500/20">
+            <div className="bg-black px-5 py-4 flex justify-between items-center border-b border-gold-500/20">
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 rounded-full bg-gold-500/10 border border-gold-500 flex items-center justify-center">
                   <Sparkles className="w-4 h-4 text-gold-500" />
@@ -116,7 +116,7 @@ export default function AiChatbot() {
             {/* Chat Messages */}
             <div
               ref={scrollRef}
-              className="flex-grow p-4 overflow-y-auto space-y-4 bg-white/5 dark:bg-black/5"
+              className="flex-grow p-4 overflow-y-auto space-y-4 bg-transparent"
             >
               {messages.map((msg) => (
                 <div
@@ -126,19 +126,19 @@ export default function AiChatbot() {
                   }`}
                 >
                   <div
-                    className={`w-6 h-6 rounded-full flex items-center justify-center border text-[10px] ${
+                    className={`w-6 h-6 rounded-full flex items-center justify-center border text-[10px] shrink-0 ${
                       msg.sender === "user"
                         ? "bg-gold-500 text-black border-gold-500"
-                        : "bg-white/10 text-white border-white/10"
+                        : "bg-black text-gold-500 border-gold-500/30 dark:bg-white/10 dark:text-white dark:border-white/10"
                     }`}
                   >
                     {msg.sender === "user" ? <User className="w-3.5 h-3.5" /> : <Bot className="w-3.5 h-3.5" />}
                   </div>
                   <div
-                    className={`max-w-[75%] p-3 text-xs leading-relaxed ${
+                    className={`max-w-[75%] p-3 text-xs leading-relaxed shadow-sm ${
                       msg.sender === "user"
-                        ? "bg-gold-500/10 text-black dark:text-white border border-gold-500/30"
-                        : "bg-black/40 text-black/80 dark:text-white/80 border border-white/5"
+                        ? "bg-gold-500 text-black border border-gold-600"
+                        : "bg-white dark:bg-[#111] text-black dark:text-white border border-black/10 dark:border-white/10"
                     }`}
                   >
                     {msg.text}
@@ -148,10 +148,10 @@ export default function AiChatbot() {
 
               {isTyping && (
                 <div className="flex items-start space-x-2">
-                  <div className="w-6 h-6 rounded-full bg-white/10 text-white border border-white/10 flex items-center justify-center">
+                  <div className="w-6 h-6 rounded-full shrink-0 bg-black text-gold-500 border border-gold-500/30 dark:bg-white/10 dark:text-white dark:border-white/10 flex items-center justify-center">
                     <Bot className="w-3.5 h-3.5" />
                   </div>
-                  <div className="bg-black/40 p-3 rounded-none border border-white/5 flex space-x-1">
+                  <div className="bg-white dark:bg-[#111] p-3 shadow-sm rounded-none border border-black/10 dark:border-white/10 flex space-x-1">
                     <span className="w-1.5 h-1.5 bg-gold-500 rounded-full animate-bounce"></span>
                     <span className="w-1.5 h-1.5 bg-gold-500 rounded-full animate-bounce [animation-delay:0.2s]"></span>
                     <span className="w-1.5 h-1.5 bg-gold-500 rounded-full animate-bounce [animation-delay:0.4s]"></span>
@@ -161,10 +161,10 @@ export default function AiChatbot() {
             </div>
 
             {/* Quick Suggestions */}
-            <div className="px-4 py-2 border-t border-white/5 bg-black/10">
-              <div className="flex items-center space-x-1 mb-1.5">
+            <div className="px-4 py-3 border-t border-black/10 dark:border-white/5 bg-[#f5f5f5] dark:bg-[#111]">
+              <div className="flex items-center space-x-1 mb-2">
                 <HelpCircle className="w-3 h-3 text-gold-500" />
-                <span className="text-[9px] uppercase tracking-wider text-black/50 dark:text-white/40 font-semibold">
+                <span className="text-[9px] uppercase tracking-wider text-black/60 dark:text-white/60 font-semibold">
                   Common Queries:
                 </span>
               </div>
@@ -173,7 +173,7 @@ export default function AiChatbot() {
                   <button
                     key={idx}
                     onClick={() => handleSend(pq.q)}
-                    className="text-[10px] bg-white/5 hover:bg-gold-500/10 hover:border-gold-500/40 border border-white/10 text-black/70 dark:text-white/70 px-2 py-1 transition-all duration-300 rounded-none text-left truncate max-w-full"
+                    className="text-[10px] bg-white dark:bg-[#222] hover:bg-gold-500 hover:text-black border border-black/10 dark:border-white/10 text-black/80 dark:text-white/80 px-2 py-1 transition-all duration-300 rounded-none text-left truncate max-w-full"
                   >
                     {pq.q}
                   </button>
@@ -187,18 +187,18 @@ export default function AiChatbot() {
                 e.preventDefault();
                 handleSend(inputValue);
               }}
-              className="p-3 border-t border-white/10 bg-black/80 dark:bg-black/85 flex items-center space-x-2"
+              className="p-3 border-t border-black/10 dark:border-white/10 bg-white dark:bg-[#0a0a0a] flex items-center space-x-2"
             >
               <input
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Ask about design, cleaning, estimation..."
-                className="bg-white/5 border border-white/10 px-3 py-2 text-xs text-white placeholder-white/30 focus:outline-none focus:border-gold-500/60 grow rounded-none"
+                className="bg-[#f5f5f5] dark:bg-[#111] border border-black/10 dark:border-white/10 px-3 py-2 text-xs text-black dark:text-white placeholder-black/40 dark:placeholder-white/40 focus:outline-none focus:border-gold-500/60 grow rounded-none"
               />
               <button
                 type="submit"
-                className="bg-gold-500 text-black p-2 hover:bg-white hover:text-black transition-colors duration-300 rounded-none"
+                className="bg-gold-500 text-black p-2 hover:bg-black hover:text-gold-500 transition-colors duration-300 rounded-none border border-gold-500"
               >
                 <Send className="w-4 h-4" />
               </button>
