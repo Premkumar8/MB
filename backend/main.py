@@ -29,6 +29,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+import erp
+app.include_router(erp.router)
+
 # Create assets and uploads folder
 UPLOADS_DIR = "static/uploads"
 os.makedirs(UPLOADS_DIR, exist_ok=True)

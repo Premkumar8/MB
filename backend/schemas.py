@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional, List
+from typing import Optional, List, Dict, Any, Union
 from datetime import datetime
 
 # Token Schemas
@@ -14,7 +14,11 @@ class TokenData(BaseModel):
 class UserBase(BaseModel):
     email: EmailStr
     full_name: Optional[str] = None
-    role: Optional[str] = "admin"
+    role: Optional[str] = "staff"
+    can_manage_products: bool = False
+    can_manage_sales: bool = False
+    can_manage_customers: bool = False
+    can_manage_purchases: bool = False
 
 class UserCreate(UserBase):
     password: str
@@ -33,15 +37,16 @@ class UserResponse(UserBase):
 # Product Schemas
 class ProductBase(BaseModel):
     name: str
-    category: str
-    origin: str
-    finish: str
-    thickness: str
-    applications: str
+    category: Optional[str] = None
+    origin: Optional[str] = None
+    finish: Optional[str] = None
+    thickness: Optional[str] = None
+    applications: Optional[str] = None
     description: Optional[str] = None
     price: Optional[float] = None
-    availability: Optional[str] = "In Stock"
-    image_url: str
+    availability: Optional[str] = None
+    image_url: Optional[str] = None
+    images: Optional[Union[List[str], List[Dict[str, Any]]]] = None
     glb_url: Optional[str] = None
     texture_url: Optional[str] = None
     roughness: Optional[float] = 0.2
@@ -51,6 +56,56 @@ class ProductCreate(ProductBase):
     pass
 
 class ProductResponse(ProductBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+# Customer Schemas
+class CustomerBase(BaseModel):
+    name: str
+    email: EmailStr
+    phone: Optional[str] = None
+    company: Optional[str] = None
+
+class CustomerCreate(CustomerBase):
+    pass
+
+class CustomerResponse(CustomerBase):
+    id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+# Sale Schemas
+class SaleBase(BaseModel):
+    customer_id: int
+    total_amount: float
+    status: Optional[str] = "Pending"
+
+class SaleCreate(SaleBase):
+    pass
+
+class SaleResponse(SaleBase):
+    id: int
+    created_at: datetime
+    customer: Optional[CustomerResponse] = None
+
+    class Config:
+        from_attributes = True
+
+# Purchase Schemas
+class PurchaseBase(BaseModel):
+    supplier_name: str
+    item: str
+    cost: float
+    status: Optional[str] = "Ordered"
+
+class PurchaseCreate(PurchaseBase):
+    pass
+
+class PurchaseResponse(PurchaseBase):
     id: int
     created_at: datetime
 

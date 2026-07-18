@@ -36,19 +36,12 @@ export default function AdminPage() {
   const [authSubmitting, setAuthSubmitting] = useState(false);
 
   // Active module tab
-  const [activeTab, setActiveTab] = useState<"products" | "quotes" | "ai3d" | "analytics" | "sales" | "customers" | "purchases" | "staff">("products");
+  const [activeTab, setActiveTab] = useState<"products" | "quotes" | "ai3d" | "analytics">("products");
   const [activeSlide, setActiveSlide] = useState(0);
 
   // API Data states
   const [quotes, setQuotes] = useState<AdminQuote[]>([]);
   const [quotesLoading, setQuotesLoading] = useState(true);
-
-
-  // ERP Data states
-  const [sales, setSales] = useState<any[]>([]);
-  const [customers, setCustomers] = useState<any[]>([]);
-  const [purchases, setPurchases] = useState<any[]>([]);
-  const [staff, setStaff] = useState<any[]>([]);
 
   // AI 3D Reconstruction inputs
   const [aiImageFile, setAiImageFile] = useState<File | null>(null);
@@ -108,30 +101,6 @@ export default function AdminPage() {
       }
     };
     fetchQuotes();
-  }, [token]);
-
-
-  // Fetch ERP data
-  useEffect(() => {
-    if (!token) return;
-    const fetchErpData = async () => {
-      try {
-        const [salesRes, custRes, purchRes, staffRes] = await Promise.all([
-          fetch(`${API_URL}/api/erp/sales`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${API_URL}/api/erp/customers`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${API_URL}/api/erp/purchases`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${API_URL}/api/erp/staff`, { headers: { Authorization: `Bearer ${token}` } })
-        ]);
-        
-        if (salesRes.ok) setSales(await salesRes.json());
-        if (custRes.ok) setCustomers(await custRes.json());
-        if (purchRes.ok) setPurchases(await purchRes.json());
-        if (staffRes.ok) setStaff(await staffRes.json());
-      } catch (err) {
-        console.error("Error loading ERP data:", err);
-      }
-    };
-    fetchErpData();
   }, [token]);
 
   // Handle Quote Status Edit
