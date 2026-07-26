@@ -4,11 +4,6 @@ import "./globals.css";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { AppProvider } from "@/context/AppContext";
-import SmoothScroll from "@/components/SmoothScroll";
-import NavBar from "@/components/NavBar";
-import Footer from "@/components/Footer";
-import AiChatbot from "@/components/AiChatbot";
-import WhatsAppWidget from "@/components/WhatsAppWidget";
 
 // Load premium fonts
 const playfair = Playfair_Display({
@@ -76,15 +71,7 @@ export default function RootLayout({
         <AuthProvider>
           <ThemeProvider>
             <AppProvider>
-              <SmoothScroll>
-                <div className="flex flex-col min-h-screen relative overflow-x-hidden">
-                  <NavBar />
-                  <main className="flex-grow pt-20">{children}</main>
-                  <Footer />
-                  <AiChatbot />
-                  <WhatsAppWidget />
-                </div>
-              </SmoothScroll>
+              {children}
             </AppProvider>
           </ThemeProvider>
         </AuthProvider>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Home, 
   GraduationCap, 
@@ -17,6 +17,9 @@ import {
 } from "lucide-react";
 import { fallbackProducts } from "@/data/products";
 import { ProductCard } from "@/components/FeaturedProducts";
+import { Product } from "@/context/AppContext";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 const applications = [
   { name: "Residential Areas", icon: Home },
@@ -35,10 +38,32 @@ const applications = [
 
 export default function ApplicationAreas() {
   const [activeApp, setActiveApp] = useState<string | null>(null);
+  const [products, setProducts] = useState<Product[]>(fallbackProducts);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/products`);
+        if (res.ok) {
+          const data = await res.json();
+          const processed = data.map((item: any) => ({
+            ...item,
+            image_url: item.image_url?.startsWith("/static") ? `${API_URL}${item.image_url}` : item.image_url,
+          }));
+          if (processed.length > 0) {
+            setProducts(processed);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching products for application areas:", err);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   const filteredProducts = activeApp 
-    ? fallbackProducts.filter(p => {
-        const apps = p.applications.toLowerCase();
+    ? products.filter(p => {
+        const apps = p.applications ? p.applications.toLowerCase() : "";
         const search = activeApp.toLowerCase().replace(" areas", "").replace(" &", "");
         // Simple heuristic match
         const keywords = search.split(" ").filter(k => k.length > 2);

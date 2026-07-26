@@ -7,7 +7,7 @@ export default function WhatsAppWidget() {
   return (
     <div className="fixed bottom-6 right-24 z-40 font-sans">
       <motion.a
-        href="https://wa.me/1234567890"
+        href="https://wa.me/919940882939"
         target="_blank"
         rel="noopener noreferrer"
         whileHover={{ scale: 1.05 }}

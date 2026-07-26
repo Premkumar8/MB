@@ -606,4 +606,4 @@ if __name__ == "__main__":
     os.makedirs("static/seed/textures", exist_ok=True)
     
     # Run the application
-    uvicorn.run("main:app", host="127.0.0.1", port=9001, reload=True)
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)

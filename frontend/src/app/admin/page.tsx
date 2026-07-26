@@ -1,13 +1,23 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
-import { Lock, Sparkles, Layers, ListTodo, FileSpreadsheet, BarChart2, Plus, LogOut, ArrowRight, ShieldCheck, ChevronLeft, ChevronRight } from "lucide-react";
+import { Lock, Sparkles, Layers, ListTodo, BarChart2, Plus, LogOut, ShieldCheck, UserCircle, Search, MoreVertical, CreditCard, DollarSign, ArrowRight, Tags, Package, Grid, ChevronLeft, ChevronRight, Image as ImageIcon, Filter } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-
-// Load 3D slab viewer dynamically - Removed as requested to keep 3D Showroom as the only 3D section.
+import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+interface AdminProduct {
+  id: number;
+  name: string;
+  category: string | null;
+  origin: string | null;
+  finish: string | null;
+  price: number | null;
+  availability: string | null;
+  image_url: string | null;
+}
 
 interface AdminQuote {
   id: number;
@@ -36,19 +46,20 @@ export default function AdminPage() {
   const [authSubmitting, setAuthSubmitting] = useState(false);
 
   // Active module tab
-  const [activeTab, setActiveTab] = useState<"products" | "quotes" | "ai3d" | "analytics" | "sales" | "customers" | "purchases" | "staff">("products");
-  const [activeSlide, setActiveSlide] = useState(0);
+  const [activeTab, setActiveTab] = useState<"products" | "categories" | "quotes" | "ai3d" | "analytics">("analytics");
 
   // API Data states
   const [quotes, setQuotes] = useState<AdminQuote[]>([]);
   const [quotesLoading, setQuotesLoading] = useState(true);
 
+  const [products, setProducts] = useState<AdminProduct[]>([]);
+  const [productsLoading, setProductsLoading] = useState(true);
 
-  // ERP Data states
-  const [sales, setSales] = useState<any[]>([]);
-  const [customers, setCustomers] = useState<any[]>([]);
-  const [purchases, setPurchases] = useState<any[]>([]);
-  const [staff, setStaff] = useState<any[]>([]);
+  // Products filtering & pagination
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   // AI 3D Reconstruction inputs
   const [aiImageFile, setAiImageFile] = useState<File | null>(null);
@@ -57,7 +68,6 @@ export default function AdminPage() {
   const [aiProcessing, setAiProcessing] = useState(false);
   const [generatedGlb, setGeneratedGlb] = useState<string | null>(null);
 
-  // Handle curator login submit
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError("");
@@ -78,18 +88,17 @@ export default function AdminPage() {
         setLoginError(err.detail || "Authentication failed. Verify credentials.");
       }
     } catch (err) {
-      console.warn("Backend auth failed. Simulating local curator login bypass...", err);
+      console.warn("Backend auth failed. Simulating local login bypass...", err);
       if (email === "admin@aureliamarmi.com" && password === "aurelia2026!") {
         login("mock-jwt-token-aurelia-luxury");
       } else {
-        setLoginError("Invalid curator credentials. Use admin@aureliamarmi.com / aurelia2026!");
+        setLoginError("Invalid credentials. Use admin@aureliamarmi.com / aurelia2026!");
       }
     } finally {
       setAuthSubmitting(false);
     }
   };
 
-  // Fetch quotes list
   useEffect(() => {
     if (!token) return;
     const fetchQuotes = async () => {
@@ -107,34 +116,51 @@ export default function AdminPage() {
         setQuotesLoading(false);
       }
     };
-    fetchQuotes();
-  }, [token]);
 
-
-  // Fetch ERP data
-  useEffect(() => {
-    if (!token) return;
-    const fetchErpData = async () => {
+    const fetchProducts = async () => {
       try {
-        const [salesRes, custRes, purchRes, staffRes] = await Promise.all([
-          fetch(`${API_URL}/api/erp/sales`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${API_URL}/api/erp/customers`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${API_URL}/api/erp/purchases`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${API_URL}/api/erp/staff`, { headers: { Authorization: `Bearer ${token}` } })
-        ]);
-        
-        if (salesRes.ok) setSales(await salesRes.json());
-        if (custRes.ok) setCustomers(await custRes.json());
-        if (purchRes.ok) setPurchases(await purchRes.json());
-        if (staffRes.ok) setStaff(await staffRes.json());
+        const res = await fetch(`${API_URL}/api/products`);
+        if (res.ok) {
+          const data = await res.json();
+          setProducts(data);
+        }
       } catch (err) {
-        console.error("Error loading ERP data:", err);
+        console.error("Error loading products:", err);
+      } finally {
+        setProductsLoading(false);
       }
     };
-    fetchErpData();
+
+    fetchQuotes();
+    fetchProducts();
   }, [token]);
 
-  // Handle Quote Status Edit
+  // Derived state for products
+  const uniqueCategories = useMemo(() => {
+    return ["All", ...Array.from(new Set(products.map(p => p.category).filter(Boolean)))];
+  }, [products]);
+
+  const filteredProducts = useMemo(() => {
+    return products.filter(p => {
+      const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                            (p.origin && p.origin.toLowerCase().includes(searchQuery.toLowerCase()));
+      const matchesCategory = selectedCategory === "All" || p.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [products, searchQuery, selectedCategory]);
+
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage) || 1;
+  
+  const paginatedProducts = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return filteredProducts.slice(start, start + itemsPerPage);
+  }, [filteredProducts, currentPage]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory]);
+
   const handleUpdateQuoteStatus = async (quoteId: number, statusStr: string) => {
     try {
       const form = new FormData();
@@ -149,17 +175,14 @@ export default function AdminPage() {
         setQuotes((prev) =>
           prev.map((q) => (q.id === quoteId ? { ...q, status: statusStr } : q))
         );
-        alert("Quote lot status updated.");
       }
     } catch (err) {
-      // Local fallback
       setQuotes((prev) =>
         prev.map((q) => (q.id === quoteId ? { ...q, status: statusStr } : q))
       );
     }
   };
 
-  // AI 3D Reconstruction submit
   const handleAiReconstruct = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!aiImageFile) return;
@@ -179,16 +202,11 @@ export default function AdminPage() {
 
       if (res.ok) {
         const data = await res.json();
-        // Use processed GLB or fallback to simulate
         setGeneratedGlb(data.glb_model_url.startsWith("/static") ? `${API_URL}${data.glb_model_url}` : data.glb_model_url);
-      } else {
-        alert("Reconstruction failed.");
       }
     } catch (err) {
-      console.warn("Direct AI endpoint failed. Simulating local mesh reconstruction...", err);
-      // Simulate local 3D rendering mapping
       setTimeout(() => {
-        setGeneratedGlb("/static/seed/textures/carrara_gold_diff.jpg"); // Pass the texture directly to our slab fallback
+        setGeneratedGlb("/static/seed/textures/carrara_gold_diff.jpg");
         setAiProcessing(false);
       }, 2500);
     } finally {
@@ -214,515 +232,659 @@ export default function AdminPage() {
 
   if (loading) {
     return (
-      <div className="w-full min-h-[500px] flex items-center justify-center">
-        <Sparkles className="w-6 h-6 text-gold-500 animate-spin" />
+      <div className="w-full h-screen flex items-center justify-center bg-slate-50">
+        <Sparkles className="w-8 h-8 text-blue-600 animate-spin" />
       </div>
     );
   }
 
-  // ==========================================
-  // 1. LOGIN INTERFACE (UNAUTHENTICATED)
-  // ==========================================
   if (!token) {
     return (
-      <div className="max-w-md mx-auto px-6 py-20 page-fade-in">
-        <div className="glass-premium p-8 space-y-6">
-          <div className="text-center space-y-2">
-            <div className="w-12 h-12 rounded-full border border-gold-500/30 flex items-center justify-center mx-auto text-gold-500 mb-2">
-              <Lock className="w-5 h-5" />
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+        <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100">
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-8 text-center text-white">
+            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto backdrop-blur-sm mb-4">
+              <Lock className="w-8 h-8 text-white" />
             </div>
-            <h2 className="font-serif text-2xl tracking-wide">Curator Portal</h2>
-            <p className="text-[10px] uppercase tracking-widest text-black/50 dark:text-white/40">
-              Admin Login • Aurelia Marmi
-            </p>
+            <h2 className="text-2xl font-bold tracking-tight">Material Admin</h2>
+            <p className="text-blue-100 text-sm mt-1">Sign in to your dashboard</p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-[9px] uppercase tracking-widest font-semibold text-black/60 dark:text-white/50">
-                Email Address
-              </label>
+          <form onSubmit={handleLogin} className="p-8 space-y-5">
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Email Address</label>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@aureliamarmi.com"
-                className="w-full bg-white/5 border border-black/10 dark:border-white/10 px-4 py-3 text-xs focus:outline-none focus:border-gold-500/60 rounded-none text-black dark:text-white"
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-sm text-slate-700"
               />
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-[9px] uppercase tracking-widest font-semibold text-black/60 dark:text-white/50">
-                Password
-              </label>
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Password</label>
               <input
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="aurelia2026!"
-                className="w-full bg-white/5 border border-black/10 dark:border-white/10 px-4 py-3 text-xs focus:outline-none focus:border-gold-500/60 rounded-none text-black dark:text-white"
+                placeholder="••••••••"
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-sm text-slate-700"
               />
             </div>
 
             {loginError && (
-              <p className="text-[10px] text-red-500 tracking-wide font-semibold">{loginError}</p>
+              <p className="text-xs text-red-500 font-medium text-center">{loginError}</p>
             )}
 
             <button
               type="submit"
               disabled={authSubmitting}
-              className="w-full btn-gold-solid text-center"
+              className="w-full py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-medium transition-colors disabled:opacity-70 shadow-md"
             >
-              {authSubmitting ? "Verifying Keys..." : "Access Console"}
+              {authSubmitting ? "Authenticating..." : "Sign In"}
             </button>
+            
+            <div className="text-center pt-2">
+              <p className="text-xs text-slate-400">admin@aureliamarmi.com / aurelia2026!</p>
+            </div>
           </form>
-
-          <div className="border-t border-black/5 dark:border-white/5 pt-4 text-center">
-            <span className="text-[9px] uppercase tracking-widest text-black/40 dark:text-white/40 leading-relaxed block">
-              Default Credentials (Seeded):
-            </span>
-            <code className="text-[9px] text-gold-500 font-semibold block mt-1">
-              admin@aureliamarmi.com / aurelia2026!
-            </code>
-          </div>
         </div>
       </div>
     );
   }
 
-  // ==========================================
-  // 2. CURATOR PANEL (AUTHENTICATED)
-  // ==========================================
+  // Define sidebar navigation items
+  const navItems = [
+    { id: "analytics", label: "Dashboard", icon: BarChart2 },
+    { id: "products", label: "Products", icon: Package },
+    { id: "categories", label: "Categories", icon: Tags },
+    { id: "quotes", label: "Quote Requests", icon: ListTodo },
+    { id: "ai3d", label: "AI Reconstruct", icon: Sparkles },
+  ] as const;
+
   return (
-    <div className="max-w-7xl mx-auto px-6 lg:px-12 py-12 space-y-8 page-fade-in">
+    <div className="flex h-screen bg-slate-50 text-slate-900 font-sans overflow-hidden">
       
-      {/* Top Banner */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-black/5 dark:border-white/5 pb-6">
-        <div>
-          <span className="text-[9px] uppercase tracking-widest text-gold-500 font-bold">
-            Authorized Studio curator
-          </span>
-          <h1 className="font-serif text-3xl font-light">
-            Welcome, <span className="font-bold text-gold-gradient">Curator</span>
-          </h1>
+      {/* Sidebar - Dark Material Design */}
+      <aside className="w-64 bg-slate-900 text-white flex flex-col shadow-2xl z-20 flex-shrink-0">
+        <div className="h-16 flex items-center justify-center border-b border-white/10 px-6">
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg">
+              <Layers className="w-5 h-5 text-white" />
+            </div>
+            <span className="font-bold text-lg tracking-wide text-white">Admin Pro</span>
+          </div>
         </div>
 
-        <button
-          onClick={logout}
-          className="mt-4 md:mt-0 flex items-center space-x-1.5 border border-red-500/20 text-red-500 px-4 py-2 text-[10px] uppercase tracking-widest font-semibold hover:bg-red-500 hover:text-white transition-all rounded-none"
-        >
-          <LogOut className="w-3.5 h-3.5" />
-          <span>Exit Console</span>
-        </button>
-      </div>
-
-      {/* Grid Dashboard Tabs */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4 px-3">Pages</div>
+          
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
+                activeTab === item.id
+                  ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-900/20 font-medium"
+                  : "text-slate-300 hover:bg-slate-800 hover:text-white"
+              }`}
+            >
+              <item.icon className="w-5 h-5" />
+              <span className="text-sm">{item.label}</span>
+            </button>
+          ))}
+        </nav>
         
-        {/* Left Tab navigation */}
-        <div className="lg:col-span-3 space-y-2">
-          <button
-            onClick={() => setActiveTab("products")}
-            className={`w-full flex items-center space-x-3 px-4 py-3.5 text-xs uppercase tracking-widest font-semibold border-l-2 text-left transition-all ${
-              activeTab === "products"
-                ? "border-gold-500 text-gold-500 bg-gold-500/5 font-bold"
-                : "border-transparent text-black/60 dark:text-white/60 hover:border-gold-500/30"
-            }`}
-          >
-            <Layers className="w-4 h-4" />
-            <span>Manage Catalog</span>
-          </button>
-          
-          <button
-            onClick={() => setActiveTab("quotes")}
-            className={`w-full flex items-center space-x-3 px-4 py-3.5 text-xs uppercase tracking-widest font-semibold border-l-2 text-left transition-all ${
-              activeTab === "quotes"
-                ? "border-gold-500 text-gold-500 bg-gold-500/5 font-bold"
-                : "border-transparent text-black/60 dark:text-white/60 hover:border-gold-500/30"
-            }`}
-          >
-            <ListTodo className="w-4 h-4" />
-            <span>Quote Requests</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab("ai3d")}
-            className={`w-full flex items-center space-x-3 px-4 py-3.5 text-xs uppercase tracking-widest font-semibold border-l-2 text-left transition-all ${
-              activeTab === "ai3d"
-                ? "border-gold-500 text-gold-500 bg-gold-500/5 font-bold"
-                : "border-transparent text-black/60 dark:text-white/60 hover:border-gold-500/30"
-            }`}
-          >
-            <Sparkles className="w-4 h-4 animate-pulse" />
-            <span>AI Image-To-3D</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab("analytics")}
-            className={`w-full flex items-center space-x-3 px-4 py-3.5 text-xs uppercase tracking-widest font-semibold border-l-2 text-left transition-all ${
-              activeTab === "analytics"
-                ? "border-gold-500 text-gold-500 bg-gold-500/5 font-bold"
-                : "border-transparent text-black/60 dark:text-white/60 hover:border-gold-500/30"
-            }`}
-          >
-            <BarChart2 className="w-4 h-4" />
-            <span>Sales Analytics</span>
-          </button>
+        <div className="p-4">
+          <div className="bg-slate-800 rounded-xl p-4 border border-white/5 relative overflow-hidden">
+            <div className="absolute top-0 right-0 -mr-4 -mt-4 w-16 h-16 bg-blue-500 rounded-full opacity-10 blur-xl"></div>
+            <ShieldCheck className="w-6 h-6 text-blue-400 mb-2" />
+            <h4 className="text-sm font-semibold text-white">Pro Status</h4>
+            <p className="text-xs text-slate-400 mt-1">All systems online</p>
+          </div>
         </div>
+      </aside>
 
-        {/* Right Tab Content boxes */}
-        <div className="lg:col-span-9 glass-premium p-6 lg:p-8">
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-w-0">
+        
+        {/* Top Navbar */}
+        <header className="h-16 bg-white/60 backdrop-blur-xl border-b border-slate-200 flex items-center justify-between px-8 z-10 sticky top-0">
+          <div className="flex items-center text-sm text-slate-500">
+            <span className="opacity-70">Pages</span>
+            <span className="mx-2">/</span>
+            <span className="font-semibold text-slate-900 capitalize">{activeTab}</span>
+          </div>
+
+          <div className="flex items-center space-x-4">
+            <div className="relative hidden md:block">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input 
+                type="text" 
+                placeholder="Type here..." 
+                className="pl-9 pr-4 py-1.5 bg-slate-100 border border-transparent focus:bg-white focus:border-slate-300 focus:ring-2 focus:ring-blue-100 rounded-lg text-sm transition-all outline-none text-slate-700 w-48"
+              />
+            </div>
+            
+            <button className="text-slate-500 hover:text-slate-800 transition-colors">
+              <UserCircle className="w-5 h-5" />
+            </button>
+            <button 
+              onClick={logout}
+              className="text-slate-500 hover:text-red-600 transition-colors"
+              title="Logout"
+            >
+              <LogOut className="w-5 h-5" />
+            </button>
+          </div>
+        </header>
+
+        {/* Scrollable Content Viewport */}
+        <main className="flex-1 overflow-y-auto p-6 lg:p-8">
           
-          {/* TAB 1: MANAGE PRODUCTS CATALOG */}
-          {activeTab === "products" && (
-            <div className="space-y-6">
-              <div className="flex justify-between items-center border-b border-black/5 dark:border-white/5 pb-4">
-                <h3 className="font-serif text-xl">Slab Inventory Manager</h3>
-                <button
-                  onClick={() => alert("Form loading to insert new natural stone lots.")}
-                  className="flex items-center space-x-1 px-3 py-1.5 bg-gold-500 text-black text-[10px] uppercase tracking-widest font-bold hover:bg-white transition-colors"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Add Stone</span>
-                </button>
+          {/* TAB 1: ANALYTICS (DASHBOARD) */}
+          {activeTab === "analytics" && (
+            <div className="space-y-6 max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+              
+              {/* Top KPI Cards - Material Dashboard Style */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-4">
+                
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 relative flex flex-col justify-between">
+                  <div className="absolute -top-4 left-4 bg-slate-900 text-white rounded-xl w-12 h-12 flex items-center justify-center shadow-lg shadow-slate-900/20">
+                    <DollarSign className="w-5 h-5" />
+                  </div>
+                  <div className="text-right pt-2 pb-1">
+                    <p className="text-sm font-medium text-slate-500">Today's Money</p>
+                    <h4 className="text-2xl font-bold text-slate-800">$53,000</h4>
+                  </div>
+                  <div className="border-t border-slate-100 mt-3 pt-3">
+                    <p className="text-sm text-slate-500"><span className="text-emerald-500 font-bold">+55%</span> than last week</p>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 relative flex flex-col justify-between">
+                  <div className="absolute -top-4 left-4 bg-blue-600 text-white rounded-xl w-12 h-12 flex items-center justify-center shadow-lg shadow-blue-600/20">
+                    <UserCircle className="w-5 h-5" />
+                  </div>
+                  <div className="text-right pt-2 pb-1">
+                    <p className="text-sm font-medium text-slate-500">Today's Users</p>
+                    <h4 className="text-2xl font-bold text-slate-800">2,300</h4>
+                  </div>
+                  <div className="border-t border-slate-100 mt-3 pt-3">
+                    <p className="text-sm text-slate-500"><span className="text-emerald-500 font-bold">+3%</span> than last month</p>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 relative flex flex-col justify-between">
+                  <div className="absolute -top-4 left-4 bg-emerald-500 text-white rounded-xl w-12 h-12 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                    <ListTodo className="w-5 h-5" />
+                  </div>
+                  <div className="text-right pt-2 pb-1">
+                    <p className="text-sm font-medium text-slate-500">New Quotes</p>
+                    <h4 className="text-2xl font-bold text-slate-800">84</h4>
+                  </div>
+                  <div className="border-t border-slate-100 mt-3 pt-3">
+                    <p className="text-sm text-slate-500"><span className="text-red-500 font-bold">-2%</span> than yesterday</p>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 relative flex flex-col justify-between">
+                  <div className="absolute -top-4 left-4 bg-rose-500 text-white rounded-xl w-12 h-12 flex items-center justify-center shadow-lg shadow-rose-500/20">
+                    <CreditCard className="w-5 h-5" />
+                  </div>
+                  <div className="text-right pt-2 pb-1">
+                    <p className="text-sm font-medium text-slate-500">Sales</p>
+                    <h4 className="text-2xl font-bold text-slate-800">$103,430</h4>
+                  </div>
+                  <div className="border-t border-slate-100 mt-3 pt-3">
+                    <p className="text-sm text-slate-500"><span className="text-emerald-500 font-bold">+5%</span> than yesterday</p>
+                  </div>
+                </div>
+
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs text-black/80 dark:text-white/80">
-                  <thead className="text-[10px] uppercase tracking-widest text-black/50 dark:text-white/40 border-b border-black/5 dark:border-white/5">
-                    <tr>
-                      <th className="py-3">Name</th>
-                      <th className="py-3">Category</th>
-                      <th className="py-3">Origin</th>
-                      <th className="py-3">Finish</th>
-                      <th className="py-3">Availability</th>
-                      <th className="py-3">Est. Price</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-black/5 dark:divide-white/5">
-                    <tr>
-                      <td className="py-3.5 font-semibold">Carrara Gold</td>
-                      <td className="py-3.5">Marble</td>
-                      <td className="py-3.5">Italy</td>
-                      <td className="py-3.5">Polished</td>
-                      <td className="py-3.5 text-green-500">In Stock</td>
-                      <td className="py-3.5 text-gold-500">$185</td>
-                    </tr>
-                    <tr>
-                      <td className="py-3.5 font-semibold">Nero Marquina</td>
-                      <td className="py-3.5">Marble</td>
-                      <td className="py-3.5">Spain</td>
-                      <td className="py-3.5">Polished</td>
-                      <td className="py-3.5 text-green-500">In Stock</td>
-                      <td className="py-3.5 text-gold-500">$140</td>
-                    </tr>
-                    <tr>
-                      <td className="py-3.5 font-semibold">Emerald Onyx</td>
-                      <td className="py-3.5">Onyx</td>
-                      <td className="py-3.5">Iran</td>
-                      <td className="py-3.5">Polished</td>
-                      <td className="py-3.5 text-yellow-500">Limited</td>
-                      <td className="py-3.5 text-gold-500">$320</td>
-                    </tr>
-                    <tr>
-                      <td className="py-3.5 font-semibold">Calacatta Viola</td>
-                      <td className="py-3.5">Marble</td>
-                      <td className="py-3.5">Italy</td>
-                      <td className="py-3.5">Honed</td>
-                      <td className="py-3.5 text-green-500">In Stock</td>
-                      <td className="py-3.5 text-gold-500">$245</td>
-                    </tr>
-                  </tbody>
-                </table>
+              {/* Charts Section */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-4">
+                
+                {/* Main Area Chart */}
+                <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden relative pt-12 pb-4 px-4">
+                  {/* Colored Box for Chart Title */}
+                  <div className="absolute -top-4 left-4 right-4 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-lg shadow-blue-500/20 p-4 text-white z-10">
+                    <h4 className="font-semibold">Monthly Revenue</h4>
+                    <p className="text-xs text-blue-100 flex items-center mt-1"><ArrowRight className="w-3 h-3 mr-1" /> Performance overview</p>
+                  </div>
+                  <div className="h-72 mt-8">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={[
+                        { name: "Apr", revenue: 50 },
+                        { name: "May", revenue: 40 },
+                        { name: "Jun", revenue: 300 },
+                        { name: "Jul", revenue: 220 },
+                        { name: "Aug", revenue: 500 },
+                        { name: "Sep", revenue: 250 },
+                        { name: "Oct", revenue: 400 },
+                        { name: "Nov", revenue: 230 },
+                        { name: "Dec", revenue: 500 }
+                      ]} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                        <defs>
+                          <linearGradient id="colorRevBlue" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                        <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
+                        <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
+                        <Tooltip 
+                          contentStyle={{ backgroundColor: "#fff", borderColor: "#e2e8f0", borderRadius: "8px", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }}
+                          itemStyle={{ color: "#3b82f6", fontWeight: "bold" }}
+                        />
+                        <Area type="monotone" dataKey="revenue" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorRevBlue)" />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Bar Chart */}
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden relative pt-12 pb-4 px-4">
+                  <div className="absolute -top-4 left-4 right-4 bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl shadow-lg shadow-slate-800/20 p-4 text-white z-10">
+                    <h4 className="font-semibold">Popular Stones</h4>
+                    <p className="text-xs text-slate-300 flex items-center mt-1"><ArrowRight className="w-3 h-3 mr-1" /> Request volume</p>
+                  </div>
+                  <div className="h-72 mt-8">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={[
+                        { name: "M", views: 50 },
+                        { name: "T", views: 20 },
+                        { name: "W", views: 10 },
+                        { name: "T", views: 22 },
+                        { name: "F", views: 50 },
+                        { name: "S", views: 10 },
+                        { name: "S", views: 40 }
+                      ]} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                        <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
+                        <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
+                        <Tooltip 
+                          cursor={{ fill: "#f8fafc" }} 
+                          contentStyle={{ backgroundColor: "#fff", borderColor: "#e2e8f0", borderRadius: "8px", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }}
+                        />
+                        <Bar dataKey="views" fill="#1e293b" radius={[4, 4, 0, 0]} barSize={12} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
               </div>
             </div>
           )}
 
-          {/* TAB 2: QUOTE REQUESTS MANAGEMENT */}
-          {activeTab === "quotes" && (
-            <div className="space-y-6">
-              <h3 className="font-serif text-xl border-b border-black/5 dark:border-white/5 pb-4">
-                Client Design Quote Inquiries
-              </h3>
+          {/* TAB 2: PRODUCTS */}
+          {activeTab === "products" && (
+            <div className="space-y-6 max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 pt-4">
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden relative">
+                <div className="absolute -top-4 left-4 right-4 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-lg shadow-blue-500/20 p-5 text-white flex justify-between items-center z-10">
+                  <div>
+                    <h4 className="font-semibold text-lg">Products Overview</h4>
+                    <p className="text-xs text-blue-100 mt-1">Manage slab catalog and pricing</p>
+                  </div>
+                  <button className="flex items-center space-x-1 px-3 py-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-lg text-sm font-medium transition-colors">
+                    <Plus className="w-4 h-4" />
+                    <span>Add Product</span>
+                  </button>
+                </div>
+                
+                <div className="p-6 pt-20">
+                  {/* Filters and Search */}
+                  <div className="flex flex-col sm:flex-row gap-4 justify-between items-center mb-6">
+                    <div className="relative w-full sm:w-64">
+                      <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <input 
+                        type="text" 
+                        placeholder="Search products..." 
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 rounded-xl text-sm transition-all outline-none text-slate-700"
+                      />
+                    </div>
+                    <div className="flex items-center space-x-2 w-full sm:w-auto">
+                      <Filter className="w-4 h-4 text-slate-400" />
+                      <select 
+                        value={selectedCategory}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
+                        className="w-full sm:w-48 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
+                      >
+                        {uniqueCategories.map(cat => (
+                          <option key={cat as string} value={cat as string}>{cat as string}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
 
-              {quotesLoading ? (
-                <div className="space-y-4">
-                  {[1, 2].map((n) => (
-                    <div key={n} className="h-20 shimmer-bg border border-white/5"></div>
-                  ))}
+                  <div className="overflow-x-auto">
+                    {productsLoading ? (
+                      <div className="space-y-4">
+                        {[1, 2, 3].map((n) => (
+                          <div key={n} className="h-12 bg-slate-100 animate-pulse rounded-xl"></div>
+                        ))}
+                      </div>
+                    ) : (
+                      <table className="w-full text-left text-sm text-slate-600">
+                        <thead className="text-xs uppercase text-slate-400 font-semibold border-b border-slate-100">
+                          <tr>
+                            <th className="pb-3 px-4 w-16">Image</th>
+                            <th className="pb-3 px-4">Name</th>
+                            <th className="pb-3 px-4">Category</th>
+                            <th className="pb-3 px-4">Origin</th>
+                            <th className="pb-3 px-4">Status</th>
+                            <th className="pb-3 px-4 text-right">Price</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-50">
+                          {paginatedProducts.map((product) => (
+                            <tr key={product.id} className="hover:bg-slate-50 transition-colors">
+                              <td className="py-3 px-4">
+                                {product.image_url ? (
+                                  <img src={product.image_url.startsWith('http') ? product.image_url : `${API_URL}${product.image_url}`} alt={product.name} className="w-10 h-10 rounded-lg object-cover border border-slate-200" />
+                                ) : (
+                                  <div className="w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400">
+                                    <ImageIcon className="w-4 h-4" />
+                                  </div>
+                                )}
+                              </td>
+                              <td className="py-4 px-4 font-semibold text-slate-800">{product.name}</td>
+                              <td className="py-4 px-4">{product.category || "Uncategorized"}</td>
+                              <td className="py-4 px-4">{product.origin || "-"}</td>
+                              <td className="py-4 px-4">
+                                <span className={`px-2.5 py-1 rounded-md text-xs font-bold ${
+                                  product.availability === "In Stock" ? "bg-emerald-100 text-emerald-700" :
+                                  product.availability === "Limited" ? "bg-amber-100 text-amber-700" :
+                                  "bg-slate-100 text-slate-700"
+                                }`}>
+                                  {product.availability || "Unknown"}
+                                </span>
+                              </td>
+                              <td className="py-4 px-4 text-right font-medium">{product.price ? `$${product.price}` : "POA"}</td>
+                            </tr>
+                          ))}
+                          {paginatedProducts.length === 0 && (
+                            <tr>
+                              <td colSpan={6} className="py-8 text-center text-slate-500">No products match your filters.</td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    )}
+                  </div>
+                  
+                  {/* Pagination Controls */}
+                  {!productsLoading && filteredProducts.length > 0 && (
+                    <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-100">
+                      <p className="text-xs text-slate-500">
+                        Showing <span className="font-semibold text-slate-700">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="font-semibold text-slate-700">{Math.min(currentPage * itemsPerPage, filteredProducts.length)}</span> of <span className="font-semibold text-slate-700">{filteredProducts.length}</span> entries
+                      </p>
+                      <div className="flex space-x-2">
+                        <button 
+                          onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                          disabled={currentPage === 1}
+                          className="p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          <ChevronLeft className="w-4 h-4" />
+                        </button>
+                        <span className="flex items-center px-3 text-sm font-medium text-slate-700 bg-slate-50 rounded-lg border border-slate-200">
+                          {currentPage} / {totalPages}
+                        </span>
+                        <button 
+                          onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                          disabled={currentPage === totalPages}
+                          className="p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              ) : quotes.length === 0 ? (
-                <div className="p-12 text-center text-black/50 dark:text-white/40 text-xs">
-                  No quotes requests have been registered. Submit requests from the Request Quote page to seed values.
+              </div>
+            </div>
+          )}
+
+          {/* TAB: CATEGORIES */}
+          {activeTab === "categories" && (
+            <div className="space-y-6 max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 pt-4">
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden relative">
+                <div className="absolute -top-4 left-4 right-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl shadow-lg shadow-purple-500/20 p-5 text-white flex justify-between items-center z-10">
+                  <div>
+                    <h4 className="font-semibold text-lg">Categories Management</h4>
+                    <p className="text-xs text-purple-100 mt-1">View and manage product categories</p>
+                  </div>
+                  <button className="flex items-center space-x-1 px-3 py-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-lg text-sm font-medium transition-colors">
+                    <Plus className="w-4 h-4" />
+                    <span>Add Category</span>
+                  </button>
                 </div>
-              ) : (
-                <div className="space-y-4">
-                  {quotes.map((q) => (
-                    <div key={q.id} className="border border-black/10 dark:border-white/10 p-5 space-y-4 bg-white/5 dark:bg-black/10">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h4 className="font-serif text-base text-white">{q.client_name}</h4>
-                          <span className="text-[9px] uppercase tracking-widest text-black/50 dark:text-white/40 mt-1 block">
-                            {q.client_email} • {q.client_phone || "No Phone"}
-                          </span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <span className={`px-2 py-0.5 text-[9px] uppercase tracking-wider font-bold ${
-                            q.status === "Pending" ? "bg-yellow-950/20 text-yellow-500 border border-yellow-500/20" : "bg-green-950/20 text-green-500 border border-green-500/20"
+                
+                <div className="p-6 pt-24 overflow-x-auto">
+                  {productsLoading ? (
+                    <div className="space-y-4">
+                      {[1, 2].map((n) => (
+                        <div key={n} className="h-12 bg-slate-100 animate-pulse rounded-xl"></div>
+                      ))}
+                    </div>
+                  ) : (
+                    <table className="w-full text-left text-sm text-slate-600">
+                      <thead className="text-xs uppercase text-slate-400 font-semibold border-b border-slate-100">
+                        <tr>
+                          <th className="pb-3 px-4">Category Name</th>
+                          <th className="pb-3 px-4 text-right">Total Products</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-50">
+                        {Array.from(new Set(products.map(p => p.category).filter(Boolean))).map((categoryName) => {
+                          const count = products.filter(p => p.category === categoryName).length;
+                          return (
+                            <tr key={categoryName as string} className="hover:bg-slate-50 transition-colors">
+                              <td className="py-4 px-4 font-semibold text-slate-800 flex items-center space-x-3">
+                                <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500">
+                                  <Tags className="w-4 h-4" />
+                                </div>
+                                <span>{categoryName}</span>
+                              </td>
+                              <td className="py-4 px-4 text-right font-medium text-slate-600">{count}</td>
+                            </tr>
+                          );
+                        })}
+                        {Array.from(new Set(products.map(p => p.category).filter(Boolean))).length === 0 && (
+                          <tr>
+                            <td colSpan={2} className="py-8 text-center text-slate-500">No categories found.</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: QUOTES */}
+          {activeTab === "quotes" && (
+            <div className="space-y-6 max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 pt-4">
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden relative">
+                <div className="absolute -top-4 left-4 right-4 bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl shadow-lg shadow-slate-800/20 p-5 text-white z-10">
+                  <h4 className="font-semibold text-lg">Client Quote Requests</h4>
+                  <p className="text-xs text-slate-300 mt-1">Review and process incoming design inquiries</p>
+                </div>
+                
+                <div className="p-6 pt-24 space-y-4">
+                  {quotesLoading ? (
+                    <div className="space-y-4">
+                      {[1, 2].map((n) => (
+                        <div key={n} className="h-24 bg-slate-100 animate-pulse rounded-xl"></div>
+                      ))}
+                    </div>
+                  ) : quotes.length === 0 ? (
+                    <div className="p-12 text-center text-slate-400 text-sm border-2 border-dashed border-slate-100 rounded-xl">
+                      No quotes requests currently logged in the system.
+                    </div>
+                  ) : (
+                    quotes.map((q) => (
+                      <div key={q.id} className="border border-slate-100 rounded-xl p-5 hover:shadow-md transition-shadow bg-slate-50/50">
+                        <div className="flex justify-between items-start mb-4">
+                          <div>
+                            <h4 className="font-bold text-slate-800 text-base">{q.client_name}</h4>
+                            <p className="text-xs text-slate-500 mt-0.5">{q.client_email} • {q.client_phone || "No Phone"}</p>
+                          </div>
+                          <span className={`px-2.5 py-1 rounded-md text-xs font-bold ${
+                            q.status === "Pending" ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"
                           }`}>
                             {q.status}
                           </span>
                         </div>
-                      </div>
 
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-[10px] uppercase tracking-wider text-black/60 dark:text-white/60">
-                        <div>
-                          <span>Stone Requested</span>
-                          <p className="font-semibold text-gold-500 mt-0.5">{q.stone_name}</p>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-slate-600 bg-white p-4 rounded-lg border border-slate-100">
+                          <div>
+                            <span className="text-xs text-slate-400 uppercase font-semibold block mb-1">Stone Requested</span>
+                            <span className="font-medium text-slate-800">{q.stone_name}</span>
+                          </div>
+                          <div>
+                            <span className="text-xs text-slate-400 uppercase font-semibold block mb-1">Finish</span>
+                            <span>{q.finish || "Polished"}</span>
+                          </div>
+                          <div>
+                            <span className="text-xs text-slate-400 uppercase font-semibold block mb-1">Dimensions</span>
+                            <span>{q.dimensions || "N/A"}</span>
+                          </div>
+                          <div>
+                            <span className="text-xs text-slate-400 uppercase font-semibold block mb-1">Budget</span>
+                            <span className="text-emerald-600 font-medium">{q.budget || "N/A"}</span>
+                          </div>
                         </div>
-                        <div>
-                          <span>Finish</span>
-                          <p className="font-semibold text-white mt-0.5">{q.finish || "Polished"}</p>
-                        </div>
-                        <div>
-                          <span>Dimensions</span>
-                          <p className="font-semibold text-white mt-0.5">{q.dimensions || "N/A"}</p>
-                        </div>
-                        <div>
-                          <span>Budget Range</span>
-                          <p className="font-semibold text-white mt-0.5">{q.budget || "N/A"}</p>
+
+                        <div className="mt-4 flex space-x-3">
+                          {q.status === "Pending" && (
+                            <button
+                              onClick={() => handleUpdateQuoteStatus(q.id, "Reviewed")}
+                              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors"
+                            >
+                              Mark as Reviewed
+                            </button>
+                          )}
+                          {q.drawing_url && (
+                            <a
+                              href={`${API_URL}${q.drawing_url}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg border border-slate-200 transition-colors"
+                            >
+                              View Blueprint
+                            </a>
+                          )}
                         </div>
                       </div>
-
-                      {q.notes && (
-                        <p className="text-[11px] text-black/50 dark:text-white/40 leading-relaxed border-t border-white/5 pt-3">
-                          <strong>Client Notes:</strong> {q.notes}
-                        </p>
-                      )}
-
-                      <div className="flex space-x-3 pt-2">
-                        {q.status === "Pending" && (
-                          <button
-                            onClick={() => handleUpdateQuoteStatus(q.id, "Reviewed")}
-                            className="bg-gold-500 text-black px-4 py-1.5 text-[9px] uppercase tracking-widest font-bold hover:bg-white"
-                          >
-                            Mark Reviewed
-                          </button>
-                        )}
-                        {q.drawing_url && (
-                          <a
-                            href={`${API_URL}${q.drawing_url}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="border border-white/10 text-white px-4 py-1.5 text-[9px] uppercase tracking-widest hover:border-gold-500 hover:text-gold-500 flex items-center space-x-1"
-                          >
-                            <span>Open Blueprint Drawing</span>
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
-              )}
+              </div>
             </div>
           )}
 
-          {/* TAB 3: AI IMAGE TO 3D GENERATOR */}
+          {/* TAB 4: AI 3D */}
           {activeTab === "ai3d" && (
-            <div className="space-y-6">
-              <div className="border-b border-black/5 dark:border-white/5 pb-4">
-                <span className="text-[9px] uppercase tracking-widest text-gold-500 font-bold">Generative Mesh Pipeline</span>
-                <h3 className="font-serif text-xl mt-1">AI Stone-to-3D Reconstruction</h3>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-6 max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 pt-4">
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden relative">
+                <div className="absolute -top-4 left-4 right-4 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl shadow-lg shadow-emerald-500/20 p-5 text-white z-10">
+                  <h4 className="font-semibold text-lg">AI Mesh Pipeline</h4>
+                  <p className="text-xs text-emerald-100 mt-1">Convert 2D stone images to 3D GLB models</p>
+                </div>
                 
-                {/* Reconstruction Input Form */}
-                <form onSubmit={handleAiReconstruct} className="space-y-6">
-                  <div className="space-y-1.5">
-                    <label className="text-[9px] uppercase tracking-widest font-semibold text-black/50 dark:text-white/40">
-                      Upload Flat Stone Photo (High-Res)
-                    </label>
-                    <div className="relative border border-dashed border-white/10 p-6 text-center cursor-pointer hover:border-gold-500/50 transition-colors">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        required
-                        onChange={handleAiImageChange}
-                        className="absolute inset-0 opacity-0 cursor-pointer"
-                      />
-                      {aiImagePreview ? (
-                        <img src={aiImagePreview} className="max-h-36 mx-auto object-contain border border-white/10" />
-                      ) : (
-                        <div className="text-[10px] uppercase tracking-widest text-white/40 space-y-1">
-                          <p>Click to choose file</p>
-                          <p className="text-[8px] text-white/20">Supports PNG, JPG up to 15MB</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-[9px] uppercase tracking-widest font-semibold text-black/50 dark:text-white/40">
-                      Reconstruction Model Provider
-                    </label>
-                    <select
-                      value={modelProvider}
-                      onChange={(e) => setModelProvider(e.target.value)}
-                      className="w-full bg-transparent border border-black/10 dark:border-white/10 px-4 py-3 text-xs focus:outline-none focus:border-gold-500/60 rounded-none text-black dark:text-white"
-                    >
-                      <option value="Meshy AI">Meshy AI (Slab Reconstruction)</option>
-                      <option value="Tripo AI">Tripo AI (Textured Meshes)</option>
-                      <option value="Luma AI">Luma Genie (Rapid GLB)</option>
-                      <option value="Hunyuan3D">Hunyuan 3D (Tencent Native)</option>
-                    </select>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={aiProcessing || !aiImageFile}
-                    className="w-full btn-gold-solid text-center flex items-center justify-center space-x-2 disabled:opacity-50"
-                  >
-                    <Sparkles className="w-4 h-4" />
-                    <span>{aiProcessing ? "Reconstructing Mesh..." : "Generate GLB Model"}</span>
-                  </button>
-                </form>
-
-                {/* 3D Viewer Result Panel */}
-                <div className="border border-white/10 aspect-square bg-[#0b0b0c] relative flex items-center justify-center">
-                  {aiProcessing && (
-                    <div className="absolute inset-0 bg-[#0f0f11]/90 flex flex-col items-center justify-center z-10 text-white space-y-4">
-                      <Sparkles className="w-8 h-8 text-gold-500 animate-spin" />
-                      <div className="text-center space-y-1">
-                        <p className="text-xs uppercase tracking-widest font-semibold">Running Neural Pipeline</p>
-                        <p className="text-[9px] text-white/40">Compiling vertex points, smoothing UV coordinate reflections...</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {generatedGlb ? (
-                    <div className="w-full h-full relative flex items-center justify-center p-4">
-                      {aiImagePreview ? (
-                        <img
-                          src={aiImagePreview}
-                          alt="Reconstructed preview"
-                          className="max-w-full max-h-full object-contain border border-white/10"
+                <div className="p-6 pt-24 grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <form onSubmit={handleAiReconstruct} className="space-y-6">
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-slate-700">Source Image</label>
+                      <div className="relative border-2 border-dashed border-slate-200 hover:border-emerald-500/50 bg-slate-50 rounded-xl p-8 text-center cursor-pointer transition-colors group">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          required
+                          onChange={handleAiImageChange}
+                          className="absolute inset-0 opacity-0 cursor-pointer z-10"
                         />
-                      ) : (
-                        <div className="text-center text-white/30 text-xs">
-                          <p className="uppercase tracking-widest font-semibold">Model Compiled</p>
-                          <p className="text-[10px] text-white/20">GLB model generated successfully.</p>
-                        </div>
-                      )}
-                      <div className="absolute top-3 left-3 bg-green-500/10 border border-green-500/30 text-green-500 text-[8px] uppercase tracking-widest font-bold px-2 py-0.5">
-                        Model Ready
+                        {aiImagePreview ? (
+                          <img src={aiImagePreview} className="max-h-40 mx-auto object-contain rounded shadow-sm" />
+                        ) : (
+                          <div className="space-y-2 text-slate-400 group-hover:text-emerald-500 transition-colors">
+                            <Plus className="w-8 h-8 mx-auto" />
+                            <p className="text-sm font-medium">Click to upload flat stone photo</p>
+                            <p className="text-xs opacity-70">PNG, JPG up to 15MB</p>
+                          </div>
+                        )}
                       </div>
                     </div>
-                  ) : (
-                    <div className="text-center space-y-2 text-white/30 text-xs">
-                      <p className="uppercase tracking-widest font-semibold">No 3D Model Rendered</p>
-                      <p className="text-[10px] text-white/20">Submit the generator form to compile GLB.</p>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-slate-700">Model Engine</label>
+                      <select
+                        value={modelProvider}
+                        onChange={(e) => setModelProvider(e.target.value)}
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 text-sm text-slate-700 shadow-sm"
+                      >
+                        <option value="Meshy AI">Meshy AI (Slab Reconstruction)</option>
+                        <option value="Tripo AI">Tripo AI (Textured Meshes)</option>
+                        <option value="Luma AI">Luma Genie (Rapid GLB)</option>
+                      </select>
                     </div>
-                  )}
-                </div>
 
-              </div>
-            </div>
-          )}
-
-          {/* TAB 4: SALES ANALYTICS */}
-          {activeTab === "analytics" && (
-            <div className="space-y-6">
-              <h3 className="font-serif text-xl border-b border-black/5 dark:border-white/5 pb-4">
-                Atelier Site Conversions
-              </h3>
-
-              {/* Carousel Viewport Container */}
-              <div className="relative border border-white/10 bg-black/40 overflow-hidden group/carousel">
-                {/* Horizontal slider body */}
-                <div 
-                  className="flex transition-transform duration-500 ease-in-out" 
-                  style={{ transform: `translateX(-${activeSlide * 100}%)` }}
-                >
-                  {/* Slide 1: Quotes */}
-                  <div className="w-full shrink-0 p-8 space-y-4 bg-gradient-to-br from-[#1c1c20] to-[#0d0d0f] flex flex-col justify-center min-h-[180px]">
-                    <span className="text-[10px] text-white/40 uppercase tracking-[0.2em] font-bold">Total Quotes Submitted</span>
-                    <div>
-                      <p className="text-3xl font-serif font-bold text-gold-gradient">142 Inquiries</p>
-                      <p className="text-xs text-green-400 font-semibold mt-2.5 flex items-center space-x-1">
-                        <span>↑ +12.4%</span>
-                        <span className="text-white/40 font-normal">increase vs last month</span>
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Slide 2: AI runs */}
-                  <div className="w-full shrink-0 p-8 space-y-4 bg-gradient-to-br from-[#1c1c20] to-[#0d0d0f] flex flex-col justify-center min-h-[180px]">
-                    <span className="text-[10px] text-white/40 uppercase tracking-[0.2em] font-bold">AI Room Visualizer Runs</span>
-                    <div>
-                      <p className="text-3xl font-serif font-bold text-gold-gradient">2,845 Generations</p>
-                      <p className="text-xs text-green-400 font-semibold mt-2.5 flex items-center space-x-1">
-                        <span>↑ +44.1%</span>
-                        <span className="text-white/40 font-normal">accelerated user engagement</span>
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Slide 3: Showroom clicks */}
-                  <div className="w-full shrink-0 p-8 space-y-4 bg-gradient-to-br from-[#1c1c20] to-[#0d0d0f] flex flex-col justify-center min-h-[180px]">
-                    <span className="text-[10px] text-white/40 uppercase tracking-[0.2em] font-bold">3D Showroom Hotspots Clicked</span>
-                    <div>
-                      <p className="text-3xl font-serif font-bold text-gold-gradient">1,902 Inspections</p>
-                      <p className="text-xs text-gold-500/80 font-semibold mt-2.5 flex items-center space-x-1">
-                        <span>• Stable Mappings</span>
-                        <span className="text-white/40 font-normal">extended user session durations</span>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Left/Right Carousel Controls */}
-                <button
-                  onClick={() => setActiveSlide((prev) => (prev === 0 ? 2 : prev - 1))}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 border border-white/10 hover:border-gold-500/40 hover:text-gold-500 flex items-center justify-center transition-all duration-300 opacity-0 group-hover/carousel:opacity-100 cursor-pointer"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setActiveSlide((prev) => (prev === 2 ? 0 : prev + 1))}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 border border-white/10 hover:border-gold-500/40 hover:text-gold-500 flex items-center justify-center transition-all duration-300 opacity-0 group-hover/carousel:opacity-100 cursor-pointer"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-
-                {/* Carousel Indicator Dots */}
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
-                  {[0, 1, 2].map((idx) => (
                     <button
-                      key={idx}
-                      onClick={() => setActiveSlide(idx)}
-                      className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                        activeSlide === idx ? "bg-gold-500 w-4" : "bg-white/20 hover:bg-white/40"
-                      }`}
-                    ></button>
-                  ))}
-                </div>
-              </div>
+                      type="submit"
+                      disabled={aiProcessing || !aiImageFile}
+                      className="w-full py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-medium transition-colors disabled:opacity-50 shadow-md flex justify-center items-center space-x-2"
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      <span>{aiProcessing ? "Processing neural mesh..." : "Generate 3D Model"}</span>
+                    </button>
+                  </form>
 
-              <div className="border border-white/5 p-6 text-center text-white/50 text-xs space-y-1">
-                <ShieldCheck className="w-6 h-6 text-gold-500 mx-auto mb-2" />
-                <p className="uppercase tracking-widest text-white">Full Analytics Database Encrypted</p>
-                <p className="text-[9px] text-white/30">Compliant with GDPR & privacy metrics policies.</p>
+                  <div className="bg-slate-900 rounded-2xl shadow-inner border border-slate-800 flex items-center justify-center min-h-[300px] relative overflow-hidden">
+                    {aiProcessing && (
+                      <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm flex flex-col items-center justify-center z-20 text-white">
+                        <Sparkles className="w-8 h-8 text-emerald-400 animate-spin mb-4" />
+                        <p className="text-sm font-semibold tracking-wider">COMPILING MESH</p>
+                        <p className="text-xs text-slate-400 mt-1">Generating UV maps...</p>
+                      </div>
+                    )}
+                    
+                    {generatedGlb ? (
+                      <div className="text-center">
+                        <div className="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <ShieldCheck className="w-8 h-8" />
+                        </div>
+                        <p className="text-white font-medium">Model Compiled Successfully</p>
+                        <p className="text-slate-400 text-xs mt-1">GLB asset is ready for showroom use.</p>
+                      </div>
+                    ) : (
+                      <div className="text-center text-slate-600">
+                        <Layers className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                        <p className="text-sm font-medium">3D Viewer Sandbox</p>
+                        <p className="text-xs mt-1">Awaiting generation</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           )}
 
-        </div>
+          {/* Footer inside the content area */}
+          <footer className="mt-auto pt-8 pb-4 text-center text-sm text-slate-400">
+            &copy; {new Date().getFullYear()} Material Admin • Made with Shadcn UI & Tailwind CSS
+          </footer>
 
+        </main>
       </div>
-
     </div>
   );
 }

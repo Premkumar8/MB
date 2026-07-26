@@ -3,40 +3,76 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Sun, Moon, Sparkles, Heart, RefreshCw, Award, User } from "lucide-react";
+import { Menu, X, Sun, Moon, Heart, RefreshCw, User, ChevronDown, ArrowRight } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { useApp } from "@/context/AppContext";
 import { motion, AnimatePresence } from "framer-motion";
 
+interface SubLink {
+  name: string;
+  href: string;
+  desc: string;
+  image: string;
+}
+
+interface MenuItem {
+  name: string;
+  href: string;
+  dropdown?: SubLink[];
+}
+
+const category = (name: string) => `/collections?category=${encodeURIComponent(name)}`;
+
+const tilesDropdown: SubLink[] = [
+  { name: "Full Body Tiles", href: category("Full Body Tiles"), desc: "Vitrified tiles built for heavy-traffic floors", image: "/static/real/tile-white-grid-texture.jpg" },
+  { name: "Wall Tiles", href: category("Wall Tiles"), desc: "Elegant finishes for walls & backsplashes", image: "/static/real/tile-white-diamond-pattern.jpg" },
+  { name: "PVT Tiles", href: category("PVT"), desc: "Polished vitrified tiles, glass-like shine", image: "/static/real/lobby-reflective-building.jpg" },
+];
+
+const marblesDropdown: SubLink[] = [
+  { name: "Indian Marble", href: category("Marble"), desc: "Classic domestic marble slabs", image: "/static/real/marble-white-carrara.jpg" },
+  { name: "Imported Marble", href: category("Imported Marble"), desc: "Italian & European statuario blocks", image: "/static/real/hero-marble-staircase.jpg" },
+  { name: "Onyx", href: category("Onyx"), desc: "Translucent, richly veined natural stone", image: "/static/real/onyx-emerald-green.jpg" },
+  { name: "Quartzite", href: category("Quartzite"), desc: "Durable stone with marble-like beauty", image: "/static/real/quartzite-travertine-beige.jpg" },
+];
+
+const menuItems: MenuItem[] = [
+  { name: "Home", href: "/" },
+  { name: "Tiles", href: "/collections", dropdown: tilesDropdown },
+  { name: "Marbles", href: "/collections", dropdown: marblesDropdown },
+  { name: "Collections", href: "/collections" },
+  { name: "3D Showroom", href: "/showroom" },
+  { name: "AI Visualizer", href: "/visualizer" },
+  { name: "Blog", href: "/blog" },
+  { name: "Contact", href: "/contact" },
+];
+
 export default function NavBar() {
   const pathname = usePathname();
   const { theme, toggleTheme } = useTheme();
-  const { wishlist, compareList, sampleCart } = useApp();
+  const { wishlist, compareList } = useApp();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [openMobileGroup, setOpenMobileGroup] = useState<string | null>(null);
 
   const [activeSection, setActiveSection] = useState("hero");
 
-  // Monitor scroll for top navbar style (if any) and intersection observer for active section
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
     window.addEventListener("scroll", handleScroll);
 
-    // Setup intersection observer for scroll spy
     const sections = ["hero", "showroom", "about", "portfolio", "testimonials"];
     const observer = new IntersectionObserver(
       (entries) => {
-        // Find the most intersecting entry
         const visibleEntries = entries.filter(entry => entry.isIntersecting);
         if (visibleEntries.length > 0) {
-          // Sort by intersection ratio to get the most visible one
           visibleEntries.sort((a, b) => b.intersectionRatio - a.intersectionRatio);
           setActiveSection(visibleEntries[0].target.id);
         }
       },
-      { threshold: [0.2, 0.5, 0.8] } 
+      { threshold: [0.2, 0.5, 0.8] }
     );
 
     sections.forEach((id) => {
@@ -50,14 +86,10 @@ export default function NavBar() {
     };
   }, [pathname]);
 
-  const navLinks = [
-    { name: "Collections", href: "/collections" },
-    { name: "3D Showroom", href: "/showroom" },
-    { name: "AI Visualizer", href: "/visualizer" },
-    { name: "Blog", href: "/blog" },
-    { name: "Dealers", href: "/dealers" },
-    { name: "Quote Request", href: "/quote" },
-  ];
+  useEffect(() => {
+    setIsOpen(false);
+    setOpenMobileGroup(null);
+  }, [pathname]);
 
   const sectionLinks = [
     { name: "Top", id: "hero" },
@@ -69,10 +101,6 @@ export default function NavBar() {
 
   return (
     <>
-      {/* 
-        Top Navbar (Minimal)
-        Logo on top left, Actions on top right.
-      */}
       <nav
         className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
           scrolled
@@ -80,15 +108,13 @@ export default function NavBar() {
             : "bg-transparent py-6 border-b border-transparent"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-6 lg:px-12 flex justify-between items-center">
-          {/* Logo on Top */}
-          <Link href="/" className="flex items-center space-x-1 lg:space-x-2 group cursor-pointer h-10 lg:h-14">
+        <div className="max-w-[1600px] mx-auto px-6 lg:px-10 flex justify-between items-center gap-6">
+          {/* Logo */}
+          <Link href="/" className="flex items-center space-x-1 lg:space-x-2 group cursor-pointer h-10 lg:h-14 shrink-0">
             <div className="relative flex items-center justify-center w-10 h-10 lg:w-14 lg:h-14">
-              {/* Outer rotating ring */}
               <svg className="absolute inset-0 w-full h-full animate-[spin_10s_linear_infinite] opacity-40 group-hover:opacity-100 transition-opacity duration-700" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r="48" fill="none" stroke="url(#gold-gradient)" strokeWidth="1.5" strokeDasharray="15 5 5 5" />
               </svg>
-              {/* Inner geometric shape (Stacked Marble Slabs) */}
               <svg className="w-6 h-6 lg:w-8 lg:h-8 drop-shadow-[0_0_10px_rgba(212,175,55,0.4)] group-hover:drop-shadow-[0_0_20px_rgba(212,175,55,0.8)] group-hover:scale-110 transition-all duration-700" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                   <linearGradient id="gold-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -117,8 +143,79 @@ export default function NavBar() {
             </div>
           </Link>
 
-          {/* Right Actions (No Black Box, Just Icons) */}
-          <div className="flex items-center space-x-4 lg:space-x-6">
+          {/* Desktop Menu */}
+          <div className="hidden xl:flex items-center flex-1 justify-center">
+            {menuItems.map((item) => {
+              const isActive = pathname === item.href;
+              if (!item.dropdown) {
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={`relative px-2.5 2xl:px-3.5 py-2 text-[10.5px] 2xl:text-[11px] tracking-[0.12em] 2xl:tracking-[0.15em] uppercase font-semibold transition-colors duration-300 whitespace-nowrap ${
+                      isActive ? "text-gold-500" : "text-black/75 dark:text-white/75 hover:text-gold-500"
+                    }`}
+                  >
+                    {item.name}
+                    {isActive && (
+                      <span className="absolute left-1/2 -translate-x-1/2 -bottom-1 w-1 h-1 rounded-full bg-gold-500" />
+                    )}
+                  </Link>
+                );
+              }
+
+              return (
+                <div key={item.name} className="relative group">
+                  <Link
+                    href={item.href}
+                    className="flex items-center gap-1 px-2.5 2xl:px-3.5 py-2 text-[10.5px] 2xl:text-[11px] tracking-[0.12em] 2xl:tracking-[0.15em] uppercase font-semibold text-black/75 dark:text-white/75 group-hover:text-gold-500 transition-colors duration-300 whitespace-nowrap"
+                  >
+                    {item.name}
+                    <ChevronDown className="w-3 h-3 transition-transform duration-300 group-hover:rotate-180" />
+                  </Link>
+
+                  {/* Dropdown Panel */}
+                  <div className="invisible opacity-0 translate-y-2 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 absolute top-full left-1/2 -translate-x-1/2 pt-4 z-50">
+                    <div className="w-96 bg-white dark:bg-[#111113] border-t-2 border-gold-500 shadow-[0_20px_60px_rgba(0,0,0,0.25)] p-2">
+                      {item.dropdown.map((sub) => (
+                        <Link
+                          key={sub.name}
+                          href={sub.href}
+                          className="group/item flex items-center gap-3 px-3 py-2.5 hover:bg-gold-500/10 transition-colors duration-200"
+                        >
+                          <div className="w-14 h-14 shrink-0 rounded-md overflow-hidden border border-black/10 dark:border-white/10">
+                            <img
+                              src={sub.image}
+                              alt={sub.name}
+                              className="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-500"
+                            />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="text-xs font-bold uppercase tracking-wider text-black dark:text-white group-hover/item:text-gold-500 transition-colors">
+                              {sub.name}
+                            </div>
+                            <div className="text-[11px] text-black/50 dark:text-white/50 mt-1 leading-snug truncate">
+                              {sub.desc}
+                            </div>
+                          </div>
+                          <ArrowRight className="w-3.5 h-3.5 shrink-0 text-gold-500 opacity-0 -translate-x-1 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-200" />
+                        </Link>
+                      ))}
+                      <Link
+                        href={item.href}
+                        className="mt-1 flex items-center justify-center gap-2 bg-black dark:bg-white text-white dark:text-black py-3 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-gold-500 dark:hover:bg-gold-500 hover:text-white transition-colors duration-300"
+                      >
+                        View All {item.name}
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Right Actions */}
+          <div className="flex items-center space-x-2 lg:space-x-3 2xl:space-x-4 shrink-0">
             {/* Compare */}
             {compareList.length > 0 && (
               <Link
@@ -156,19 +253,27 @@ export default function NavBar() {
               {theme === "dark" ? <Sun className="w-4.5 h-4.5" /> : <Moon className="w-4.5 h-4.5" />}
             </button>
 
-            {/* Login / Register (Desktop) */}
+            {/* Login / Register */}
             <Link
               href="/login"
-              className="hidden lg:flex items-center space-x-1.5 border border-black/20 dark:border-white/20 hover:border-gold-500 hover:text-gold-500 transition-all duration-300 px-4 py-1.5 text-[10px] tracking-widest uppercase font-semibold text-black/80 dark:text-white/80"
+              className="hidden 2xl:flex items-center space-x-1.5 border border-black/20 dark:border-white/20 hover:border-gold-500 hover:text-gold-500 transition-all duration-300 px-4 py-1.5 text-[10px] tracking-widest uppercase font-semibold text-black/80 dark:text-white/80"
             >
               <User className="w-3.5 h-3.5" />
-              <span>Login / Register</span>
+              <span>Login</span>
+            </Link>
+
+            {/* Get a Quote CTA */}
+            <Link
+              href="/quote"
+              className="hidden lg:inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-600 text-black px-4 2xl:px-5 py-2.5 text-[10px] font-bold uppercase tracking-[0.2em] transition-all duration-300 shadow-[0_4px_20px_rgba(234,179,8,0.35)] hover:shadow-[0_4px_25px_rgba(234,179,8,0.55)] whitespace-nowrap"
+            >
+              Get a Quote
             </Link>
 
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="lg:hidden p-2 text-black dark:text-white focus:outline-none hover:text-gold-500 transition-colors"
+              className="xl:hidden p-2 text-black dark:text-white focus:outline-none hover:text-gold-500 transition-colors"
               aria-label="Toggle Menu"
             >
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -177,13 +282,10 @@ export default function NavBar() {
         </div>
       </nav>
 
-      {/* 
-        Right Side ScrollSpy Navigation 
-        Only shown on desktop, usually useful on the homepage where sections exist.
-      */}
+      {/* Right Side ScrollSpy Navigation (homepage only) */}
       {pathname === "/" && (
-        <div className="hidden lg:flex fixed right-8 top-1/2 -translate-y-1/2 z-50 flex-col space-y-6 items-end">
-          {sectionLinks.map((section, i) => {
+        <div className="hidden xl:flex fixed right-8 top-1/2 -translate-y-1/2 z-50 flex-col space-y-6 items-end">
+          {sectionLinks.map((section) => {
             const isActive = activeSection === section.id;
             return (
               <a
@@ -191,7 +293,6 @@ export default function NavBar() {
                 href={`#${section.id}`}
                 className="group flex items-center justify-end relative h-4 w-40 cursor-pointer"
               >
-                {/* Menu Name (Slides out from right) */}
                 <motion.span
                   initial={false}
                   animate={{
@@ -204,8 +305,7 @@ export default function NavBar() {
                 >
                   {section.name}
                 </motion.span>
-                
-                {/* Dot / Line Indicator */}
+
                 <div className="absolute right-0 flex items-center justify-center w-4 h-4">
                   <motion.div
                     animate={{
@@ -224,34 +324,93 @@ export default function NavBar() {
         </div>
       )}
 
-      {/* Mobile Drawer Overlay */}
+      {/* Mobile Drawer */}
       <AnimatePresence>
         {isOpen && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="lg:hidden fixed inset-0 top-[60px] w-full bg-white/95 dark:bg-black/95 backdrop-blur-md z-40 flex flex-col justify-between p-8 border-t border-black/5 dark:border-white/5"
+            className="xl:hidden fixed inset-0 top-[76px] w-full bg-white/98 dark:bg-black/98 backdrop-blur-md z-40 flex flex-col justify-between p-8 border-t border-black/5 dark:border-white/5 overflow-y-auto"
           >
-            <div className="flex flex-col space-y-6">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  onClick={() => setIsOpen(false)}
-                  className={`font-serif text-2xl tracking-wider hover:text-gold-500 transition-colors duration-300 ${
-                    pathname === link.href ? "text-gold-500" : "text-black/80 dark:text-white/80"
-                  }`}
-                >
-                  {link.name}
-                </Link>
-              ))}
+            <div className="flex flex-col space-y-2">
+              {menuItems.map((item) => {
+                if (!item.dropdown) {
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      onClick={() => setIsOpen(false)}
+                      className={`py-3 font-serif text-2xl tracking-wider hover:text-gold-500 transition-colors duration-300 border-b border-black/5 dark:border-white/5 ${
+                        pathname === item.href ? "text-gold-500" : "text-black/80 dark:text-white/80"
+                      }`}
+                    >
+                      {item.name}
+                    </Link>
+                  );
+                }
+
+                const isGroupOpen = openMobileGroup === item.name;
+                return (
+                  <div key={item.name} className="border-b border-black/5 dark:border-white/5">
+                    <button
+                      onClick={() => setOpenMobileGroup(isGroupOpen ? null : item.name)}
+                      className="w-full flex items-center justify-between py-3 font-serif text-2xl tracking-wider text-black/80 dark:text-white/80"
+                    >
+                      {item.name}
+                      <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${isGroupOpen ? "rotate-180 text-gold-500" : ""}`} />
+                    </button>
+                    <AnimatePresence>
+                      {isGroupOpen && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.25 }}
+                          className="overflow-hidden pl-4"
+                        >
+                          {item.dropdown.map((sub) => (
+                            <Link
+                              key={sub.name}
+                              href={sub.href}
+                              onClick={() => setIsOpen(false)}
+                              className="block py-2.5 text-sm tracking-wide text-black/60 dark:text-white/60 hover:text-gold-500 transition-colors"
+                            >
+                              {sub.name}
+                            </Link>
+                          ))}
+                          <Link
+                            href={item.href}
+                            onClick={() => setIsOpen(false)}
+                            className="block py-2.5 text-sm font-bold tracking-wide text-gold-500"
+                          >
+                            View All {item.name} →
+                          </Link>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                );
+              })}
             </div>
 
-            <div className="flex flex-col space-y-4 mt-12">
-              {/* Admin/Login link removed per request */}
-              <div className="text-center text-[10px] tracking-widest text-black/40 dark:text-white/40 uppercase">
+            <div className="flex flex-col space-y-4 mt-8">
+              <Link
+                href="/quote"
+                onClick={() => setIsOpen(false)}
+                className="w-full text-center bg-gold-500 text-black py-4 text-xs font-bold uppercase tracking-[0.2em]"
+              >
+                Get a Quote
+              </Link>
+              <Link
+                href="/login"
+                onClick={() => setIsOpen(false)}
+                className="w-full text-center border border-black/20 dark:border-white/20 py-4 text-xs font-bold uppercase tracking-[0.2em] text-black/80 dark:text-white/80"
+              >
+                Login / Register
+              </Link>
+              <div className="text-center text-[10px] tracking-widest text-black/40 dark:text-white/40 uppercase pt-2">
                 © 2026 Sharma Marble Trading Co.
               </div>
             </div>

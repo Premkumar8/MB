@@ -2,6 +2,9 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Default to SQLite local database, or use DATABASE_URL if present (e.g. Supabase PostgreSQL)
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./aurelia_marmi.db")

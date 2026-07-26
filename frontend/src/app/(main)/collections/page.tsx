@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Search, Heart, RefreshCw, Layers, MapPin, Check, Plus, Trash2, ArrowUpRight } from "lucide-react";
 import { useApp, Product } from "@/context/AppContext";
 import { fallbackProducts } from "@/data/products";
@@ -12,6 +13,15 @@ import { fallbackProducts } from "@/data/products";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export default function CollectionsPage() {
+  return (
+    <Suspense fallback={null}>
+      <CollectionsContent />
+    </Suspense>
+  );
+}
+
+function CollectionsContent() {
+  const searchParams = useSearchParams();
   const {
     wishlist,
     addToWishlist,
@@ -39,6 +49,11 @@ export default function CollectionsPage() {
   const [active3dProduct, setActive3dProduct] = useState<Product | null>(null);
   // Show Comparison Modal
   const [showCompareModal, setShowCompareModal] = useState(false);
+
+  useEffect(() => {
+    const categoryParam = searchParams.get("category");
+    setSelectedCategory(categoryParam || "All");
+  }, [searchParams]);
 
   useEffect(() => {
     const fetchStones = async () => {
@@ -115,6 +130,8 @@ export default function CollectionsPage() {
                 <option value="All">All Categories</option>
                 <option value="Marble">Marble</option>
                 <option value="Imported Marble">Imported Marble</option>
+                <option value="Onyx">Onyx</option>
+                <option value="Quartzite">Quartzite</option>
                 <option value="Full Body Tiles">Full Body Tiles</option>
                 <option value="Wall Tiles">Wall Tiles</option>
                 <option value="PVT">PVT</option>

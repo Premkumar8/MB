@@ -3,50 +3,66 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import NavBar from "@/components/NavBar";
-import Footer from "@/components/Footer";
-import SmoothScroll from "@/components/SmoothScroll";
-import WhatsAppWidget from "@/components/WhatsAppWidget";
 import { fallbackProducts } from "@/data/products";
-import { Product } from "@/context/AppContext";
-import { ArrowLeft, ShoppingCart, Plus, Minus, Shield, Sparkles } from "lucide-react";
+import { Product, useApp } from "@/context/AppContext";
+import { ArrowLeft, Heart, MessageSquareText, Store } from "lucide-react";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export default function ProductDetailPage() {
   const { id } = useParams();
   const router = useRouter();
+  const { wishlist, addToWishlist, removeFromWishlist } = useApp();
   const [product, setProduct] = useState<Product | null>(null);
   const [mainImage, setMainImage] = useState<string>("");
-  const [quantity, setQuantity] = useState(1);
-  const [added, setAdded] = useState(false);
 
   useEffect(() => {
-    if (id) {
-      const found = fallbackProducts.find(p => p.id === Number(id));
-      if (found) {
-        setProduct(found);
-        setMainImage(found.images?.[0] || found.image_url);
+    const fetchProduct = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/products/${id}`);
+        if (res.ok) {
+          const data = await res.json();
+          const processed: Product = {
+            ...data,
+            image_url: data.image_url.startsWith("/static") ? `${API_URL}${data.image_url}` : data.image_url,
+            images: data.images ? data.images.map((img: string) => img.startsWith("/static") ? `${API_URL}${img}` : img) : [data.image_url.startsWith("/static") ? `${API_URL}${data.image_url}` : data.image_url]
+          };
+          setProduct(processed);
+          setMainImage(processed.images?.[0] || processed.image_url);
+        } else {
+          const found = fallbackProducts.find(p => p.id === Number(id));
+          if (found) {
+            setProduct(found);
+            setMainImage(found.images?.[0] || found.image_url);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching product detail:", err);
+        const found = fallbackProducts.find(p => p.id === Number(id));
+        if (found) {
+          setProduct(found);
+          setMainImage(found.images?.[0] || found.image_url);
+        }
       }
+    };
+
+    if (id) {
+      fetchProduct();
     }
   }, [id]);
 
-  const increase = () => setQuantity(prev => prev + 1);
-  const decrease = () => setQuantity(prev => (prev > 1 ? prev - 1 : 1));
-
-  const handleAddToCart = () => {
-    setAdded(true);
-    setTimeout(() => setAdded(false), 2000);
-  };
-
   if (!product) {
     return (
-      <SmoothScroll>
-        <NavBar />
-        <div className="min-h-screen flex items-center justify-center bg-[#fcfcfc] dark:bg-[#080809] pt-24">
-          <p className="text-black dark:text-white font-serif text-2xl">Product not found.</p>
-        </div>
-      </SmoothScroll>
+      <div className="min-h-screen flex items-center justify-center bg-[#fcfcfc] dark:bg-[#080809] pt-24">
+        <p className="text-black dark:text-white font-serif text-2xl">Product not found.</p>
+      </div>
     );
   }
+
+  const isFav = wishlist.some((item) => item.id === product.id);
+  const toggleWishlist = () => {
+    isFav ? removeFromWishlist(product.id) : addToWishlist(product);
+  };
 
   let suggestedProducts = fallbackProducts
     .filter(p => p.category === product.category && p.id !== product.id)
@@ -60,18 +76,15 @@ export default function ProductDetailPage() {
   }
 
   return (
-    <SmoothScroll>
-      <div className="bg-[#fcfcfc] dark:bg-[#080809] min-h-screen text-black dark:text-white selection:bg-gold-500/30">
-        <NavBar />
-        
-        <main className="pt-32 pb-24 max-w-7xl mx-auto px-6 lg:px-12">
-          <button 
-            onClick={() => router.back()}
-            className="flex items-center space-x-2 text-black/60 dark:text-white/60 hover:text-gold-500 mb-8 transition-colors text-sm uppercase tracking-widest font-semibold"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back</span>
-          </button>
+    <div className="bg-[#fcfcfc] dark:bg-[#080809] min-h-screen text-black dark:text-white selection:bg-gold-500/30">
+      <div className="pt-8 pb-24 max-w-7xl mx-auto px-6 lg:px-12">
+        <button
+          onClick={() => router.back()}
+          className="flex items-center space-x-2 text-black/60 dark:text-white/60 hover:text-gold-500 mb-8 transition-colors text-sm uppercase tracking-widest font-semibold"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back</span>
+        </button>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
             {/* Left Column: Image Gallery */}
@@ -181,26 +194,25 @@ export default function ProductDetailPage() {
               {/* Action Buttons */}
               <div className="space-y-4 pt-4 mt-auto">
                 <div className="flex items-center space-x-4">
-                  <div className="flex items-center border border-black/20 dark:border-white/20 rounded-sm bg-transparent w-32 h-14">
-                    <button onClick={decrease} className="px-4 h-full text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white transition-colors">
-                      <Minus className="w-4 h-4" />
-                    </button>
-                    <span className="font-sans font-bold text-base w-full text-center">{quantity}</span>
-                    <button onClick={increase} className="px-4 h-full text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white transition-colors">
-                      <Plus className="w-4 h-4" />
-                    </button>
-                  </div>
-                  
-                  <button 
-                    onClick={handleAddToCart}
-                    className={`flex-1 h-14 flex items-center justify-center space-x-2 rounded-sm text-sm uppercase tracking-widest font-bold transition-all duration-300 ${added ? 'bg-green-600 text-white' : 'bg-black dark:bg-white text-white dark:text-black hover:bg-gold-500 dark:hover:bg-gold-500 hover:text-white dark:hover:text-white'}`}
+                  <Link
+                    href="/quote"
+                    className="flex-1 h-14 flex items-center justify-center space-x-2 rounded-sm text-sm uppercase tracking-widest font-bold transition-all duration-300 bg-black dark:bg-white text-white dark:text-black hover:bg-gold-500 dark:hover:bg-gold-500 hover:text-white dark:hover:text-white"
                   >
-                    <ShoppingCart className="w-5 h-5" />
-                    <span>{added ? 'Added to Cart' : 'Add to Cart'}</span>
+                    <MessageSquareText className="w-5 h-5" />
+                    <span>Get a Quote</span>
+                  </Link>
+
+                  <button
+                    onClick={toggleWishlist}
+                    className={`h-14 w-14 shrink-0 flex items-center justify-center border-2 rounded-sm transition-colors duration-300 ${isFav ? 'border-gold-500 text-gold-500' : 'border-black dark:border-white text-black dark:text-white hover:border-gold-500 hover:text-gold-500'}`}
+                    title={isFav ? "Remove from wishlist" : "Add to wishlist"}
+                  >
+                    <Heart className={`w-5 h-5 ${isFav ? 'fill-gold-500' : ''}`} />
                   </button>
                 </div>
-                
+
                 <button className="w-full h-14 flex items-center justify-center space-x-2 border-2 border-black dark:border-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors rounded-sm text-sm uppercase tracking-widest font-bold">
+                  <Store className="w-4 h-4" />
                   <span>Find a Store</span>
                 </button>
               </div>
@@ -234,11 +246,7 @@ export default function ProductDetailPage() {
               </div>
             </div>
           )}
-        </main>
-        
-        <Footer />
-        <WhatsAppWidget />
       </div>
-    </SmoothScroll>
+    </div>
   );
 }

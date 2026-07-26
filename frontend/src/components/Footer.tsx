@@ -23,7 +23,7 @@ export default function Footer() {
               Marble
             </span>
           <p className="text-white/50 text-xs leading-relaxed max-w-sm">
-            Sharma Marble Trading Company is a leading supplier of Ceramic Tiles, Granites, and Italian marbles for architects, engineers, builders and clients. Established in 1980.
+            Sharma Marble Trading Company is a leading supplier of Ceramic Tiles, Granites, and Italian marbles for architects, engineers, builders and clients. Established in 1986.
           </p>
           <div className="flex space-x-4 pt-2">
             <a
@@ -48,27 +48,37 @@ export default function Footer() {
         {/* Navigation Links Column */}
         <div className="space-y-6">
           <h4 className="text-xs uppercase tracking-[0.25em] text-gold-500 font-semibold">
-            Branded Products
+            Exclusive Tiles Showroom For
           </h4>
           <ul className="space-y-3.5 text-xs text-white/60">
             <li>
               <span className="hover:text-white transition-colors duration-200 flex items-center">
-                Hindware & Parryware
+                Lavish Ceramics
               </span>
             </li>
             <li>
               <span className="hover:text-white transition-colors duration-200 flex items-center">
-                Orient Bell & Bonzer 7
+                Parryware
               </span>
             </li>
             <li>
               <span className="hover:text-white transition-colors duration-200 flex items-center">
-                RAK & Lavish Ceramics
+                Bonzer 7 Tiles
               </span>
             </li>
             <li>
               <span className="hover:text-white transition-colors duration-200 flex items-center">
-                Italian Marbles & Granites
+                Orientbell Tiles
+              </span>
+            </li>
+            <li>
+              <span className="hover:text-white transition-colors duration-200 flex items-center">
+                Hindware Italian Collection
+              </span>
+            </li>
+            <li>
+              <span className="hover:text-white transition-colors duration-200 flex items-center">
+                RAK Ceramics
               </span>
             </li>
           </ul>
@@ -83,21 +93,29 @@ export default function Footer() {
             <li className="flex items-start space-x-2.5">
               <MapPin className="w-4 h-4 text-gold-500 shrink-0 mt-0.5" />
               <span>
-                370, Thadagam Main Road, K.N.G.Pudur, Coimbatore - 641 025
+                370, Thadagam Main Road, K.N.G. Pudur, Coimbatore - 641 025
               </span>
             </li>
             <li className="flex items-start space-x-2.5">
               <Mail className="w-4 h-4 text-gold-500 shrink-0 mt-0.5" />
               <span>sharma_marbles@yahoo.in</span>
             </li>
-            <li className="flex items-start space-x-2.5">
-              <Phone className="w-4 h-4 text-gold-500 shrink-0 mt-0.5" />
-              <span>+91 99408 82939</span>
-            </li>
             <li className="flex items-start space-x-2.5 pt-2">
               <span>
-                <strong>O.P. SHARMA</strong><br/>
-                Managing Director
+                <strong className="text-white">O.P. Sharma</strong> — Marketing Partner<br/>
+                <a href="tel:+919940882939" className="hover:text-gold-500 transition-colors">+91 99408 82939</a>
+              </span>
+            </li>
+            <li className="flex items-start space-x-2.5">
+              <span>
+                <strong className="text-white">Ranjeet</strong> — Marketing<br/>
+                <a href="tel:+918870780734" className="hover:text-gold-500 transition-colors">+91 88707 80734</a>
+              </span>
+            </li>
+            <li className="flex items-start space-x-2.5">
+              <span>
+                <strong className="text-white">Manish</strong> — Sales<br/>
+                <a href="tel:+918610827837" className="hover:text-gold-500 transition-colors">+91 86108 27837</a>
               </span>
             </li>
           </ul>
