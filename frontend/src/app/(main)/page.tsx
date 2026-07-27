@@ -288,110 +288,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* VIDEO SHOWCASE */}
-      <section className="bg-black relative z-10 overflow-hidden">
-        <div className="relative w-full aspect-[4/5] sm:aspect-video lg:aspect-[21/9] lg:max-h-[80vh]">
-          <AnimatePresence mode="wait">
-            <motion.video
-              key={showcaseVideos[activeVideo].src}
-              ref={videoRef}
-              autoPlay
-              muted={videoMuted}
-              loop
-              playsInline
-              initial={{ opacity: 0, scale: 1.05 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute inset-0 w-full h-full object-cover"
-              onPlay={() => setVideoPlaying(true)}
-              onPause={() => setVideoPlaying(false)}
-            >
-              <source src={showcaseVideos[activeVideo].src} type="video/mp4" />
-            </motion.video>
-          </AnimatePresence>
-
-          {/* Readability gradient */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/10 to-black/50 pointer-events-none" />
-
-          {/* Content overlay */}
-          <div className="absolute inset-0 flex flex-col justify-between p-6 sm:p-10 lg:p-16">
-            <motion.div
-              key={`${showcaseVideos[activeVideo].name}-caption`}
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="max-w-xl"
-            >
-              <span className="inline-flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase text-gold-500 font-bold bg-black/30 backdrop-blur-sm px-4 py-2 border border-gold-500/20">
-                <span className="w-1.5 h-1.5 rounded-full bg-gold-500 animate-pulse" />
-                Real Projects, Real Craftsmanship
-              </span>
-              <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-white mt-6 leading-tight">
-                {showcaseVideos[activeVideo].name}
-              </h2>
-              <p className="text-white/70 text-sm sm:text-base mt-4 max-w-md leading-relaxed">
-                {showcaseVideos[activeVideo].desc}
-              </p>
-            </motion.div>
-
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
-              {/* Video switcher */}
-              <div className="flex gap-6 sm:gap-8 overflow-x-auto pb-2 max-w-full">
-                {showcaseVideos.map((v, i) => {
-                  const isActive = activeVideo === i;
-                  return (
-                    <button
-                      key={v.src}
-                      onClick={() => setActiveVideo(i)}
-                      className="group text-left cursor-pointer shrink-0"
-                    >
-                      <div className="relative h-[2px] w-24 sm:w-32 bg-white/20 rounded-full overflow-hidden mb-3">
-                        <div
-                          className={`absolute inset-0 bg-gold-500 transition-all duration-500 ${
-                            isActive ? "w-full" : "w-0 group-hover:w-1/3"
-                          }`}
-                        />
-                      </div>
-                      <div className="flex items-baseline gap-2">
-                        <span className={`text-[10px] font-bold ${isActive ? "text-gold-500" : "text-white/40"}`}>
-                          0{i + 1}
-                        </span>
-                        <span
-                          className={`text-[10px] sm:text-xs tracking-[0.15em] uppercase font-bold transition-colors duration-300 ${
-                            isActive ? "text-white" : "text-white/45 group-hover:text-white/75"
-                          }`}
-                        >
-                          {v.name}
-                        </span>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Playback controls */}
-              <div className="flex gap-3">
-                <button
-                  onClick={toggleVideoPlay}
-                  aria-label={videoPlaying ? "Pause video" : "Play video"}
-                  className="w-11 h-11 flex items-center justify-center rounded-full border border-white/25 text-white hover:border-gold-500 hover:text-gold-500 bg-black/20 backdrop-blur-sm transition-colors duration-300"
-                >
-                  {videoPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
-                </button>
-                <button
-                  onClick={() => setVideoMuted(!videoMuted)}
-                  aria-label={videoMuted ? "Unmute video" : "Mute video"}
-                  className="w-11 h-11 flex items-center justify-center rounded-full border border-white/25 text-white hover:border-gold-500 hover:text-gold-500 bg-black/20 backdrop-blur-sm transition-colors duration-300"
-                >
-                  {videoMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ACHIEVEMENTS SECTION */}
       <section className="bg-white dark:bg-[#080809] py-20 lg:py-24 border-t border-b border-black/5 dark:border-white/5 relative z-10 overflow-hidden">
         {/* Decorative ambient glow */}
@@ -430,6 +326,115 @@ export default function HomePage() {
             );
           })}
         </motion.div>
+      </section>
+
+      {/* VIDEO SHOWCASE */}
+      <section className="bg-black relative z-10 overflow-hidden">
+        <div className="relative w-full min-h-[760px] sm:min-h-[820px] lg:min-h-[92vh]">
+          <AnimatePresence mode="wait">
+            <motion.video
+              key={showcaseVideos[activeVideo].src}
+              ref={videoRef}
+              autoPlay
+              muted={videoMuted}
+              loop
+              playsInline
+              initial={{ opacity: 0, scale: 1.05 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute inset-0 w-full h-full object-cover"
+              onPlay={() => setVideoPlaying(true)}
+              onPause={() => setVideoPlaying(false)}
+            >
+              <source src={showcaseVideos[activeVideo].src} type="video/mp4" />
+            </motion.video>
+          </AnimatePresence>
+
+          {/* Readability gradient */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/35 to-black/15 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-transparent to-black/55 pointer-events-none" />
+          <div
+            className="absolute inset-0 opacity-[0.08] pointer-events-none"
+            style={{
+              backgroundImage: "linear-gradient(rgba(255,255,255,0.35) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.35) 1px, transparent 1px)",
+              backgroundSize: "80px 80px",
+            }}
+          />
+          <div className="absolute inset-6 sm:inset-10 border border-white/10 pointer-events-none" />
+          <div className="absolute left-6 sm:left-10 top-6 sm:top-10 h-20 w-px bg-gold-500/80 pointer-events-none" />
+          <div className="absolute right-6 sm:right-10 bottom-6 sm:bottom-10 h-20 w-px bg-gold-500/80 pointer-events-none" />
+
+          {/* Content overlay */}
+          <div className="absolute inset-0 flex flex-col justify-between p-6 sm:p-10 lg:p-16">
+            <div className="hidden lg:flex absolute right-16 top-1/2 -translate-y-1/2 flex-col items-end gap-4">
+              {showcaseVideos.map((v, i) => {
+                const isActive = activeVideo === i;
+                return (
+                  <button
+                    key={`${v.src}-rail`}
+                    onClick={() => setActiveVideo(i)}
+                    className="group flex items-center gap-4 text-right"
+                  >
+                    <span className={`text-[10px] uppercase tracking-[0.2em] font-bold transition-colors ${isActive ? "text-white" : "text-white/35 group-hover:text-white/70"}`}>
+                      {v.name}
+                    </span>
+                    <span className={`h-px transition-all duration-300 ${isActive ? "w-14 bg-gold-500" : "w-7 bg-white/25 group-hover:w-10 group-hover:bg-gold-500/60"}`} />
+                    <span className={`text-xs font-bold tabular-nums ${isActive ? "text-gold-500" : "text-white/30"}`}>
+                      0{i + 1}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <motion.div
+              key={`${showcaseVideos[activeVideo].name}-caption`}
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="max-w-3xl pt-10 sm:pt-12 lg:pt-16"
+            >
+              <span className="inline-flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase text-gold-500 font-bold bg-black/35 backdrop-blur-sm px-4 py-2 border border-gold-500/30">
+                <span className="w-1.5 h-1.5 rounded-full bg-gold-500 animate-pulse" />
+                Real Projects, Real Craftsmanship
+              </span>
+              <h2 className="font-serif text-5xl sm:text-6xl lg:text-8xl text-white mt-8 leading-[0.95] max-w-4xl">
+                {showcaseVideos[activeVideo].name}
+              </h2>
+              <p className="text-white/75 text-base sm:text-lg mt-6 max-w-xl leading-relaxed">
+                {showcaseVideos[activeVideo].desc}
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                {["Site footage", "Showroom picks", "Installed finishes"].map((item) => (
+                  <span key={item} className="border border-white/15 bg-white/5 px-4 py-2 text-[10px] uppercase tracking-[0.18em] font-bold text-white/75 backdrop-blur-sm">
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </motion.div>
+
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+              {/* Playback controls */}
+              <div className="flex gap-3 ml-auto">
+                <button
+                  onClick={toggleVideoPlay}
+                  aria-label={videoPlaying ? "Pause video" : "Play video"}
+                  className="w-11 h-11 flex items-center justify-center rounded-full border border-white/25 text-white hover:border-gold-500 hover:text-gold-500 bg-black/20 backdrop-blur-sm transition-colors duration-300"
+                >
+                  {videoPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
+                </button>
+                <button
+                  onClick={() => setVideoMuted(!videoMuted)}
+                  aria-label={videoMuted ? "Unmute video" : "Mute video"}
+                  className="w-11 h-11 flex items-center justify-center rounded-full border border-white/25 text-white hover:border-gold-500 hover:text-gold-500 bg-black/20 backdrop-blur-sm transition-colors duration-300"
+                >
+                  {videoMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* PROJECT REELS */}
