@@ -2,6 +2,7 @@ import os
 import shutil
 import uuid
 import math
+import re
 from fastapi import FastAPI, Depends, HTTPException, status, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -34,8 +35,54 @@ app.include_router(erp.router)
 
 # Create assets and uploads folder
 UPLOADS_DIR = "static/uploads"
+MAX_UPLOAD_SIZE = 10 * 1024 * 1024
 os.makedirs(UPLOADS_DIR, exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+def clean_optional(value: Optional[str]) -> Optional[str]:
+    if value is None:
+        return None
+    cleaned = value.strip()
+    return cleaned or None
+
+def validate_quote_payload(
+    client_name: str,
+    client_email: str,
+    client_phone: str,
+    stone_name: str,
+    quantity: Optional[float],
+    notes: Optional[str]
+) -> tuple[str, str, str, str, Optional[str]]:
+    client_name = client_name.strip()
+    client_email = client_email.strip().lower()
+    client_phone = client_phone.strip()
+    stone_name = stone_name.strip()
+    notes = clean_optional(notes)
+
+    if len(client_name) < 2:
+        raise HTTPException(status_code=422, detail="Enter your full name.")
+    if not re.match(r"^[^\s@]+@[^\s@]+\.[^\s@]+$", client_email):
+        raise HTTPException(status_code=422, detail="Enter a valid email address.")
+    if len(re.sub(r"\D", "", client_phone)) < 10:
+        raise HTTPException(status_code=422, detail="Enter a valid phone number.")
+    if not stone_name:
+        raise HTTPException(status_code=422, detail="Select a material.")
+    if quantity is not None and quantity <= 0:
+        raise HTTPException(status_code=422, detail="Quantity must be greater than 0.")
+    if notes and len(notes) > 1000:
+        raise HTTPException(status_code=422, detail="Keep notes under 1000 characters.")
+
+    return client_name, client_email, client_phone, stone_name, notes
+
+def validate_upload(file: UploadFile, allowed: str) -> None:
+    content_type = file.content_type or ""
+    file_size = getattr(file, "size", None)
+    if file_size and file_size > MAX_UPLOAD_SIZE:
+        raise HTTPException(status_code=422, detail="Uploaded files must be 10MB or less.")
+    if allowed == "drawing" and content_type != "application/pdf" and not content_type.startswith("image/"):
+        raise HTTPException(status_code=422, detail="Architectural drawing must be a PDF or image.")
+    if allowed == "image" and not content_type.startswith("image/"):
+        raise HTTPException(status_code=422, detail="Room photo must be an image.")
 
 # ==========================================
 # SEED DATABASE ON STARTUP
@@ -422,7 +469,7 @@ def delete_product(
 async def submit_quote(
     client_name: str = Form(...),
     client_email: str = Form(...),
-    client_phone: Optional[str] = Form(None),
+    client_phone: str = Form(...),
     stone_name: str = Form(...),
     quantity: Optional[float] = Form(None),
     dimensions: Optional[str] = Form(None),
@@ -433,10 +480,22 @@ async def submit_quote(
     room_image: Optional[UploadFile] = File(None),
     db: Session = Depends(get_db)
 ):
+    client_name, client_email, client_phone, stone_name, notes = validate_quote_payload(
+        client_name,
+        client_email,
+        client_phone,
+        stone_name,
+        quantity,
+        notes
+    )
+    dimensions = clean_optional(dimensions)
+    finish = clean_optional(finish)
+    budget = clean_optional(budget)
     drawing_url = None
     room_image_url = None
 
     if drawing:
+        validate_upload(drawing, "drawing")
         ext = os.path.splitext(drawing.filename)[1]
         fname = f"drawing_{uuid.uuid4().hex}{ext}"
         path = os.path.join(UPLOADS_DIR, fname)
@@ -445,6 +504,7 @@ async def submit_quote(
         drawing_url = f"/static/uploads/{fname}"
 
     if room_image:
+        validate_upload(room_image, "image")
         ext = os.path.splitext(room_image.filename)[1]
         fname = f"room_{uuid.uuid4().hex}{ext}"
         path = os.path.join(UPLOADS_DIR, fname)

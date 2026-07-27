@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Sun, Moon, Heart, RefreshCw, User, ChevronDown, ArrowRight } from "lucide-react";
+import { Menu, X, Sun, Moon, Heart, RefreshCw, ChevronDown, ArrowRight } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { useApp } from "@/context/AppContext";
 import { motion, AnimatePresence } from "framer-motion";
@@ -250,15 +250,6 @@ export default function NavBar() {
               {theme === "dark" ? <Sun className="w-4.5 h-4.5" /> : <Moon className="w-4.5 h-4.5" />}
             </button>
 
-            {/* Login / Register */}
-            <Link
-              href="/login"
-              className="hidden 2xl:flex items-center space-x-1.5 border border-black/20 dark:border-white/20 hover:border-gold-500 hover:text-gold-500 transition-all duration-300 px-4 py-1.5 text-[10px] tracking-widest uppercase font-semibold text-black/80 dark:text-white/80"
-            >
-              <User className="w-3.5 h-3.5" />
-              <span>Login</span>
-            </Link>
-
             {/* Get a Quote CTA */}
             <Link
               href="/quote"
@@ -399,13 +390,6 @@ export default function NavBar() {
                 className="w-full text-center bg-gold-500 text-black py-4 text-xs font-bold uppercase tracking-[0.2em]"
               >
                 Get a Quote
-              </Link>
-              <Link
-                href="/login"
-                onClick={() => setIsOpen(false)}
-                className="w-full text-center border border-black/20 dark:border-white/20 py-4 text-xs font-bold uppercase tracking-[0.2em] text-black/80 dark:text-white/80"
-              >
-                Login / Register
               </Link>
               <div className="text-center text-[10px] tracking-widest text-black/40 dark:text-white/40 uppercase pt-2">
                 © 2026 Sharma Marble Trading Co.

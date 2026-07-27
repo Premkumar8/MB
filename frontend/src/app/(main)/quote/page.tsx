@@ -5,6 +5,22 @@ import { Send, Upload, CheckCircle, Clock, ShieldCheck, HelpCircle } from "lucid
 import confetti from "canvas-confetti";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const MAX_UPLOAD_SIZE = 10 * 1024 * 1024;
+
+type QuoteField =
+  | "clientName"
+  | "clientEmail"
+  | "clientPhone"
+  | "stoneName"
+  | "quantity"
+  | "dimensions"
+  | "finish"
+  | "budget"
+  | "notes"
+  | "drawingFile"
+  | "roomFile";
+
+type FormErrors = Partial<Record<QuoteField, string>>;
 
 export default function QuotePage() {
   const [formData, setFormData] = useState({
@@ -24,50 +40,107 @@ export default function QuotePage() {
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [submitError, setSubmitError] = useState("");
 
   const stoneOptions = ["Carrara Gold", "Nero Marquina", "Emerald Onyx", "Calacatta Viola", "Taj Mahal"];
   const finishOptions = ["Polished", "Honed", "Brushed", "Leathered"];
   const budgetOptions = ["Under $5k", "$5k - $10k", "$10k - $25k", "$25k - $50k", "$50k+"];
 
+  const inputClass = (field: QuoteField) =>
+    `w-full bg-white/5 border px-4 py-3 text-xs focus:outline-none focus:border-gold-500/60 rounded-none text-black dark:text-white ${
+      errors[field] ? "border-red-500/70" : "border-black/10 dark:border-white/10"
+    }`;
+
+  const errorText = (field: QuoteField) =>
+    errors[field] ? <p className="text-[10px] font-semibold uppercase tracking-wider text-red-500">{errors[field]}</p> : null;
+
+  const validateFile = (file: File | null, kind: "drawing" | "room") => {
+    if (!file) return "";
+    if (file.size > MAX_UPLOAD_SIZE) return "File must be 10MB or less.";
+    if (kind === "drawing" && file.type !== "application/pdf" && !file.type.startsWith("image/")) {
+      return "Attach a PDF or image file.";
+    }
+    if (kind === "room" && !file.type.startsWith("image/")) {
+      return "Attach an image file.";
+    }
+    return "";
+  };
+
+  const validateForm = () => {
+    const nextErrors: FormErrors = {};
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneDigits = formData.clientPhone.replace(/\D/g, "");
+
+    if (formData.clientName.trim().length < 2) nextErrors.clientName = "Enter your full name.";
+    if (!emailPattern.test(formData.clientEmail.trim())) nextErrors.clientEmail = "Enter a valid email address.";
+    if (phoneDigits.length < 10) nextErrors.clientPhone = "Enter a valid phone number.";
+    if (!formData.stoneName.trim()) nextErrors.stoneName = "Select a material.";
+    if (formData.quantity && Number(formData.quantity) <= 0) nextErrors.quantity = "Quantity must be greater than 0.";
+    if (formData.notes.length > 1000) nextErrors.notes = "Keep notes under 1000 characters.";
+
+    const drawingError = validateFile(drawingFile, "drawing");
+    const roomError = validateFile(roomFile, "room");
+    if (drawingError) nextErrors.drawingFile = drawingError;
+    if (roomError) nextErrors.roomFile = roomError;
+
+    return nextErrors;
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: undefined }));
+    setSubmitError("");
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: "drawing" | "room") => {
     const file = e.target.files?.[0] || null;
+    const field = type === "drawing" ? "drawingFile" : "roomFile";
+    const message = validateFile(file, type);
+
     if (type === "drawing") setDrawingFile(file);
     else setRoomFile(file);
+
+    setErrors((prev) => ({ ...prev, [field]: message || undefined }));
+    setSubmitError("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitError("");
+
+    const nextErrors = validateForm();
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
       const payload = new FormData();
-      payload.append("client_name", formData.clientName);
-      payload.append("client_email", formData.clientEmail);
-      payload.append("client_phone", formData.clientPhone);
-      payload.append("stone_name", formData.stoneName);
+      payload.append("client_name", formData.clientName.trim());
+      payload.append("client_email", formData.clientEmail.trim());
+      payload.append("client_phone", formData.clientPhone.trim());
+      payload.append("stone_name", formData.stoneName.trim());
       if (formData.quantity) payload.append("quantity", formData.quantity);
-      if (formData.dimensions) payload.append("dimensions", formData.dimensions);
+      if (formData.dimensions) payload.append("dimensions", formData.dimensions.trim());
       if (formData.finish) payload.append("finish", formData.finish);
       if (formData.budget) payload.append("budget", formData.budget);
-      if (formData.notes) payload.append("notes", formData.notes);
+      if (formData.notes) payload.append("notes", formData.notes.trim());
 
       if (drawingFile) payload.append("drawing", drawingFile);
       if (roomFile) payload.append("room_image", roomFile);
 
-      // Deliver to backend
       const res = await fetch(`${API_URL}/api/quotes`, {
         method: "POST",
         body: payload,
       });
 
       if (res.ok) {
+        setErrors({});
         setSuccess(true);
-        // Fire confetti for celebration
         confetti({
           particleCount: 120,
           spread: 80,
@@ -75,19 +148,12 @@ export default function QuotePage() {
           colors: ["#6366f1", "#ffffff", "#000000"],
         });
       } else {
-        const error = await res.json();
-        alert(`Error: ${error.detail || "Submission failed"}`);
+        const error = await res.json().catch(() => null);
+        setSubmitError(error?.detail || "Quote could not be saved. Please check the details and try again.");
       }
     } catch (err) {
-      console.warn("API direct connect failed. Simulating local backup quote submission...", err);
-      // Fallback local simulation
-      setSuccess(true);
-      confetti({
-        particleCount: 120,
-        spread: 80,
-        origin: { y: 0.6 },
-        colors: ["#6366f1", "#ffffff", "#000000"],
-      });
+      console.error("Quote submission failed", err);
+      setSubmitError("Could not reach the quote server. Your request was not saved. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -145,6 +211,8 @@ export default function QuotePage() {
               });
               setDrawingFile(null);
               setRoomFile(null);
+              setErrors({});
+              setSubmitError("");
             }}
             className="btn-gold-solid inline-block text-xs"
           >
@@ -153,6 +221,12 @@ export default function QuotePage() {
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="glass-premium p-8 lg:p-12 grid grid-cols-1 md:grid-cols-2 gap-6">
+          {submitError && (
+            <div className="md:col-span-2 border border-red-500/30 bg-red-500/10 px-4 py-3 text-xs font-semibold text-red-500">
+              {submitError}
+            </div>
+          )}
+
           {/* Client Details */}
           <div className="space-y-2">
             <label className="text-[10px] uppercase tracking-widest text-black/60 dark:text-white/50 font-semibold">
@@ -164,9 +238,11 @@ export default function QuotePage() {
               required
               value={formData.clientName}
               onChange={handleInputChange}
+              aria-invalid={Boolean(errors.clientName)}
               placeholder="E.g., Julian Sterling"
-              className="w-full bg-white/5 border border-black/10 dark:border-white/10 px-4 py-3 text-xs focus:outline-none focus:border-gold-500/60 rounded-none text-black dark:text-white"
+              className={inputClass("clientName")}
             />
+            {errorText("clientName")}
           </div>
 
           <div className="space-y-2">
@@ -179,23 +255,28 @@ export default function QuotePage() {
               required
               value={formData.clientEmail}
               onChange={handleInputChange}
+              aria-invalid={Boolean(errors.clientEmail)}
               placeholder="E.g., julian@sterlinginteriors.com"
-              className="w-full bg-white/5 border border-black/10 dark:border-white/10 px-4 py-3 text-xs focus:outline-none focus:border-gold-500/60 rounded-none text-black dark:text-white"
+              className={inputClass("clientEmail")}
             />
+            {errorText("clientEmail")}
           </div>
 
           <div className="space-y-2">
             <label className="text-[10px] uppercase tracking-widest text-black/60 dark:text-white/50 font-semibold">
-              Phone Number
+              Phone Number *
             </label>
             <input
               type="tel"
               name="clientPhone"
+              required
               value={formData.clientPhone}
               onChange={handleInputChange}
+              aria-invalid={Boolean(errors.clientPhone)}
               placeholder="E.g., +1 (310) 555-0199"
-              className="w-full bg-white/5 border border-black/10 dark:border-white/10 px-4 py-3 text-xs focus:outline-none focus:border-gold-500/60 rounded-none text-black dark:text-white"
+              className={inputClass("clientPhone")}
             />
+            {errorText("clientPhone")}
           </div>
 
           {/* Stone Select */}
@@ -207,7 +288,8 @@ export default function QuotePage() {
               name="stoneName"
               value={formData.stoneName}
               onChange={handleInputChange}
-              className="w-full bg-transparent border border-black/10 dark:border-white/10 px-4 py-3 text-xs focus:outline-none focus:border-gold-500/60 rounded-none text-black dark:text-white"
+              aria-invalid={Boolean(errors.stoneName)}
+              className={inputClass("stoneName").replace("bg-white/5", "bg-transparent")}
             >
               {stoneOptions.map((opt) => (
                 <option key={opt} value={opt} className="dark:bg-black">
@@ -215,6 +297,7 @@ export default function QuotePage() {
                 </option>
               ))}
             </select>
+            {errorText("stoneName")}
           </div>
 
           {/* Quantity & Dimensions */}
@@ -225,11 +308,15 @@ export default function QuotePage() {
             <input
               type="number"
               name="quantity"
+              min="0"
+              step="0.01"
               value={formData.quantity}
               onChange={handleInputChange}
+              aria-invalid={Boolean(errors.quantity)}
               placeholder="E.g., 180"
-              className="w-full bg-white/5 border border-black/10 dark:border-white/10 px-4 py-3 text-xs focus:outline-none focus:border-gold-500/60 rounded-none text-black dark:text-white"
+              className={inputClass("quantity")}
             />
+            {errorText("quantity")}
           </div>
 
           <div className="space-y-2">
@@ -242,7 +329,7 @@ export default function QuotePage() {
               value={formData.dimensions}
               onChange={handleInputChange}
               placeholder="E.g., Waterfall island 124x60"
-              className="w-full bg-white/5 border border-black/10 dark:border-white/10 px-4 py-3 text-xs focus:outline-none focus:border-gold-500/60 rounded-none text-black dark:text-white"
+              className={inputClass("dimensions")}
             />
           </div>
 
@@ -255,7 +342,7 @@ export default function QuotePage() {
               name="finish"
               value={formData.finish}
               onChange={handleInputChange}
-              className="w-full bg-transparent border border-black/10 dark:border-white/10 px-4 py-3 text-xs focus:outline-none focus:border-gold-500/60 rounded-none text-black dark:text-white"
+              className={inputClass("finish").replace("bg-white/5", "bg-transparent")}
             >
               {finishOptions.map((opt) => (
                 <option key={opt} value={opt} className="dark:bg-black">
@@ -273,7 +360,7 @@ export default function QuotePage() {
               name="budget"
               value={formData.budget}
               onChange={handleInputChange}
-              className="w-full bg-transparent border border-black/10 dark:border-white/10 px-4 py-3 text-xs focus:outline-none focus:border-gold-500/60 rounded-none text-black dark:text-white"
+              className={inputClass("budget").replace("bg-white/5", "bg-transparent")}
             >
               {budgetOptions.map((opt) => (
                 <option key={opt} value={opt} className="dark:bg-black">
@@ -303,6 +390,7 @@ export default function QuotePage() {
                 <span>{drawingFile ? `Attached: ${drawingFile.name}` : "Click to attach architectural plans (PDF/IMG)"}</span>
               </div>
             </div>
+            {errorText("drawingFile")}
           </div>
 
           {/* Room photo upload */}
@@ -322,6 +410,7 @@ export default function QuotePage() {
                 <span>{roomFile ? `Attached: ${roomFile.name}` : "Click to attach room image (JPG/PNG)"}</span>
               </div>
             </div>
+            {errorText("roomFile")}
           </div>
 
           {/* Notes */}
@@ -332,11 +421,14 @@ export default function QuotePage() {
             <textarea
               name="notes"
               rows={4}
+              maxLength={1000}
               value={formData.notes}
               onChange={handleInputChange}
+              aria-invalid={Boolean(errors.notes)}
               placeholder="Detail edge details (e.g. mitered apron), bookmatching, or structural support parameters..."
-              className="w-full bg-white/5 border border-black/10 dark:border-white/10 px-4 py-3 text-xs focus:outline-none focus:border-gold-500/60 rounded-none text-black dark:text-white"
+              className={inputClass("notes")}
             />
+            {errorText("notes")}
           </div>
 
           {/* Submit */}
