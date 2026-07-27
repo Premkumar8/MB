@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowUpRight, Heart } from "lucide-react";
-import { fallbackProducts } from "@/data/products";
+import { fallbackProducts, mergeWithFallbackProducts } from "@/data/products";
 import { Product } from "@/context/AppContext";
 import { useApp } from "@/context/AppContext";
 
@@ -24,7 +24,8 @@ export default function FeaturedProducts() {
             ...item,
             image_url: item.image_url.startsWith("/static") ? `${API_URL}${item.image_url}` : item.image_url,
           }));
-          const filtered = processed.filter((p: any) => p.category === "Full Body Tiles").reverse().slice(0, 8);
+          const merged = mergeWithFallbackProducts(processed);
+          const filtered = merged.filter((p: Product) => p.category === "Full Body Tiles").reverse().slice(0, 8);
           if (filtered.length > 0) {
             setProducts(filtered);
           }

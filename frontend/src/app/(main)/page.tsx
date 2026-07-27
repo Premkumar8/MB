@@ -10,13 +10,51 @@ import ApplicationAreas from "@/components/ApplicationAreas";
 const showcaseVideos = [
   {
     name: "Craftsmanship In Motion",
-    src: "/videos/craftsmanship-walkthrough.mp4",
-    desc: "A walkthrough of our granite and marble cladding work, installed end-to-end by our own team on site.",
+    src: "/videos/site-craftsmanship-tour.mp4",
+    desc: "A moving look through real tile and marble work, from showroom selection to installed finish.",
   },
   {
     name: "Visit Our Showroom",
     src: "/videos/showroom-storefront.mp4",
     desc: "Step outside our Coimbatore showroom — home to India's leading tile and marble brands under one roof.",
+  },
+  {
+    name: "Material Gallery",
+    src: "/videos/showroom-slab-wall-tour.mp4",
+    desc: "A fast pass through slab walls, tile displays, and surface samples arranged for hands-on selection.",
+  },
+  {
+    name: "Project Walkthrough",
+    src: "/videos/residential-floor-walkthrough.mp4",
+    desc: "Finished floor work captured in motion so the polish, joints, and room scale are easy to judge.",
+  },
+  {
+    name: "Finish Details",
+    src: "/videos/installation-finish-tour.mp4",
+    desc: "Close-up movement across final installations, highlighting surface finish and workmanship.",
+  },
+];
+
+const projectReels = [
+  {
+    name: "Tile Display Closeup",
+    src: "/videos/tile-display-closeup.mp4",
+    label: "Showroom",
+  },
+  {
+    name: "Material Bays",
+    src: "/videos/showroom-material-bays.mp4",
+    label: "Selection",
+  },
+  {
+    name: "Bathroom Tile Detail",
+    src: "/videos/bathroom-tile-detail.mp4",
+    label: "Bathrooms",
+  },
+  {
+    name: "Counter Detail",
+    src: "/videos/showroom-counter-detail.mp4",
+    label: "Finishes",
   },
 ];
 
@@ -299,14 +337,14 @@ export default function HomePage() {
 
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
               {/* Video switcher */}
-              <div className="flex gap-6 sm:gap-8">
+              <div className="flex gap-6 sm:gap-8 overflow-x-auto pb-2 max-w-full">
                 {showcaseVideos.map((v, i) => {
                   const isActive = activeVideo === i;
                   return (
                     <button
                       key={v.src}
                       onClick={() => setActiveVideo(i)}
-                      className="group text-left cursor-pointer"
+                      className="group text-left cursor-pointer shrink-0"
                     >
                       <div className="relative h-[2px] w-24 sm:w-32 bg-white/20 rounded-full overflow-hidden mb-3">
                         <div
@@ -392,6 +430,74 @@ export default function HomePage() {
             );
           })}
         </motion.div>
+      </section>
+
+      {/* PROJECT REELS */}
+      <section className="bg-[#f8f7f3] dark:bg-[#0b0b0c] py-20 lg:py-28 relative z-10 overflow-hidden border-b border-black/5 dark:border-white/5">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-end mb-12">
+            <div className="lg:col-span-5 space-y-4">
+              <span className="inline-flex items-center gap-3 text-[10px] tracking-[0.3em] uppercase text-gold-500 font-bold">
+                <span className="w-8 h-[1px] bg-gold-500/60" />
+                Project Reels
+              </span>
+              <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl leading-tight">
+                Surfaces, <span className="text-gold-gradient font-light italic">In Real Spaces</span>
+              </h2>
+            </div>
+            <p className="lg:col-span-5 lg:col-start-8 text-sm sm:text-base leading-relaxed text-black/60 dark:text-white/60">
+              Short motion clips from showroom selections and finished installations, placed together so texture, reflection, and scale are easier to compare.
+            </p>
+          </div>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5"
+          >
+            {projectReels.map((reel, index) => (
+              <motion.div
+                key={reel.src}
+                variants={{
+                  hidden: { opacity: 0, y: 28 },
+                  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } },
+                }}
+                className={`group relative overflow-hidden bg-black min-h-[360px] ${
+                  index === 1 ? "lg:mt-10" : index === 2 ? "lg:-mt-6" : ""
+                }`}
+              >
+                <video
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                >
+                  <source src={reel.src} type="video/mp4" />
+                </video>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <span className="text-[9px] uppercase tracking-[0.25em] font-bold text-gold-500">
+                        {reel.label}
+                      </span>
+                      <h3 className="font-serif text-xl text-white mt-2 leading-tight">
+                        {reel.name}
+                      </h3>
+                    </div>
+                    <span className="w-10 h-10 shrink-0 rounded-full border border-white/25 flex items-center justify-center text-white group-hover:text-gold-500 group-hover:border-gold-500 transition-colors">
+                      <Play className="w-4 h-4 ml-0.5" />
+                    </span>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
       </section>
 
       {/* BRANDED PRODUCTS */}

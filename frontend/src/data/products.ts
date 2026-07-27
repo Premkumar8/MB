@@ -814,5 +814,365 @@ export const fallbackProducts: Product[] = [
     availability: "In Stock",
     image_url: "/static/real/quartzite-charcoal-stair-tread.jpg",
     images: ["/static/real/quartzite-charcoal-stair-tread.jpg"]
+  },
+  {
+    id: 241,
+    name: "Wood Look Floor Tile Installation",
+    category: "Full Body Tiles",
+    origin: "India",
+    finish: "Matte Wood Look",
+    thickness: "10mm",
+    applications: "Bedroom Flooring, Hallways, Residential Floors",
+    description: "A warm wood-effect floor tile installed in a residential room, giving the comfort of timber with the durability and easier maintenance of tile.",
+    price: 58.00,
+    availability: "In Stock",
+    image_url: "/static/real/tile-wood-look-floor-installation.jpg",
+    images: [
+      "/static/real/tile-wood-look-floor-installation.jpg",
+      "/static/real/tile-wood-look-bedroom-floor.jpg",
+      "/static/real/tile-wood-look-bedroom-floor-alt.jpg"
+    ]
+  },
+  {
+    id: 242,
+    name: "Color Subway Wall Tile Display",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Glossy / Textured",
+    thickness: "8mm",
+    applications: "Kitchen Backsplash, Bathrooms, Feature Walls",
+    description: "A showroom display of colorful subway and relief wall tiles, suited for bright backsplash and bathroom feature-wall combinations.",
+    price: 46.00,
+    availability: "In Stock",
+    image_url: "/static/real/tile-color-subway-display.jpg",
+    images: ["/static/real/tile-color-subway-display.jpg"]
+  },
+  {
+    id: 243,
+    name: "Cafe Print Wall Tile Panel",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Glossy Printed",
+    thickness: "8mm",
+    applications: "Kitchen Walls, Dining Corners, Commercial Cafes",
+    description: "A printed wall-tile panel with cafe motifs and contrasting dark accents, designed for kitchen and dining feature walls.",
+    price: 44.00,
+    availability: "In Stock",
+    image_url: "/static/real/tile-cafe-print-wall-panel.jpg",
+    images: ["/static/real/tile-cafe-print-wall-panel.jpg"]
+  },
+  {
+    id: 244,
+    name: "Stone Mosaic Display Board",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Textured",
+    thickness: "10mm",
+    applications: "Feature Walls, Exterior Cladding, Accent Panels",
+    description: "A mixed stone and mosaic wall-tile display with stacked, geometric, and textured finishes for feature walls and cladding.",
+    price: 62.00,
+    availability: "In Stock",
+    image_url: "/static/real/tile-stone-mosaic-display-board.jpg",
+    images: ["/static/real/tile-stone-mosaic-display-board.jpg"]
+  },
+  {
+    id: 245,
+    name: "Splitface Quartzite Wall Cladding",
+    category: "Quartzite",
+    origin: "India",
+    finish: "Natural Splitface",
+    thickness: "Varies",
+    applications: "Exterior Walls, Feature Walls, Facades",
+    description: "A grey splitface quartzite cladding panel with a rugged stacked-stone texture for durable exterior and accent wall use.",
+    price: 78.00,
+    availability: "In Stock",
+    image_url: "/static/real/quartzite-splitface-wall-cladding.jpg",
+    images: ["/static/real/quartzite-splitface-wall-cladding.jpg"]
+  },
+  {
+    id: 246,
+    name: "Green Polished Marble Slab",
+    category: "Marble",
+    origin: "India",
+    finish: "Polished",
+    thickness: "2cm",
+    applications: "Countertops, Wall Cladding, Statement Panels",
+    description: "A deep green polished marble-look slab with white mineral veining, photographed in the showroom for selection and fabrication.",
+    price: 190.00,
+    availability: "In Stock",
+    image_url: "/static/real/marble-green-polished-slab.jpg",
+    images: ["/static/real/marble-green-polished-slab.jpg"]
+  },
+  {
+    id: 247,
+    name: "RAK White Marble Look Slab Tile",
+    category: "Full Body Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "Large Format",
+    applications: "Flooring, Kitchen Walls, Living Rooms",
+    description: "A large-format white marble-look slab tile with soft grey veins, suitable for clean contemporary wall and floor layouts.",
+    price: 82.00,
+    availability: "In Stock",
+    image_url: "/static/real/tile-rak-white-marble-look-slab.jpg",
+    images: ["/static/real/tile-rak-white-marble-look-slab.jpg"]
+  },
+  {
+    id: 248,
+    name: "Glossy White Kitchen Wall Tile",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Glossy",
+    thickness: "8mm",
+    applications: "Kitchen Walls, Utility Walls, Backsplashes",
+    description: "A glossy white kitchen wall tile installed with a warm horizontal accent band for simple, easy-to-clean kitchen surfaces.",
+    price: 39.00,
+    availability: "In Stock",
+    image_url: "/static/real/tile-glossy-white-kitchen-wall.jpg",
+    images: ["/static/real/tile-glossy-white-kitchen-wall.jpg"]
+  },
+  {
+    id: 249,
+    name: "Gray Shower Suite Wall Tile",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Matte Stone Look",
+    thickness: "10mm",
+    applications: "Bathroom Walls, Shower Floors, Wet Areas",
+    description: "A grey stone-look bathroom tile installed across shower walls and floors, pairing slip-conscious texture with a restrained modern palette.",
+    price: 52.00,
+    availability: "In Stock",
+    image_url: "/static/real/tile-gray-shower-suite.jpg",
+    images: ["/static/real/tile-gray-shower-suite.jpg"]
+  },
+  {
+    id: 250,
+    name: "Monochrome Feature Tile Display",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Glossy / Matte Mix",
+    thickness: "8mm",
+    applications: "Feature Walls, Bathrooms, Showroom Displays",
+    description: "A black-and-white feature tile display combining glossy slabs, dark accents, and decorative floor inserts for coordinated wall designs.",
+    price: 56.00,
+    availability: "In Stock",
+    image_url: "/static/real/tile-monochrome-feature-display.jpg",
+    images: ["/static/real/tile-monochrome-feature-display.jpg"]
+  },
+  {
+    id: 251,
+    name: "White Marble Look Slab Display",
+    category: "Full Body Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "Large Format",
+    applications: "Flooring, Wall Cladding, Living Rooms",
+    description: "A white marble-look slab tile displayed upright, with fine grey veining and a glossy surface for large-format interiors.",
+    price: 84.00,
+    availability: "In Stock",
+    image_url: "/static/real/tile-white-marble-look-slab-display.jpg",
+    images: ["/static/real/tile-white-marble-look-slab-display.jpg"]
+  },
+  {
+    id: 252,
+    name: "Botanical Matte Wall Tile",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Matte Printed",
+    thickness: "8mm",
+    applications: "Bathroom Walls, Feature Walls, Powder Rooms",
+    description: "A soft botanical printed wall tile with muted leaf and floral forms, used to add pattern without making the room feel busy.",
+    price: 50.00,
+    availability: "In Stock",
+    image_url: "/static/real/tile-botanical-matte-wall.jpg",
+    images: ["/static/real/tile-botanical-matte-wall.jpg"]
+  },
+  {
+    id: 253,
+    name: "Decorative Floor Pattern Tile Board",
+    category: "Full Body Tiles",
+    origin: "India",
+    finish: "Matte Patterned",
+    thickness: "10mm",
+    applications: "Foyers, Balconies, Accent Floors",
+    description: "A display board of decorative patterned floor tiles in neutral tones, suitable for entryways, balconies, and accent flooring.",
+    price: 54.00,
+    availability: "In Stock",
+    image_url: "/static/real/tile-decorative-floor-pattern-board.jpg",
+    images: [
+      "/static/real/tile-decorative-floor-pattern-board.jpg",
+      "/static/real/tile-geometric-floor-pattern-display.jpg"
+    ]
+  },
+  {
+    id: 254,
+    name: "Wood Floral Wall Tile Panel",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Glossy Printed",
+    thickness: "8mm",
+    applications: "Feature Walls, Bathrooms, Decorative Niches",
+    description: "A decorative wall tile panel combining wood tones and floral printwork for warm residential accent walls.",
+    price: 47.00,
+    availability: "In Stock",
+    image_url: "/static/real/tile-wood-floral-wall-panel.jpg",
+    images: ["/static/real/tile-wood-floral-wall-panel.jpg"]
+  },
+  {
+    id: 255,
+    name: "Glossy Showroom Corridor Tile",
+    category: "PVT",
+    origin: "India",
+    finish: "Glossy / PVT",
+    thickness: "10mm",
+    applications: "Showrooms, Corridors, Commercial Floors",
+    description: "A reflective polished vitrified tile installation through a showroom corridor, showing the shine and scale possible in commercial spaces.",
+    price: 74.00,
+    availability: "In Stock",
+    image_url: "/static/real/tile-showroom-glossy-corridor.jpg",
+    images: [
+      "/static/real/tile-showroom-glossy-corridor.jpg",
+      "/static/real/tile-mixed-slab-showroom-corridor.jpg"
+    ]
+  },
+  {
+    id: 256,
+    name: "Gray Herringbone Marble Floor",
+    category: "Marble",
+    origin: "India",
+    finish: "Polished",
+    thickness: "2cm",
+    applications: "Living Rooms, Hallways, Luxury Floors",
+    description: "A grey marble floor laid in a herringbone pattern with a polished finish, photographed across multiple angles from a completed installation.",
+    price: 225.00,
+    availability: "In Stock",
+    image_url: "/static/real/marble-gray-herringbone-floor.jpg",
+    images: [
+      "/static/real/marble-gray-herringbone-floor.jpg",
+      "/static/real/marble-gray-herringbone-floor-closeup.jpg",
+      "/static/real/marble-gray-herringbone-floor-alt.jpg",
+      "/static/real/marble-gray-herringbone-floor-wide.jpg"
+    ]
+  },
+  {
+    id: 257,
+    name: "Charcoal Outdoor Quartzite Walkway",
+    category: "Quartzite",
+    origin: "India",
+    finish: "Textured",
+    thickness: "2cm",
+    applications: "Outdoor Walkways, Patios, Utility Areas",
+    description: "A dark outdoor quartzite walkway with a textured surface for practical exterior circulation areas.",
+    price: 95.00,
+    availability: "In Stock",
+    image_url: "/static/real/quartzite-charcoal-outdoor-walkway.jpg",
+    images: [
+      "/static/real/quartzite-charcoal-outdoor-walkway.jpg",
+      "/static/real/quartzite-speckled-courtyard-floor.jpg",
+      "/static/real/quartzite-speckled-courtyard-floor-detail.jpg"
+    ]
+  },
+  {
+    id: 258,
+    name: "Travertine Exterior Cladding Tile",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Matte Stone Look",
+    thickness: "10mm",
+    applications: "Exterior Walls, Facades, Porches",
+    description: "A warm travertine-look exterior wall tile installed around windows and porch walls for a clean residential facade.",
+    price: 66.00,
+    availability: "In Stock",
+    image_url: "/static/real/tile-travertine-exterior-cladding.jpg",
+    images: ["/static/real/tile-travertine-exterior-cladding.jpg"]
+  },
+  {
+    id: 259,
+    name: "Gray Marble Staircase Installation",
+    category: "Marble",
+    origin: "India",
+    finish: "Polished",
+    thickness: "2cm",
+    applications: "Staircases, Landings, Duplex Homes",
+    description: "A grey marble staircase installation with broad tread pieces and polished stone movement across the steps and landing.",
+    price: 210.00,
+    availability: "In Stock",
+    image_url: "/static/real/marble-gray-staircase-installation.jpg",
+    images: [
+      "/static/real/marble-gray-staircase-installation.jpg",
+      "/static/real/marble-gray-stair-tread-installation.jpg"
+    ]
+  },
+  {
+    id: 260,
+    name: "Gray Elevator Marble Cladding",
+    category: "Marble",
+    origin: "India",
+    finish: "Polished",
+    thickness: "2cm",
+    applications: "Elevator Lobbies, Wall Cladding, Apartment Interiors",
+    description: "A grey marble-look elevator wall cladding installation that adds a durable polished surface around high-use lobby areas.",
+    price: 205.00,
+    availability: "In Stock",
+    image_url: "/static/real/marble-gray-elevator-cladding.jpg",
+    images: ["/static/real/marble-gray-elevator-cladding.jpg"]
+  },
+  {
+    id: 261,
+    name: "Speckled Bathroom Wall Tile",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Matte",
+    thickness: "8mm",
+    applications: "Bathroom Walls, Shower Areas, Utility Rooms",
+    description: "A light speckled bathroom wall tile installed in a shower area, giving small bathrooms a bright and practical wall finish.",
+    price: 43.00,
+    availability: "In Stock",
+    image_url: "/static/real/tile-speckled-bathroom-wall.jpg",
+    images: ["/static/real/tile-speckled-bathroom-wall.jpg"]
+  },
+  {
+    id: 262,
+    name: "Purple Ribbed Bathroom Wall Tile",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Glossy Ribbed",
+    thickness: "8mm",
+    applications: "Bathroom Walls, Vanity Backsplashes, Feature Walls",
+    description: "A purple ribbed wall tile used behind a bathroom vanity, adding vertical texture and color to compact wet-area designs.",
+    price: 49.00,
+    availability: "In Stock",
+    image_url: "/static/real/tile-purple-ribbed-bathroom-wall.jpg",
+    images: ["/static/real/tile-purple-ribbed-bathroom-wall.jpg"]
+  },
+  {
+    id: 263,
+    name: "Cream Polished Floor Tile Installation",
+    category: "PVT",
+    origin: "India",
+    finish: "Glossy / PVT",
+    thickness: "10mm",
+    applications: "Living Rooms, Bedrooms, Apartment Floors",
+    description: "A cream polished vitrified tile installation photographed across residential rooms, showing a bright, low-maintenance floor finish.",
+    price: 69.00,
+    availability: "In Stock",
+    image_url: "/static/real/tile-cream-polished-floor-installation.jpg",
+    images: [
+      "/static/real/tile-cream-polished-floor-installation.jpg",
+      "/static/real/tile-cream-polished-floor-room.jpg",
+      "/static/real/tile-cream-polished-floor-living-room.jpg"
+    ]
   }
 ];
+
+export function mergeWithFallbackProducts(products: Product[]): Product[] {
+  const seenIds = new Set(products.map((product) => product.id));
+  const seenNames = new Set(products.map((product) => product.name.toLowerCase()));
+
+  return [
+    ...products,
+    ...fallbackProducts.filter((product) => {
+      return !seenIds.has(product.id) && !seenNames.has(product.name.toLowerCase());
+    }),
+  ];
+}

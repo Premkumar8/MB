@@ -41,9 +41,6 @@ const menuItems: MenuItem[] = [
   { name: "Tiles", href: "/collections", dropdown: tilesDropdown },
   { name: "Marbles", href: "/collections", dropdown: marblesDropdown },
   { name: "Collections", href: "/collections" },
-  { name: "3D Showroom", href: "/showroom" },
-  { name: "AI Visualizer", href: "/visualizer" },
-  { name: "Blog", href: "/blog" },
   { name: "Contact", href: "/contact" },
 ];
 

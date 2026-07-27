@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Search, Heart, RefreshCw, Layers, MapPin, Check, Plus, Trash2, ArrowUpRight } from "lucide-react";
 import { useApp, Product } from "@/context/AppContext";
-import { fallbackProducts } from "@/data/products";
+import { fallbackProducts, mergeWithFallbackProducts } from "@/data/products";
 
 // Load 3D slab viewer dynamically - Removed as requested to keep 3D Showroom as the only 3D section.
 
@@ -67,7 +67,7 @@ function CollectionsContent() {
             image_url: item.image_url.startsWith("/static") ? `${API_URL}${item.image_url}` : item.image_url,
             texture_url: item.texture_url && item.texture_url.startsWith("/static") ? `${API_URL}${item.texture_url}` : item.texture_url,
           }));
-          setProducts(processed.length > 0 ? processed : fallbackProducts);
+          setProducts(processed.length > 0 ? mergeWithFallbackProducts(processed) : fallbackProducts);
         } else {
           setProducts(fallbackProducts);
         }
