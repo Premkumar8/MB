@@ -33,6 +33,16 @@ const showcaseVideos = [
     src: "/videos/installation-finish-tour.mp4",
     desc: "Close-up movement across final installations, highlighting surface finish and workmanship.",
   },
+  {
+    name: "Premium Display Tour",
+    src: "/videos/bn-premium-display-tour.mp4",
+    desc: "A focused showroom pass through premium display zones and polished surface selections.",
+  },
+  {
+    name: "Countertop Motion",
+    src: "/videos/bn-countertop-motion.mp4",
+    desc: "Close motion across countertop and surface details, useful for judging reflection and finish.",
+  },
 ];
 
 const projectReels = [
@@ -56,7 +66,37 @@ const projectReels = [
     src: "/videos/showroom-counter-detail.mp4",
     label: "Finishes",
   },
+  {
+    name: "Wall Tile Reel",
+    src: "/videos/bn-wall-tile-reel.mp4",
+    label: "Walls",
+  },
+  {
+    name: "Showroom Walk Reel",
+    src: "/videos/bn-showroom-walk-reel.mp4",
+    label: "Walkthrough",
+  },
+  {
+    name: "Finish Detail Reel",
+    src: "/videos/bn-finish-detail-reel.mp4",
+    label: "Detail",
+  },
+  {
+    name: "Quick Material Detail",
+    src: "/videos/bn-quick-material-detail.mp4",
+    label: "Material",
+  },
 ];
+
+interface HeroStone {
+  name: string;
+  texture: string;
+  video: string | null;
+  titleFirst: string;
+  titleSecond: string;
+  description: string;
+  gradientClass: string;
+}
 
 export default function HomePage() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -75,19 +115,21 @@ export default function HomePage() {
     }
     setVideoPlaying(!videoPlaying);
   };
-  const [activeHeroStone, setActiveHeroStone] = useState({
-    name: "Kitchen Tiles",
+  const [activeHeroStone, setActiveHeroStone] = useState<HeroStone>({
+    name: "Home Design",
     texture: "/static/real/hero-kitchen-tiles.jpg",
+    video: "/videos/banner-showroom-motion.mp4",
     titleFirst: "Sharma Marble",
     titleSecond: "Trading Company",
     description: "Leading supplier of Ceramic Tiles, Granites, Italian marbles for kitchens, homes and businesses since 1986.",
     gradientClass: "text-gold-gradient"
   });
 
-  const heroStones = [
+  const heroStones: HeroStone[] = [
     {
-      name: "Kitchen Tiles",
+      name: "Home Design",
       texture: "/static/real/hero-kitchen-tiles.jpg",
+      video: "/videos/banner-showroom-motion.mp4",
       titleFirst: "Sharma Marble",
       titleSecond: "Trading Company",
       description: "Leading supplier of Ceramic Tiles, Granites, Italian marbles for kitchens, homes and businesses since 1986.",
@@ -96,6 +138,7 @@ export default function HomePage() {
     {
       name: "Italian Marbles",
       texture: "/static/real/hero-marble-staircase.jpg",
+      video: null,
       titleFirst: "Premium Selection",
       titleSecond: "Italian Marbles",
       description: "Delivering high quality aesthetic and durable materials to enhance the beauty and functionality of architectural spaces.",
@@ -104,12 +147,21 @@ export default function HomePage() {
     {
       name: "Office Spaces",
       texture: "/static/real/project-tncd-building-exterior.jpg",
+      video: null,
       titleFirst: "Engineered For",
       titleSecond: "Every Space",
       description: "From corporate lobbies to commercial interiors, our technical slabs bring refined strength and visual depth to every space.",
       gradientClass: "text-emerald-gradient"
     },
   ];
+
+  const advanceHeroStone = () => {
+    setActiveHeroStone((prev) => {
+      const currentIndex = heroStones.findIndex((stone) => stone.name === prev.name);
+      const nextIndex = (currentIndex + 1) % heroStones.length;
+      return heroStones[nextIndex];
+    });
+  };
 
   const achievements = [
     { value: "40+", label: "Years of Experience", icon: Award },
@@ -143,15 +195,11 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveHeroStone((prev) => {
-        const currentIndex = heroStones.findIndex((stone) => stone.name === prev.name);
-        const nextIndex = (currentIndex + 1) % heroStones.length;
-        return heroStones[nextIndex];
-      });
-    }, 4500);
-    return () => clearInterval(timer);
-  }, [activeHeroStone]);
+    if (activeHeroStone.video) return;
+
+    const timer = setTimeout(advanceHeroStone, 6500);
+    return () => clearTimeout(timer);
+  }, [activeHeroStone.name]);
 
   return (
     <div
@@ -165,7 +213,7 @@ export default function HomePage() {
       <div className="absolute inset-0 bg-radial-gradient from-transparent to-white dark:to-[#070708] pointer-events-none z-0"></div>
 
       {/* HERO SECTION */}
-      <section id="hero" className="relative w-full h-[calc(100vh-80px)] lg:h-[85vh] flex items-center justify-center overflow-hidden bg-black">
+      <section id="hero" className="relative w-full h-screen min-h-[720px] flex items-center justify-center overflow-hidden bg-black">
         {/* Background Images */}
         <AnimatePresence initial={false}>
           <motion.div
@@ -176,18 +224,136 @@ export default function HomePage() {
             transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
             className="absolute inset-0 z-0"
           >
-            <img
-              src={activeHeroStone.texture.replace("/textures/", "/").replace("_diff.jpg", ".jpg")}
-              alt={activeHeroStone.name}
-              className="w-full h-full object-cover"
-            />
+            {activeHeroStone.video ? (
+              <div className="relative w-full h-full overflow-hidden bg-[#120f0a]">
+                <img
+                  src={activeHeroStone.texture}
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-cover scale-110 blur-xl opacity-55"
+                />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_30%,rgba(234,179,8,0.32),transparent_30%),radial-gradient(circle_at_82%_22%,rgba(255,255,255,0.18),transparent_28%),linear-gradient(115deg,rgba(14,11,8,0.94),rgba(44,33,18,0.72)_45%,rgba(121,82,25,0.38))]" />
+                <div
+                  className="absolute inset-0 opacity-[0.16]"
+                  style={{
+                    backgroundImage: "linear-gradient(120deg, rgba(255,255,255,0.28) 1px, transparent 1px)",
+                    backgroundSize: "42px 42px",
+                  }}
+                />
+                <div className="absolute left-0 top-0 h-full w-2/3 bg-gradient-to-r from-black/85 via-black/45 to-transparent" />
+              </div>
+            ) : (
+              <img
+                src={activeHeroStone.texture.replace("/textures/", "/").replace("_diff.jpg", ".jpg")}
+                alt={activeHeroStone.name}
+                className="w-full h-full object-cover"
+              />
+            )}
             {/* Dramatic Overlay for text readability */}
-            <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/50 to-transparent"></div>
+            <div className={`absolute inset-0 ${activeHeroStone.video ? "bg-gradient-to-r from-black/35 via-transparent to-black/25" : "bg-gradient-to-r from-black/95 via-black/50 to-transparent"}`}></div>
           </motion.div>
         </AnimatePresence>
 
         {/* Content Container */}
         <div className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-12 flex flex-col justify-center h-full">
+          {activeHeroStone.video ? (
+            <div className="grid grid-cols-1 lg:grid-cols-[0.82fr_1.18fr] gap-8 lg:gap-12 items-center pt-24 pb-28">
+              <div className="relative max-w-2xl p-6 sm:p-8 lg:p-10 border border-white/12 bg-[linear-gradient(135deg,rgba(255,255,255,0.10),rgba(255,255,255,0.035)_44%,rgba(234,179,8,0.08))] backdrop-blur-xl shadow-[0_30px_100px_rgba(0,0,0,0.35)] overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_12%,rgba(234,179,8,0.18),transparent_30%),radial-gradient(circle_at_78%_76%,rgba(255,255,255,0.08),transparent_34%)]" />
+                <div
+                  className="absolute inset-0 opacity-[0.08]"
+                  style={{
+                    backgroundImage: "linear-gradient(135deg, rgba(255,255,255,0.35) 1px, transparent 1px)",
+                    backgroundSize: "34px 34px",
+                  }}
+                />
+                <div className="absolute -left-px top-10 h-28 w-px bg-gold-500" />
+                <div className="absolute right-8 top-8 h-px w-24 bg-gold-500/70" />
+                <div className="absolute inset-x-8 bottom-8 h-px bg-gradient-to-r from-gold-500/80 via-white/18 to-transparent" />
+                <div className="relative z-10">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 1, ease: "easeOut" }}
+                  className="inline-flex items-center space-x-3 bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full text-gold-400"
+                >
+                  <Sparkles className="w-4 h-4 animate-spin-slow" />
+                  <span className="text-[10px] tracking-[0.4em] uppercase font-bold text-white">
+                    Excellence Since 1986
+                  </span>
+                </motion.div>
+
+                <div className="mt-8 flex items-center gap-3 text-[10px] uppercase tracking-[0.28em] font-bold text-gold-500">
+                  <span className="h-px w-10 bg-gold-500/70" />
+                  Curated Home Surfaces
+                </div>
+
+                <div className="relative mt-5">
+                  <AnimatePresence mode="wait">
+                    <motion.h1
+                      key={activeHeroStone.name}
+                      initial={{ opacity: 0, y: 80, rotateX: -15 }}
+                      animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                      exit={{ opacity: 0, y: -40, filter: "blur(10px)" }}
+                      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                      className="font-sans text-5xl sm:text-6xl lg:text-[5.4rem] text-white font-light tracking-tight leading-[1.02]"
+                      style={{ textShadow: "0 10px 30px rgba(0,0,0,0.5)" }}
+                    >
+                      <span className="block mb-2 font-medium text-white">Home</span>
+                      <span className="text-white/72 font-light text-4xl sm:text-5xl lg:text-[4.4rem]">Design</span>
+                    </motion.h1>
+                  </AnimatePresence>
+                </div>
+
+                <div className="relative mt-7 border-l-2 border-gold-500 pl-6">
+                  <AnimatePresence mode="wait">
+                    <motion.p
+                      key={activeHeroStone.name}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                      transition={{ duration: 0.6, delay: 0.2 }}
+                      className="text-base sm:text-lg lg:text-xl text-white/84 leading-relaxed max-w-xl font-light"
+                    >
+                      See floors, walls, lighting, and marble accents working together as one finished interior, not as separate samples.
+                    </motion.p>
+                  </AnimatePresence>
+                </div>
+
+                <div className="mt-8 grid grid-cols-3 gap-3">
+                  {["Floor Flow", "Wall Mood", "Final Finish"].map((item) => (
+                    <div key={item} className="border border-white/12 bg-black/20 px-3 py-3 text-center backdrop-blur-sm hover:border-gold-500/40 transition-colors">
+                      <span className="text-[10px] uppercase tracking-[0.16em] font-bold text-white/76">{item}</span>
+                    </div>
+                  ))}
+                </div>
+                </div>
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, x: 60, scale: 0.96 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                className="relative w-full h-[52vh] min-h-[360px] sm:h-[60vh] lg:h-[78vh] lg:max-h-[820px] border border-white/15 bg-black shadow-[0_35px_120px_rgba(0,0,0,0.48)] overflow-hidden"
+              >
+                <video
+                  autoPlay
+                  muted
+                  playsInline
+                  preload="metadata"
+                  poster={activeHeroStone.texture}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  onEnded={advanceHeroStone}
+                >
+                  <source src={activeHeroStone.video} type="video/mp4" />
+                </video>
+                <div className="absolute left-4 bottom-4 right-4 flex items-center justify-between gap-4 text-[10px] uppercase tracking-[0.2em] font-bold text-white/75">
+                  <span className="bg-black/35 backdrop-blur-sm border border-white/10 px-3 py-2">Full View</span>
+                  <span className="h-px flex-1 bg-white/20" />
+                  <span className="text-gold-500">Home Design</span>
+                </div>
+              </motion.div>
+            </div>
+          ) : (
           <div className="max-w-3xl space-y-8">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
@@ -233,16 +399,60 @@ export default function HomePage() {
               </AnimatePresence>
             </div>
           </div>
+          )}
         </div>
 
-        {/* Bottom Bar: CTA (right-aligned) + Slide Switcher */}
+        {/* Floating Hero Selector */}
+        <div className="hidden md:flex absolute right-6 lg:right-10 top-1/2 -translate-y-1/2 z-30 flex-col gap-3 pointer-events-auto">
+          {heroStones.map((stone, index) => {
+            const isActive = activeHeroStone.name === stone.name;
+            return (
+              <button
+                key={stone.name}
+                onClick={() => setActiveHeroStone(stone)}
+                className={`group relative flex items-center justify-end gap-4 py-3 pl-5 pr-3 border transition-all duration-300 backdrop-blur-md ${
+                  isActive
+                    ? "w-64 border-gold-500/50 bg-black/45 shadow-[0_18px_50px_rgba(0,0,0,0.35)]"
+                    : "w-16 border-white/10 bg-black/20 hover:w-56 hover:border-white/25"
+                }`}
+              >
+                <span
+                  className={`absolute left-0 top-0 h-full w-[2px] transition-colors ${
+                    isActive ? "bg-gold-500" : "bg-white/15 group-hover:bg-gold-500/60"
+                  }`}
+                />
+                <span
+                  className={`min-w-0 overflow-hidden whitespace-nowrap text-right text-[10px] uppercase tracking-[0.18em] font-bold transition-all duration-300 ${
+                    isActive ? "max-w-44 text-white opacity-100" : "max-w-0 text-white/60 opacity-0 group-hover:max-w-36 group-hover:opacity-100"
+                  }`}
+                >
+                  {stone.name}
+                </span>
+                <span className={`text-xs font-bold tabular-nums ${isActive ? "text-gold-500" : "text-white/45"}`}>
+                  0{index + 1}
+                </span>
+                {isActive && !activeHeroStone.video && (
+                  <motion.span
+                    key={`${stone.name}-side-progress`}
+                    className="absolute left-0 bottom-0 h-[2px] bg-gold-500"
+                    initial={{ width: "0%" }}
+                    animate={{ width: "100%" }}
+                    transition={{ duration: 6.5, ease: "linear" }}
+                  />
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Bottom Bar: CTA (right-aligned) */}
         <div className="absolute bottom-0 left-0 w-full z-20 pointer-events-none">
           <div className="max-w-7xl mx-auto px-6 lg:px-12 pb-8 sm:pb-10 pointer-events-auto flex flex-col gap-6 sm:gap-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.8, ease: "easeOut" }}
-              className="flex justify-end"
+              className={`justify-end ${activeHeroStone.video ? "hidden" : "flex"}`}
             >
               <Link href="/collections" className="group relative inline-flex items-center gap-3 bg-white text-black px-10 py-4 sm:px-12 sm:py-5 text-xs uppercase tracking-[0.2em] font-extrabold rounded-sm transition-all duration-500 overflow-hidden shadow-2xl hover:shadow-gold-500/20">
                 <span className="relative z-10 group-hover:text-white transition-colors duration-500">Explore Collection</span>
@@ -250,40 +460,6 @@ export default function HomePage() {
                 <div className="absolute inset-0 h-full w-full bg-gold-500 scale-x-0 group-hover:scale-x-100 origin-right transition-transform duration-500 ease-out"></div>
               </Link>
             </motion.div>
-
-            <div className="flex items-stretch gap-4 sm:gap-8">
-              {heroStones.map((stone, index) => {
-                const isActive = activeHeroStone.name === stone.name;
-                return (
-                  <button
-                    key={stone.name}
-                    onClick={() => setActiveHeroStone(stone)}
-                    className="group flex-1 min-w-0 text-left cursor-pointer"
-                  >
-                    <div className="relative h-[2px] w-full bg-white/20 rounded-full overflow-hidden mb-3">
-                      <div className={`absolute inset-0 bg-white/25 transition-opacity duration-300 ${isActive ? "opacity-0" : "opacity-100 group-hover:bg-white/50"}`} />
-                      {isActive && (
-                        <motion.div
-                          key={stone.name + "-progress"}
-                          className="absolute inset-y-0 left-0 bg-gold-500"
-                          initial={{ width: "0%" }}
-                          animate={{ width: "100%" }}
-                          transition={{ duration: 4.5, ease: "linear" }}
-                        />
-                      )}
-                    </div>
-                    <div className="flex items-baseline gap-2 min-w-0">
-                      <span className={`text-[10px] font-bold shrink-0 transition-colors duration-300 ${isActive ? "text-gold-500" : "text-white/40"}`}>
-                        0{index + 1}
-                      </span>
-                      <span className={`text-[10px] sm:text-xs tracking-[0.15em] uppercase font-bold truncate transition-colors duration-300 ${isActive ? "text-white" : "text-white/45 group-hover:text-white/75"}`}>
-                        {stone.name}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
           </div>
         </div>
       </section>
