@@ -121,7 +121,7 @@ export default function HomePage() {
     video: "/videos/banner-showroom-motion.mp4",
     titleFirst: "Sharma Marble",
     titleSecond: "Trading Company",
-    description: "Leading supplier of Ceramic Tiles, Granites, Italian marbles for kitchens, homes and businesses since 1986.",
+    description: "Wholesale Dealer of Tiles, Granites, Italian Marbles for kitchens, homes and businesses since 1986.",
     gradientClass: "text-gold-gradient"
   });
 
@@ -132,7 +132,7 @@ export default function HomePage() {
       video: "/videos/banner-showroom-motion.mp4",
       titleFirst: "Sharma Marble",
       titleSecond: "Trading Company",
-      description: "Leading supplier of Ceramic Tiles, Granites, Italian marbles for kitchens, homes and businesses since 1986.",
+      description: "Wholesale Dealer of Tiles, Granites, Italian Marbles for kitchens, homes and businesses since 1986.",
       gradientClass: "text-gold-gradient"
     },
     {
@@ -698,19 +698,19 @@ export default function HomePage() {
         <div className="w-full overflow-visible py-10 mt-4">
           <div className="flex animate-marquee w-[200%] gap-6 md:gap-10 pl-6 md:pl-10">
             {[
-              { name: "Lavish Ceramics", category: "Ceramic Tiles", image: "/static/real/tile-floor-bright-white.jpg", desc: "Premium Lavish Ceramics collection." },
+              { name: "Lavish Ceramics", category: "Tiles", image: "/static/real/tile-floor-bright-white.jpg", desc: "Premium Lavish Ceramics collection." },
               { name: "Parryware", category: "Sanitaryware", image: "/static/real/onyx-emerald-green.jpg", desc: "Complete Parryware sanitaryware range." },
-              { name: "Bonzer 7 Tiles", category: "Ceramic Tiles", image: "/static/real/marble-bathroom-calacatta.jpg", desc: "Elegant Bonzer 7 Tiles series." },
-              { name: "Orientbell Tiles", category: "Ceramic Tiles", image: "/static/real/marble-black-nero.jpg", desc: "Orientbell Tiles premium selection." },
-              { name: "Hindware Italian Collection", category: "Ceramic Tile Division", image: "/static/real/quartzite-travertine-beige.jpg", desc: "Hindware's Italian Collection tiles." },
-              { name: "RAK Ceramics", category: "Premium Tile", image: "/static/real/granite-black-veined.jpg", desc: "World class RAK Ceramics." },
+              { name: "Bonzer 7 Tiles", category: "Tiles", image: "/static/real/marble-bathroom-calacatta.jpg", desc: "Elegant Bonzer 7 Tiles series." },
+              { name: "Orientbell Tiles", category: "Tiles", image: "/static/real/marble-black-nero.jpg", desc: "Orientbell Tiles premium selection." },
+              { name: "Hindware Italian Collection", category: "Tile Division", image: "/static/real/quartzite-travertine-beige.jpg", desc: "Hindware's Italian Collection tiles." },
+              { name: "RAK Ceramics", category: "Premium Tiles", image: "/static/real/granite-black-veined.jpg", desc: "World class RAK Ceramics." },
               // Duplicate for seamless marquee scroll
-              { name: "Lavish Ceramics", category: "Ceramic Tiles", image: "/static/real/tile-floor-bright-white.jpg", desc: "Premium Lavish Ceramics collection." },
+              { name: "Lavish Ceramics", category: "Tiles", image: "/static/real/tile-floor-bright-white.jpg", desc: "Premium Lavish Ceramics collection." },
               { name: "Parryware", category: "Sanitaryware", image: "/static/real/onyx-emerald-green.jpg", desc: "Complete Parryware sanitaryware range." },
-              { name: "Bonzer 7 Tiles", category: "Ceramic Tiles", image: "/static/real/marble-bathroom-calacatta.jpg", desc: "Elegant Bonzer 7 Tiles series." },
-              { name: "Orientbell Tiles", category: "Ceramic Tiles", image: "/static/real/marble-black-nero.jpg", desc: "Orientbell Tiles premium selection." },
-              { name: "Hindware Italian Collection", category: "Ceramic Tile Division", image: "/static/real/quartzite-travertine-beige.jpg", desc: "Hindware's Italian Collection tiles." },
-              { name: "RAK Ceramics", category: "Premium Tile", image: "/static/real/granite-black-veined.jpg", desc: "World class RAK Ceramics." },
+              { name: "Bonzer 7 Tiles", category: "Tiles", image: "/static/real/marble-bathroom-calacatta.jpg", desc: "Elegant Bonzer 7 Tiles series." },
+              { name: "Orientbell Tiles", category: "Tiles", image: "/static/real/marble-black-nero.jpg", desc: "Orientbell Tiles premium selection." },
+              { name: "Hindware Italian Collection", category: "Tile Division", image: "/static/real/quartzite-travertine-beige.jpg", desc: "Hindware's Italian Collection tiles." },
+              { name: "RAK Ceramics", category: "Premium Tiles", image: "/static/real/granite-black-veined.jpg", desc: "World class RAK Ceramics." },
             ].map((product, idx) => (
               <div key={idx} className="group relative w-[280px] md:w-[350px] lg:w-[400px] aspect-[4/5] shrink-0 cursor-pointer transition-all duration-500 hover:z-50">
                 <div className="absolute inset-0 bg-black/5 transition-all duration-500 ease-out group-hover:scale-110 md:group-hover:scale-125 group-hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-10 origin-center overflow-hidden">
@@ -820,7 +820,7 @@ export default function HomePage() {
             </div>
             <div className="space-y-6 text-sm text-black/70 dark:text-white/70 leading-relaxed font-sans">
               <p className="font-serif text-xl md:text-2xl text-black dark:text-white leading-snug">
-                "Sharma Marble Trading Company is a leading supplier of Ceramic Tiles, Granites, and Italian marbles for architects, engineers, builders and clients."
+                "Sharma Marble Trading Company is a Wholesale Dealer of Tiles, Granites, and Italian Marbles for architects, engineers, builders and clients."
               </p>
               <p>
                 Established in 1986, we are located at 370, Thadagam Main Road, K.N.G. Pudur, Coimbatore.
@@ -976,8 +976,8 @@ export default function HomePage() {
           
           <div className="flex animate-marquee w-[200%] gap-6 md:gap-8 items-center pl-6 md:pl-8">
             {[
-              "DAKSHA PROPERTIES", "GUJAN", "NIKON CONSTRUCTION", "AHWIN CONSTRUCTION", "CASA GRAND", "INFINIUM DEVELOPERS", "DIYA FOUNDATION", "UNITED LIVING SPACE", "TNCD", "INDIA BUILDERS", "A PLUS B", "SUKRA PROPERTIES", "RP CONSTRUCTION", "LANDS AND LANDS", "TIDEL NEO PARK",
-              "DAKSHA PROPERTIES", "GUJAN", "NIKON CONSTRUCTION", "AHWIN CONSTRUCTION", "CASA GRAND", "INFINIUM DEVELOPERS", "DIYA FOUNDATION", "UNITED LIVING SPACE", "TNCD", "INDIA BUILDERS", "A PLUS B", "SUKRA PROPERTIES", "RP CONSTRUCTION", "LANDS AND LANDS", "TIDEL NEO PARK"
+              "DAKSHA PROPERTIES", "GUJAN", "CASA GRAND", "INFINIUM DEVELOPERS", "DIYA FOUNDATION", "UNITED LIVING SPACE", "TNCD", "INDIA BUILDERS", "A PLUS B", "SUKRA PROPERTIES", "RP CONSTRUCTION", "LANDS AND LANDS", "TIDEL NEO PARK",
+              "DAKSHA PROPERTIES", "GUJAN", "CASA GRAND", "INFINIUM DEVELOPERS", "DIYA FOUNDATION", "UNITED LIVING SPACE", "TNCD", "INDIA BUILDERS", "A PLUS B", "SUKRA PROPERTIES", "RP CONSTRUCTION", "LANDS AND LANDS", "TIDEL NEO PARK"
             ].map((client, idx) => (
               <div 
                 key={`client-${idx}`} 
