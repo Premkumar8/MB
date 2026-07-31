@@ -76,17 +76,17 @@ const projectReels = [
 ];
 
 const brandsList = [
-  { name: "Lavish Ceramics", category: "Ceramic Tiles" },
+  { name: "Lavish Ceramics", category: "Tiles" },
   { name: "Parryware", category: "Sanitaryware" },
-  { name: "Bonzer 7 Tiles", category: "Ceramic Tiles" },
-  { name: "Orientbell Tiles", category: "Ceramic Tiles" },
-  { name: "Hindware Italian Collection", category: "Ceramic Tile Division" },
-  { name: "RAK Ceramics", category: "Premium Tile" },
+  { name: "Bonzer 7 Tiles", category: "Tiles" },
+  { name: "Orientbell Tiles", category: "Tiles" },
+  { name: "Hindware Italian Collection", category: "Tile Division" },
+  { name: "RAK Ceramics", category: "Premium Tiles" },
 ];
 const brands = [...brandsList, ...brandsList];
 
 const clients = [
-  "DAKSHA PROPERTIES", "GUJAN", "NIKON CONSTRUCTION", "AHWIN CONSTRUCTION", "CASA GRAND", "INFINIUM DEVELOPERS", "DIYA FOUNDATION", "UNITED LIVING SPACE", "TNCD", "INDIA BUILDERS", "A PLUS B", "SUKRA PROPERTIES", "RP CONSTRUCTION", "LANDS AND LANDS", "TIDEL NEO PARK",
+  "DAKSHA PROPERTIES", "GUJAN", "CASA GRAND", "INFINIUM DEVELOPERS", "DIYA FOUNDATION", "UNITED LIVING SPACE", "TNCD", "INDIA BUILDERS", "A PLUS B", "SUKRA PROPERTIES", "RP CONSTRUCTION", "LANDS AND LANDS", "TIDEL NEO PARK",
 ];
 const architects = [
   "CUBOID ARCHITECTS", "A PLUS B ARCHITECTS", "HARRISON ARCHITECT", "SHIVAM ARCHITECT", "IKSHA ARCHITECTS", "JAYABAL ASSOCIATES", "ARUN AND ASSOCIATES", "DESIGN AND ARCH", "DESIGN CONSORTIUM",
@@ -519,7 +519,7 @@ export default function HomePage() {
             <span className="text-[10px] tracking-[0.3em] uppercase text-brand-600 font-bold">Our Heritage</span>
             <h2 className="font-sans text-2xl sm:text-3xl font-bold text-black dark:text-white">About Sharma Marble</h2>
             <p className="text-black/70 dark:text-white/70 text-sm sm:text-base leading-relaxed">
-              Established in 1986, Sharma Marble Trading Company is a leading supplier of Ceramic Tiles, Granites, and Italian Marbles for architects, engineers, builders and clients — built on a reputation for quality, aesthetics and durability.
+              Established in 1986, Sharma Marble Trading Company is a Wholesale Dealer of Tiles, Granites, and Italian Marbles for architects, engineers, builders and clients — built on a reputation for quality, aesthetics and durability.
             </p>
             <Link href="#about" className="inline-flex items-center gap-2 text-sm font-bold text-brand-600 hover:text-brand-700 transition-colors">
               Read Our Story <ArrowRight className="w-4 h-4" />
@@ -649,7 +649,7 @@ export default function HomePage() {
             </h2>
             <div className="space-y-5 text-sm text-black/70 dark:text-white/70 leading-relaxed">
               <p className="text-lg text-black dark:text-white font-medium leading-snug">
-                &ldquo;Sharma Marble Trading Company is a leading supplier of Ceramic Tiles, Granites, and Italian marbles for architects, engineers, builders and clients.&rdquo;
+                &ldquo;Sharma Marble Trading Company is a Wholesale Dealer of Tiles, Granites, and Italian Marbles for architects, engineers, builders and clients.&rdquo;
               </p>
               <p>Established in 1986, we are located at 370, Thadagam Main Road, K.N.G. Pudur, Coimbatore.</p>
               <p>The company has built a strong reputation for delivering high quality, aesthetic, and durable materials to enhance the beauty and functionality of architectural spaces.</p>

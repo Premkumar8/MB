@@ -23,7 +23,7 @@ export default function Footer() {
               Marble
             </span>
           <p className="text-white/50 text-xs leading-relaxed max-w-sm">
-            Sharma Marble Trading Company is a leading supplier of Ceramic Tiles, Granites, and Italian marbles for architects, engineers, builders and clients. Established in 1986.
+            Sharma Marble Trading Company is a Wholesale Dealer of Tiles, Granites, and Italian Marbles for architects, engineers, builders and clients. Established in 1986.
           </p>
           <div className="flex space-x-4 pt-2">
             <a

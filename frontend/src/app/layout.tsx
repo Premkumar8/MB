@@ -27,11 +27,11 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Sharma Marble | Premium Tiles & Natural Stone",
+    default: "Sharma Marble | Premium Tiles & Natural Stones",
     template: "%s | Sharma Marble",
   },
   description:
-    "Explore our vast collection of premium tiles, granites, and natural stone. Featuring top brands like Somany Ceramics and world-class craftsmanship for your home and business.",
+    "Explore our vast collection of premium tiles, granites, and natural stones. Featuring top brands like Somany Ceramics and world-class craftsmanship for your home and business.",
   keywords: [
     "Luxury Marble",
     "Italian Carrara",
@@ -43,9 +43,9 @@ export const metadata: Metadata = {
   ],
   metadataBase: new URL("http://localhost:3000"),
   openGraph: {
-    title: "Sharma Marble | Premium Tiles & Natural Stone",
+    title: "Sharma Marble | Premium Tiles & Natural Stones",
     description:
-      "Explore our vast collection of premium tiles, granites, and natural stone.",
+      "Explore our vast collection of premium tiles, granites, and natural stones.",
     url: "https://sharmamarble.com",
     siteName: "Sharma Marble",
     locale: "en_US",
