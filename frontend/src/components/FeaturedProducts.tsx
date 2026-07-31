@@ -41,9 +41,9 @@ export default function FeaturedProducts() {
     <section className="bg-white dark:bg-[#080809] py-24 relative z-10 border-t border-black/5 dark:border-white/5">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         <div className="text-center mb-16 space-y-4">
-          <span className="text-[10px] tracking-[0.3em] uppercase text-gold-500 font-bold">New Arrivals</span>
-          <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-black dark:text-white">
-            Full Body <span className="text-gold-gradient font-light italic">Tiles</span>
+          <span className="text-[10px] tracking-[0.3em] uppercase text-brand-500 font-bold">New Arrivals</span>
+          <h2 className="font-sans font-bold text-4xl sm:text-5xl lg:text-6xl text-black dark:text-white">
+            Full Body <span className="text-brand-gradient">Tiles</span>
           </h2>
         </div>
         
@@ -55,7 +55,7 @@ export default function FeaturedProducts() {
 
         <div className="mt-16 text-center">
           <Link href="/collections">
-            <button className="bg-black dark:bg-white text-white dark:text-black px-10 py-4 text-sm tracking-[0.2em] uppercase hover:bg-gold-500 hover:text-white dark:hover:bg-gold-500 transition-colors duration-300">
+            <button className="bg-black dark:bg-white text-white dark:text-black px-10 py-4 text-sm tracking-[0.2em] uppercase hover:bg-brand-500 hover:text-white dark:hover:bg-brand-500 transition-colors duration-300">
               Explore All Collections
             </button>
           </Link>
@@ -75,7 +75,7 @@ export function ProductCard({ product }: { product: Product }) {
   };
 
   return (
-    <Link href={`/products/${product.id}`} className="group relative bg-white dark:bg-[#111] rounded-lg shadow-sm border border-black/5 dark:border-white/5 overflow-hidden hover:shadow-2xl hover:border-gold-500/30 hover:-translate-y-1 transition-all duration-500 flex flex-col h-full cursor-pointer">
+    <Link href={`/products/${product.id}`} className="group relative bg-white dark:bg-[#111] rounded-lg shadow-sm border border-black/5 dark:border-white/5 overflow-hidden hover:shadow-2xl hover:border-brand-500/30 hover:-translate-y-1 transition-all duration-500 flex flex-col h-full cursor-pointer">
       <div className="relative aspect-square overflow-hidden bg-black/5 dark:bg-white/5">
         <img
           src={product.image_url}
@@ -86,10 +86,10 @@ export function ProductCard({ product }: { product: Product }) {
 
         <button
           onClick={toggleWishlist}
-          className="absolute top-3 left-3 w-9 h-9 flex items-center justify-center bg-white/90 dark:bg-black/70 backdrop-blur-sm rounded-full border border-black/10 dark:border-white/10 text-black/60 dark:text-white/70 hover:text-gold-500 hover:border-gold-500 transition-colors z-10"
+          className="absolute top-3 left-3 w-9 h-9 flex items-center justify-center bg-white/90 dark:bg-black/70 backdrop-blur-sm rounded-full border border-black/10 dark:border-white/10 text-black/60 dark:text-white/70 hover:text-brand-500 hover:border-brand-500 transition-colors z-10"
           title={isFav ? "Remove from wishlist" : "Add to wishlist"}
         >
-          <Heart className={`w-4 h-4 ${isFav ? "fill-gold-500 text-gold-500" : ""}`} />
+          <Heart className={`w-4 h-4 ${isFav ? "fill-brand-500 text-brand-500" : ""}`} />
         </button>
 
         <div className="absolute top-3 right-3 bg-white/90 dark:bg-black/80 backdrop-blur-sm px-3 py-1 rounded-full border border-black/10 dark:border-white/10 shadow-sm z-10">
@@ -99,15 +99,15 @@ export function ProductCard({ product }: { product: Product }) {
 
       <div className="p-5 flex flex-col flex-grow justify-between bg-white dark:bg-[#111]">
         <div className="mb-5">
-          <span className="text-[9px] uppercase tracking-[0.2em] text-gold-500 font-bold">{product.category}</span>
-          <h3 className="font-serif text-lg text-black dark:text-white font-medium leading-snug mt-1 group-hover:text-gold-500 transition-colors">{product.name}</h3>
+          <span className="text-[9px] uppercase tracking-[0.2em] text-brand-500 font-bold">{product.category}</span>
+          <h3 className="font-sans text-lg text-black dark:text-white font-semibold leading-snug mt-1 group-hover:text-brand-500 transition-colors">{product.name}</h3>
         </div>
 
         <div className="mt-auto flex items-center justify-between pt-4 border-t border-black/5 dark:border-white/10">
           <span className="text-[10px] uppercase tracking-widest font-semibold text-black/50 dark:text-white/40">
             {product.availability || "In Stock"}
           </span>
-          <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-black dark:text-white group-hover:text-gold-500 transition-colors">
+          <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-black dark:text-white group-hover:text-brand-500 transition-colors">
             View Details
             <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300" />
           </span>

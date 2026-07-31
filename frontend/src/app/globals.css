@@ -18,6 +18,17 @@
   
   --color-onyx: #0f0f11;
   --color-emerald-accent: #1b4d3e;
+
+  --color-brand-50: #eff6ff;
+  --color-brand-100: #dbeafe;
+  --color-brand-200: #bfdbfe;
+  --color-brand-300: #93c5fd;
+  --color-brand-400: #60a5fa;
+  --color-brand-500: #2563eb;
+  --color-brand-600: #1d4ed8;
+  --color-brand-700: #1e40af;
+  --color-brand-800: #1e3a8a;
+  --color-brand-900: #172554;
 }
 
 :root {
@@ -92,6 +103,21 @@ body {
   background: linear-gradient(135deg, #059669 0%, #10b981 50%, #064e3b 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+.text-brand-gradient {
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 55%, #60a5fa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Brand (navy/blue) button classes — used on homepage, nav, footer */
+.btn-brand-solid {
+  @apply relative overflow-hidden transition-all duration-300 rounded-md tracking-wide uppercase text-xs sm:text-sm font-bold px-9 py-4 bg-brand-500 text-white hover:bg-brand-600 hover:shadow-[0_8px_25px_rgba(37,99,235,0.35)];
+}
+
+.btn-brand-outline {
+  @apply relative overflow-hidden transition-all duration-300 rounded-md tracking-wide uppercase text-xs sm:text-sm font-bold px-9 py-4 border-2 border-white/70 text-white hover:border-brand-400 hover:bg-white hover:text-brand-700;
 }
 
 /* Custom Scrollbar for Luxury Aesthetics */

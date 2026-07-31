@@ -11,15 +11,15 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-[#09090b] text-white border-t border-gold-500/10 font-sans mt-auto">
+    <footer className="bg-brand-900 text-white border-t border-brand-500/10 font-sans mt-auto">
       <div className="max-w-7xl mx-auto px-6 lg:px-12 py-16 lg:py-24 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
         
         {/* Brand Column */}
         <div className="space-y-6">
-            <span className="font-serif text-2xl tracking-[0.25em] uppercase font-bold text-white">
+            <span className="font-sans text-2xl tracking-[0.15em] uppercase font-bold text-white">
               Sharma
             </span>
-            <span className="font-sans text-[8px] tracking-[0.4em] uppercase text-gold-500 pt-1.5 font-light">
+            <span className="font-sans text-[8px] tracking-[0.4em] uppercase text-brand-400 pt-1.5 font-light">
               Marble
             </span>
           <p className="text-white/50 text-xs leading-relaxed max-w-sm">
@@ -30,7 +30,7 @@ export default function Footer() {
               href="https://instagram.com"
               target="_blank"
               rel="noreferrer"
-              className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-white/60 hover:text-gold-500 hover:border-gold-500 transition-all duration-300"
+              className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-white/60 hover:text-brand-400 hover:border-brand-400 transition-all duration-300"
             >
               <svg className="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
             </a>
@@ -38,7 +38,7 @@ export default function Footer() {
               href="https://facebook.com"
               target="_blank"
               rel="noreferrer"
-              className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-white/60 hover:text-gold-500 hover:border-gold-500 transition-all duration-300"
+              className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-white/60 hover:text-brand-400 hover:border-brand-400 transition-all duration-300"
             >
               <svg className="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
             </a>
@@ -47,7 +47,7 @@ export default function Footer() {
 
         {/* Navigation Links Column */}
         <div className="space-y-6">
-          <h4 className="text-xs uppercase tracking-[0.25em] text-gold-500 font-semibold">
+          <h4 className="text-xs uppercase tracking-[0.25em] text-brand-400 font-semibold">
             Exclusive Tiles Showroom For
           </h4>
           <ul className="space-y-3.5 text-xs text-white/60">
@@ -86,36 +86,36 @@ export default function Footer() {
 
         {/* Contact Column */}
         <div className="space-y-6">
-          <h4 className="text-xs uppercase tracking-[0.25em] text-gold-500 font-semibold">
+          <h4 className="text-xs uppercase tracking-[0.25em] text-brand-400 font-semibold">
             Contact Us
           </h4>
           <ul className="space-y-4 text-xs text-white/60">
             <li className="flex items-start space-x-2.5">
-              <MapPin className="w-4 h-4 text-gold-500 shrink-0 mt-0.5" />
+              <MapPin className="w-4 h-4 text-brand-400 shrink-0 mt-0.5" />
               <span>
                 370, Thadagam Main Road, K.N.G. Pudur, Coimbatore - 641 025
               </span>
             </li>
             <li className="flex items-start space-x-2.5">
-              <Mail className="w-4 h-4 text-gold-500 shrink-0 mt-0.5" />
+              <Mail className="w-4 h-4 text-brand-400 shrink-0 mt-0.5" />
               <span>sharma_marbles@yahoo.in</span>
             </li>
             <li className="flex items-start space-x-2.5 pt-2">
               <span>
                 <strong className="text-white">O.P. Sharma</strong> — Marketing Partner<br/>
-                <a href="tel:+919940882939" className="hover:text-gold-500 transition-colors">+91 99408 82939</a>
+                <a href="tel:+919940882939" className="hover:text-brand-400 transition-colors">+91 99408 82939</a>
               </span>
             </li>
             <li className="flex items-start space-x-2.5">
               <span>
                 <strong className="text-white">Ranjeet</strong> — Marketing<br/>
-                <a href="tel:+918870780734" className="hover:text-gold-500 transition-colors">+91 88707 80734</a>
+                <a href="tel:+918870780734" className="hover:text-brand-400 transition-colors">+91 88707 80734</a>
               </span>
             </li>
             <li className="flex items-start space-x-2.5">
               <span>
                 <strong className="text-white">Manish</strong> — Sales<br/>
-                <a href="tel:+918610827837" className="hover:text-gold-500 transition-colors">+91 86108 27837</a>
+                <a href="tel:+918610827837" className="hover:text-brand-400 transition-colors">+91 86108 27837</a>
               </span>
             </li>
           </ul>
@@ -123,7 +123,7 @@ export default function Footer() {
 
         {/* Sister Concern Column */}
         <div className="space-y-6">
-          <h4 className="text-xs uppercase tracking-[0.25em] text-gold-500 font-semibold">
+          <h4 className="text-xs uppercase tracking-[0.25em] text-brand-400 font-semibold">
             Our Sister Concern
           </h4>
           <p className="text-white/50 text-xs leading-relaxed">

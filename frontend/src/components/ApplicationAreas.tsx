@@ -78,14 +78,14 @@ export default function ApplicationAreas() {
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6">
           <div className="space-y-4 max-w-2xl">
-            <h2 className="font-serif text-4xl sm:text-5xl text-black dark:text-white font-bold tracking-tight">
+            <h2 className="font-sans text-4xl sm:text-5xl text-black dark:text-white font-bold tracking-tight">
               Robust Application Areas
             </h2>
             <p className="text-black/60 dark:text-white/60 text-sm sm:text-base leading-relaxed font-medium">
               Tiles engineered for diverse applications, each application supported by the right balance of strength, finish, and function.
             </p>
           </div>
-          <button className="px-6 py-3 bg-[#111] dark:bg-white text-white dark:text-black rounded-full text-sm font-semibold hover:bg-gold-500 dark:hover:bg-gold-500 hover:text-white transition-colors whitespace-nowrap">
+          <button className="px-6 py-3 bg-[#111] dark:bg-white text-white dark:text-black rounded-full text-sm font-semibold hover:bg-brand-500 dark:hover:bg-brand-500 hover:text-white transition-colors whitespace-nowrap">
             Applications Areas
           </button>
         </div>
@@ -101,10 +101,10 @@ export default function ApplicationAreas() {
                 onClick={() => setActiveApp(isActive ? null : app.name)}
                 className={`flex flex-col items-center justify-center space-y-4 cursor-pointer group p-4 rounded-xl transition-all duration-300 ${isActive ? 'bg-black/5 dark:bg-white/10 shadow-inner' : 'hover:bg-black/5 dark:hover:bg-white/5'}`}
               >
-                <div className={`p-4 rounded-full transition-colors duration-300 ${isActive ? 'bg-gold-500 text-white' : 'bg-transparent text-black dark:text-white group-hover:text-gold-500'}`}>
+                <div className={`p-4 rounded-full transition-colors duration-300 ${isActive ? 'bg-brand-500 text-white' : 'bg-transparent text-black dark:text-white group-hover:text-brand-500'}`}>
                   <Icon strokeWidth={1.5} className="w-10 h-10" />
                 </div>
-                <span className={`text-xs font-semibold text-center transition-colors duration-300 ${isActive ? 'text-gold-500' : 'text-black/80 dark:text-white/80 group-hover:text-gold-500'}`}>
+                <span className={`text-xs font-semibold text-center transition-colors duration-300 ${isActive ? 'text-brand-500' : 'text-black/80 dark:text-white/80 group-hover:text-brand-500'}`}>
                   {app.name}
                 </span>
               </div>
@@ -116,9 +116,9 @@ export default function ApplicationAreas() {
         {activeApp && (
           <div className="pt-12 border-t border-black/10 dark:border-white/10 animate-fade-in">
             <div className="mb-8 flex items-center space-x-3">
-              <div className="w-2 h-8 bg-gold-500"></div>
-              <h3 className="font-serif text-2xl text-black dark:text-white">
-                Products for <span className="text-gold-500">{activeApp}</span>
+              <div className="w-2 h-8 bg-brand-500"></div>
+              <h3 className="font-sans text-2xl text-black dark:text-white">
+                Products for <span className="text-brand-500">{activeApp}</span>
               </h3>
             </div>
             

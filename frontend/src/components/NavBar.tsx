@@ -108,32 +108,20 @@ export default function NavBar() {
         <div className="max-w-[1600px] mx-auto px-6 lg:px-10 flex justify-between items-center gap-6">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-1 lg:space-x-2 group cursor-pointer h-10 lg:h-14 shrink-0">
-            <div className="relative flex items-center justify-center w-10 h-10 lg:w-14 lg:h-14">
-              <svg className="absolute inset-0 w-full h-full animate-[spin_10s_linear_infinite] opacity-40 group-hover:opacity-100 transition-opacity duration-700" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="48" fill="none" stroke="url(#gold-gradient)" strokeWidth="1.5" strokeDasharray="15 5 5 5" />
-              </svg>
-              <svg className="w-6 h-6 lg:w-8 lg:h-8 drop-shadow-[0_0_10px_rgba(212,175,55,0.4)] group-hover:drop-shadow-[0_0_20px_rgba(212,175,55,0.8)] group-hover:scale-110 transition-all duration-700" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <linearGradient id="gold-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#BF953F" />
-                    <stop offset="25%" stopColor="#FCF6BA" />
-                    <stop offset="50%" stopColor="#B38728" />
-                    <stop offset="75%" stopColor="#FBF5B7" />
-                    <stop offset="100%" stopColor="#AA771C" />
-                  </linearGradient>
-                </defs>
-                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="url(#gold-gradient)" fillOpacity="0.9" stroke="url(#gold-gradient)" strokeWidth="0.5" strokeLinejoin="round"/>
-                <path d="M2 17L12 22L22 17" stroke="url(#gold-gradient)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M2 12L12 17L22 12" stroke="url(#gold-gradient)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <div className="relative flex items-center justify-center w-10 h-10 lg:w-14 lg:h-14 rounded-full bg-brand-700 group-hover:bg-brand-600 transition-colors duration-500">
+              <svg className="w-6 h-6 lg:w-8 lg:h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="white" fillOpacity="0.95" />
+                <path d="M2 17L12 22L22 17" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
             <div className="flex flex-col justify-center ml-1">
-              <span className="font-serif text-xl lg:text-3xl tracking-[0.15em] uppercase font-light text-black dark:text-white leading-none mb-1 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-gold-400 group-hover:to-gold-600 transition-all duration-500">
+              <span className="font-sans text-xl lg:text-3xl tracking-[0.1em] uppercase font-bold text-brand-800 dark:text-white leading-none mb-1 group-hover:text-brand-500 transition-colors duration-500">
                 Sharma
               </span>
               <div className="flex items-center space-x-2">
-                <span className="h-[1px] w-4 lg:w-6 bg-gold-500/50"></span>
-                <span className="font-sans text-[7px] lg:text-[9px] tracking-[0.5em] uppercase text-black/60 dark:text-gold-500/80 font-semibold leading-none">
+                <span className="h-[1px] w-4 lg:w-6 bg-brand-500/60"></span>
+                <span className="font-sans text-[7px] lg:text-[9px] tracking-[0.5em] uppercase text-black/60 dark:text-brand-400 font-semibold leading-none">
                   Marble
                 </span>
               </div>
@@ -150,12 +138,12 @@ export default function NavBar() {
                     key={item.name}
                     href={item.href}
                     className={`relative px-2.5 2xl:px-3.5 py-2 text-[10.5px] 2xl:text-[11px] tracking-[0.12em] 2xl:tracking-[0.15em] uppercase font-semibold transition-colors duration-300 whitespace-nowrap ${
-                      isActive ? "text-gold-500" : "text-black/75 dark:text-white/75 hover:text-gold-500"
+                      isActive ? "text-brand-500" : "text-black/75 dark:text-white/75 hover:text-brand-500"
                     }`}
                   >
                     {item.name}
                     {isActive && (
-                      <span className="absolute left-1/2 -translate-x-1/2 -bottom-1 w-1 h-1 rounded-full bg-gold-500" />
+                      <span className="absolute left-1/2 -translate-x-1/2 -bottom-1 w-1 h-1 rounded-full bg-brand-500" />
                     )}
                   </Link>
                 );
@@ -165,7 +153,7 @@ export default function NavBar() {
                 <div key={item.name} className="relative group">
                   <Link
                     href={item.href}
-                    className="flex items-center gap-1 px-2.5 2xl:px-3.5 py-2 text-[10.5px] 2xl:text-[11px] tracking-[0.12em] 2xl:tracking-[0.15em] uppercase font-semibold text-black/75 dark:text-white/75 group-hover:text-gold-500 transition-colors duration-300 whitespace-nowrap"
+                    className="flex items-center gap-1 px-2.5 2xl:px-3.5 py-2 text-[10.5px] 2xl:text-[11px] tracking-[0.12em] 2xl:tracking-[0.15em] uppercase font-semibold text-black/75 dark:text-white/75 group-hover:text-brand-500 transition-colors duration-300 whitespace-nowrap"
                   >
                     {item.name}
                     <ChevronDown className="w-3 h-3 transition-transform duration-300 group-hover:rotate-180" />
@@ -173,12 +161,12 @@ export default function NavBar() {
 
                   {/* Dropdown Panel */}
                   <div className="invisible opacity-0 translate-y-2 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 absolute top-full left-1/2 -translate-x-1/2 pt-4 z-50">
-                    <div className="w-96 bg-white dark:bg-[#111113] border-t-2 border-gold-500 shadow-[0_20px_60px_rgba(0,0,0,0.25)] p-2">
+                    <div className="w-96 bg-white dark:bg-[#111113] border-t-2 border-brand-500 shadow-[0_20px_60px_rgba(0,0,0,0.25)] p-2">
                       {item.dropdown.map((sub) => (
                         <Link
                           key={sub.name}
                           href={sub.href}
-                          className="group/item flex items-center gap-3 px-3 py-2.5 hover:bg-gold-500/10 transition-colors duration-200"
+                          className="group/item flex items-center gap-3 px-3 py-2.5 hover:bg-brand-500/10 transition-colors duration-200"
                         >
                           <div className="w-14 h-14 shrink-0 rounded-md overflow-hidden border border-black/10 dark:border-white/10">
                             <img
@@ -188,19 +176,19 @@ export default function NavBar() {
                             />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <div className="text-xs font-bold uppercase tracking-wider text-black dark:text-white group-hover/item:text-gold-500 transition-colors">
+                            <div className="text-xs font-bold uppercase tracking-wider text-black dark:text-white group-hover/item:text-brand-500 transition-colors">
                               {sub.name}
                             </div>
                             <div className="text-[11px] text-black/50 dark:text-white/50 mt-1 leading-snug truncate">
                               {sub.desc}
                             </div>
                           </div>
-                          <ArrowRight className="w-3.5 h-3.5 shrink-0 text-gold-500 opacity-0 -translate-x-1 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-200" />
+                          <ArrowRight className="w-3.5 h-3.5 shrink-0 text-brand-500 opacity-0 -translate-x-1 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-200" />
                         </Link>
                       ))}
                       <Link
                         href={item.href}
-                        className="mt-1 flex items-center justify-center gap-2 bg-black dark:bg-white text-white dark:text-black py-3 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-gold-500 dark:hover:bg-gold-500 hover:text-white transition-colors duration-300"
+                        className="mt-1 flex items-center justify-center gap-2 bg-black dark:bg-white text-white dark:text-black py-3 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-brand-500 dark:hover:bg-brand-500 hover:text-white transition-colors duration-300"
                       >
                         View All {item.name}
                       </Link>
@@ -217,11 +205,11 @@ export default function NavBar() {
             {compareList.length > 0 && (
               <Link
                 href="/collections?compare=true"
-                className="relative p-2 text-black/70 dark:text-white/70 hover:text-gold-500 transition-colors duration-300 hidden lg:block"
+                className="relative p-2 text-black/70 dark:text-white/70 hover:text-brand-500 transition-colors duration-300 hidden lg:block"
                 title="Compare Slabs"
               >
                 <RefreshCw className="w-4 h-4 animate-spin-slow" />
-                <span className="absolute top-0 right-0 bg-gold-500 text-black text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                <span className="absolute top-0 right-0 bg-brand-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
                   {compareList.length}
                 </span>
               </Link>
@@ -230,12 +218,12 @@ export default function NavBar() {
             {/* Wishlist */}
             <Link
               href="/wishlist"
-              className="relative p-2 text-black/70 dark:text-white/70 hover:text-gold-500 transition-colors duration-300"
+              className="relative p-2 text-black/70 dark:text-white/70 hover:text-brand-500 transition-colors duration-300"
               title="Wishlist"
             >
-              <Heart className={`w-4 h-4 ${wishlist.length > 0 ? "fill-gold-500 text-gold-500" : ""}`} />
+              <Heart className={`w-4 h-4 ${wishlist.length > 0 ? "fill-brand-500 text-brand-500" : ""}`} />
               {wishlist.length > 0 && (
-                <span className="absolute top-0 right-0 bg-gold-500 text-black text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
+                <span className="absolute top-0 right-0 bg-brand-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
                   {wishlist.length}
                 </span>
               )}
@@ -244,7 +232,7 @@ export default function NavBar() {
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="p-2 text-black/70 dark:text-white/70 hover:text-gold-500 transition-colors duration-300"
+              className="p-2 text-black/70 dark:text-white/70 hover:text-brand-500 transition-colors duration-300"
               aria-label="Toggle Theme"
             >
               {theme === "dark" ? <Sun className="w-4.5 h-4.5" /> : <Moon className="w-4.5 h-4.5" />}
@@ -253,7 +241,7 @@ export default function NavBar() {
             {/* Get a Quote CTA */}
             <Link
               href="/quote"
-              className="hidden lg:inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-600 text-black px-4 2xl:px-5 py-2.5 text-[10px] font-bold uppercase tracking-[0.2em] transition-all duration-300 shadow-[0_4px_20px_rgba(234,179,8,0.35)] hover:shadow-[0_4px_25px_rgba(234,179,8,0.55)] whitespace-nowrap"
+              className="hidden lg:inline-flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white px-4 2xl:px-5 py-2.5 text-[10px] font-bold uppercase tracking-[0.2em] transition-all duration-300 shadow-[0_4px_20px_rgba(37,99,235,0.35)] hover:shadow-[0_4px_25px_rgba(37,99,235,0.55)] whitespace-nowrap"
             >
               Get a Quote
             </Link>
@@ -261,7 +249,7 @@ export default function NavBar() {
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="xl:hidden p-2 text-black dark:text-white focus:outline-none hover:text-gold-500 transition-colors"
+              className="xl:hidden p-2 text-black dark:text-white focus:outline-none hover:text-brand-500 transition-colors"
               aria-label="Toggle Menu"
             >
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -289,7 +277,7 @@ export default function NavBar() {
                     display: isActive ? "block" : "none"
                   }}
                   transition={{ duration: 0.4, ease: "easeOut" }}
-                  className="mr-6 font-sans text-xs tracking-[0.2em] uppercase font-bold text-gold-500 whitespace-nowrap drop-shadow-md"
+                  className="mr-6 font-sans text-xs tracking-[0.2em] uppercase font-bold text-brand-500 whitespace-nowrap drop-shadow-md"
                 >
                   {section.name}
                 </motion.span>
@@ -303,7 +291,7 @@ export default function NavBar() {
                       borderRadius: isActive ? "1px" : "9999px"
                     }}
                     transition={{ duration: 0.3 }}
-                    className="group-hover:bg-gold-500 group-hover:scale-125 transition-all duration-300"
+                    className="group-hover:bg-brand-500 group-hover:scale-125 transition-all duration-300"
                   />
                 </div>
               </a>
@@ -330,8 +318,8 @@ export default function NavBar() {
                       key={item.name}
                       href={item.href}
                       onClick={() => setIsOpen(false)}
-                      className={`py-3 font-serif text-2xl tracking-wider hover:text-gold-500 transition-colors duration-300 border-b border-black/5 dark:border-white/5 ${
-                        pathname === item.href ? "text-gold-500" : "text-black/80 dark:text-white/80"
+                      className={`py-3 font-serif text-2xl tracking-wider hover:text-brand-500 transition-colors duration-300 border-b border-black/5 dark:border-white/5 ${
+                        pathname === item.href ? "text-brand-500" : "text-black/80 dark:text-white/80"
                       }`}
                     >
                       {item.name}
@@ -347,7 +335,7 @@ export default function NavBar() {
                       className="w-full flex items-center justify-between py-3 font-serif text-2xl tracking-wider text-black/80 dark:text-white/80"
                     >
                       {item.name}
-                      <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${isGroupOpen ? "rotate-180 text-gold-500" : ""}`} />
+                      <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${isGroupOpen ? "rotate-180 text-brand-500" : ""}`} />
                     </button>
                     <AnimatePresence>
                       {isGroupOpen && (
@@ -363,7 +351,7 @@ export default function NavBar() {
                               key={sub.name}
                               href={sub.href}
                               onClick={() => setIsOpen(false)}
-                              className="block py-2.5 text-sm tracking-wide text-black/60 dark:text-white/60 hover:text-gold-500 transition-colors"
+                              className="block py-2.5 text-sm tracking-wide text-black/60 dark:text-white/60 hover:text-brand-500 transition-colors"
                             >
                               {sub.name}
                             </Link>
@@ -371,7 +359,7 @@ export default function NavBar() {
                           <Link
                             href={item.href}
                             onClick={() => setIsOpen(false)}
-                            className="block py-2.5 text-sm font-bold tracking-wide text-gold-500"
+                            className="block py-2.5 text-sm font-bold tracking-wide text-brand-500"
                           >
                             View All {item.name} →
                           </Link>
@@ -387,7 +375,7 @@ export default function NavBar() {
               <Link
                 href="/quote"
                 onClick={() => setIsOpen(false)}
-                className="w-full text-center bg-gold-500 text-black py-4 text-xs font-bold uppercase tracking-[0.2em]"
+                className="w-full text-center bg-brand-500 text-white py-4 text-xs font-bold uppercase tracking-[0.2em]"
               >
                 Get a Quote
               </Link>
