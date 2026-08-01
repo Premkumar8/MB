@@ -194,14 +194,14 @@ export default function HomePage() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7 }}
-              className="block font-sans text-[10px] sm:text-xs uppercase tracking-[0.5em] text-black font-semibold mb-4 [text-shadow:0_2px_10px_rgba(255,255,255,0.5)]"
+              className="inline-block bg-white px-3 py-1.5 font-sans text-[10px] sm:text-xs uppercase tracking-[0.5em] text-black font-bold mb-4"
             >
               Coimbatore&apos;s Trusted
             </motion.span>
 
             <h1
               key={heroScenes[safeIndex].phrase}
-              className="font-serif italic text-3xl sm:text-4xl lg:text-5xl text-black leading-[1.15] [text-shadow:0_4px_20px_rgba(255,255,255,0.55)]"
+              className="font-serif text-3xl sm:text-4xl lg:text-5xl text-black leading-[1.4]"
             >
               {heroScenes[safeIndex].phrase.split(" ").map((word, i) => (
                 <motion.span
@@ -209,7 +209,7 @@ export default function HomePage() {
                   initial={{ opacity: 0, y: 24, filter: "blur(10px)" }}
                   animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                   transition={{ duration: 0.6, delay: i * 0.12, ease: [0.16, 1, 0.3, 1] }}
-                  className="inline-block mr-3 last:mr-0 text-black"
+                  className="inline-block bg-white px-3 py-1 mr-2 mb-2 font-bold text-black box-decoration-clone"
                 >
                   {word}
                 </motion.span>
@@ -306,7 +306,7 @@ export default function HomePage() {
             whileInView="visible"
             viewport={{ once: true, margin: "-60px" }}
             variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-black/10 dark:bg-white/10 rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 shadow-[0_25px_70px_rgba(15,23,42,0.08)]"
+            className="grid grid-cols-1 lg:grid-cols-2 gap-px bg-black/10 dark:bg-white/10 rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 shadow-[0_25px_70px_rgba(15,23,42,0.08)]"
           >
             {categories.map((cat) => {
               const Icon = cat.icon;
@@ -320,18 +320,18 @@ export default function HomePage() {
                   <div className="grid grid-rows-2 gap-px bg-black/10 dark:bg-white/10">
                     <Link
                       href={`/collections?category=${encodeURIComponent(cat.name)}`}
-                      className="group relative flex flex-col items-center justify-center text-center gap-2 h-32 sm:h-40 px-3 bg-white dark:bg-[#0f1420] hover:bg-brand-50 dark:hover:bg-brand-500/10 transition-colors duration-300 overflow-hidden"
+                      className="group relative flex flex-col items-center justify-center text-center gap-3 h-44 sm:h-52 lg:h-60 px-4 bg-white dark:bg-[#0f1420] hover:bg-brand-50 dark:hover:bg-brand-500/10 transition-colors duration-300 overflow-hidden"
                     >
-                      <div className="w-9 h-9 rounded-full bg-brand-50 dark:bg-brand-500/10 flex items-center justify-center text-brand-700 dark:text-brand-300 group-hover:bg-brand-600 group-hover:text-white group-hover:scale-110 transition-all duration-300">
-                        <Icon className="w-4 h-4" />
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-brand-50 dark:bg-brand-500/10 flex items-center justify-center text-brand-700 dark:text-brand-300 group-hover:bg-brand-600 group-hover:text-white group-hover:scale-110 transition-all duration-300">
+                        <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
                       </div>
-                      <h3 className="font-sans text-xs sm:text-sm font-bold uppercase tracking-wide text-black dark:text-white leading-snug">
+                      <h3 className="font-sans text-base sm:text-lg lg:text-xl font-bold uppercase tracking-wide text-black dark:text-white leading-snug">
                         {cat.name}
                       </h3>
                       <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] w-0 bg-brand-500 group-hover:w-2/3 transition-all duration-300" />
                     </Link>
 
-                    <div className="group relative h-32 sm:h-40 overflow-hidden bg-black">
+                    <div className="group relative h-44 sm:h-52 lg:h-60 overflow-hidden bg-black">
                       <img
                         src={cat.secondary}
                         alt=""
@@ -341,28 +341,28 @@ export default function HomePage() {
                   </div>
 
                   {/* Right: full-height hero shot */}
-                  <div className="group relative h-64 sm:h-80 overflow-hidden bg-black">
+                  <div className="group relative h-[22rem] sm:h-[26rem] lg:h-[30rem] overflow-hidden bg-black">
                     <img
                       src={cat.image}
                       alt={cat.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700 ease-out [filter:grayscale(25%)_saturate(1.1)_contrast(1.03)] group-hover:[filter:grayscale(0%)_saturate(1.15)_contrast(1.05)]"
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors duration-300" />
-                    <div className="absolute inset-0 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="absolute inset-0 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <button
                         type="button"
                         onClick={handleInquire(cat.name)}
                         aria-label={`Inquire about ${cat.name}`}
-                        className="w-10 h-10 rounded-full bg-white/95 flex items-center justify-center text-brand-700 hover:bg-white shadow-lg transition-transform hover:scale-110"
+                        className="w-12 h-12 rounded-full bg-white/95 flex items-center justify-center text-brand-700 hover:bg-white shadow-lg transition-transform hover:scale-110"
                       >
-                        <Mail className="w-4 h-4" />
+                        <Mail className="w-5 h-5" />
                       </button>
                       <Link
                         href={`/collections?category=${encodeURIComponent(cat.name)}`}
                         aria-label={`Explore ${cat.name}`}
-                        className="w-10 h-10 rounded-full bg-brand-600 flex items-center justify-center text-white hover:bg-brand-700 shadow-lg transition-transform hover:scale-110"
+                        className="w-12 h-12 rounded-full bg-brand-600 flex items-center justify-center text-white hover:bg-brand-700 shadow-lg transition-transform hover:scale-110"
                       >
-                        <ArrowRight className="w-4 h-4" />
+                        <ArrowRight className="w-5 h-5" />
                       </Link>
                     </div>
                   </div>
@@ -413,25 +413,48 @@ export default function HomePage() {
       {/* TRENDING PRODUCTS */}
       <FeaturedProducts />
 
-      {/* SHOWROOM VIDEO SPOTLIGHT */}
-      <section className="relative w-full bg-brand-900">
-        <div className="relative w-full min-h-[520px] lg:min-h-[620px]">
-          <video ref={videoRef} autoPlay muted={videoMuted} loop playsInline preload="metadata" className="absolute inset-0 w-full h-full object-cover opacity-70">
-            <source src="/videos/showroom-storefront.mp4" type="video/mp4" />
-          </video>
-          <div className="absolute inset-0 bg-gradient-to-r from-brand-900/95 via-brand-900/60 to-brand-900/30" />
+      {/* SHOWROOM SPOTLIGHT */}
+      <section className="relative w-full bg-[#f5f8fc] dark:bg-[#0b0f16] py-20 lg:py-28 overflow-hidden">
+        <div className="absolute -top-20 -right-20 w-96 h-96 bg-brand-200/40 dark:bg-brand-500/10 rounded-full blur-[110px] pointer-events-none" />
 
-          <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 h-full min-h-[520px] lg:min-h-[620px] flex flex-col justify-center py-16">
-            <span className="inline-flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase text-brand-300 font-bold mb-6">
-              <span className="w-8 h-px bg-brand-300" /> Come See Us
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 relative grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-16 items-center">
+          {/* Left: content */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            className="space-y-6"
+          >
+            <span className="inline-flex items-center gap-3 text-[10px] tracking-[0.3em] uppercase text-brand-600 font-bold">
+              <span className="w-8 h-px bg-brand-500/60" /> Visit Us In Person
             </span>
-            <h2 className="font-sans text-3xl sm:text-4xl lg:text-5xl font-bold text-white max-w-xl leading-tight">
-              Step Inside Our Showroom
+            <h2 className="font-sans text-3xl sm:text-4xl lg:text-5xl font-bold text-black dark:text-white leading-tight">
+              Nothing Beats Seeing It <span className="text-brand-gradient">In Real Light</span>
             </h2>
-            <p className="text-white/75 text-sm sm:text-base mt-5 max-w-lg leading-relaxed">
-              Browse tiles, marbles and sanitaryware from India&apos;s leading brands, all under one roof at our Coimbatore showroom.
+            <p className="text-black/60 dark:text-white/60 text-sm sm:text-base leading-relaxed max-w-lg">
+              Photos only tell half the story. Walk our Coimbatore showroom floor to feel the finish, judge the shade, and compare slabs side by side before you decide.
             </p>
-            <div className="mt-8 flex flex-wrap items-center gap-4">
+
+            <div className="grid grid-cols-3 gap-4 pt-2 max-w-md">
+              {[
+                { icon: LayoutGrid, label: "6+ Premium Brands" },
+                { icon: Compass, label: "7,000+ sq.ft Floor" },
+                { icon: Clock, label: "Open 7 Days" },
+              ].map((stat) => {
+                const StatIcon = stat.icon;
+                return (
+                  <div key={stat.label} className="flex flex-col items-start gap-2">
+                    <div className="w-9 h-9 rounded-full bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 flex items-center justify-center text-brand-600">
+                      <StatIcon className="w-4 h-4" />
+                    </div>
+                    <span className="text-[11px] font-semibold text-black/70 dark:text-white/60 leading-snug">{stat.label}</span>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 pt-4">
               <a
                 href={`https://www.google.com/maps?q=${MAPS_QUERY}`}
                 target="_blank"
@@ -440,22 +463,54 @@ export default function HomePage() {
               >
                 Get Directions <ArrowRight className="w-4 h-4" />
               </a>
-              <button
-                onClick={toggleVideoPlay}
-                aria-label={videoPlaying ? "Pause video" : "Play video"}
-                className="w-11 h-11 flex items-center justify-center rounded-full border border-white/25 text-white hover:border-brand-400 hover:text-brand-300 bg-black/20 backdrop-blur-sm transition-colors duration-300"
-              >
-                {videoPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
-              </button>
-              <button
-                onClick={() => setVideoMuted(!videoMuted)}
-                aria-label={videoMuted ? "Unmute video" : "Mute video"}
-                className="w-11 h-11 flex items-center justify-center rounded-full border border-white/25 text-white hover:border-brand-400 hover:text-brand-300 bg-black/20 backdrop-blur-sm transition-colors duration-300"
-              >
-                {videoMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-              </button>
+              <a href="tel:+919940882939" className="btn-brand-outline inline-flex items-center gap-2 !text-brand-700 dark:!text-brand-300 !border-brand-500/40">
+                Call Us
+              </a>
             </div>
-          </div>
+          </motion.div>
+
+          {/* Right: layered media collage */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            className="relative h-[420px] sm:h-[480px] lg:h-[540px]"
+          >
+            <div className="absolute left-0 top-0 w-[70%] h-full rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 shadow-[0_30px_80px_rgba(15,23,42,0.18)] bg-black">
+              <video ref={videoRef} autoPlay muted={videoMuted} loop playsInline preload="metadata" className="absolute inset-0 w-full h-full object-cover">
+                <source src="/videos/showroom-storefront.mp4" type="video/mp4" />
+              </video>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              <div className="absolute bottom-4 left-4 flex items-center gap-2">
+                <button
+                  onClick={toggleVideoPlay}
+                  aria-label={videoPlaying ? "Pause video" : "Play video"}
+                  className="w-10 h-10 flex items-center justify-center rounded-full border border-white/25 text-white hover:border-brand-400 hover:text-brand-300 bg-black/30 backdrop-blur-sm transition-colors duration-300"
+                >
+                  {videoPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 ml-0.5" />}
+                </button>
+                <button
+                  onClick={() => setVideoMuted(!videoMuted)}
+                  aria-label={videoMuted ? "Unmute video" : "Mute video"}
+                  className="w-10 h-10 flex items-center justify-center rounded-full border border-white/25 text-white hover:border-brand-400 hover:text-brand-300 bg-black/30 backdrop-blur-sm transition-colors duration-300"
+                >
+                  {videoMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+            </div>
+
+            <div className="absolute right-0 top-4 w-[42%] h-[46%] rounded-2xl overflow-hidden border-4 border-white dark:border-[#0b0f16] shadow-[0_20px_50px_rgba(15,23,42,0.2)] bg-black">
+              <video autoPlay muted loop playsInline preload="metadata" className="w-full h-full object-cover">
+                <source src="/videos/tile-display-closeup.mp4" type="video/mp4" />
+              </video>
+            </div>
+            <div className="absolute right-0 bottom-4 w-[48%] h-[42%] rounded-2xl overflow-hidden border-4 border-white dark:border-[#0b0f16] shadow-[0_20px_50px_rgba(15,23,42,0.2)] bg-black">
+              <video autoPlay muted loop playsInline preload="metadata" className="w-full h-full object-cover">
+                <source src="/videos/showroom-material-bays.mp4" type="video/mp4" />
+              </video>
+            </div>
+          </motion.div>
         </div>
       </section>
 
