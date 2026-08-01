@@ -35,7 +35,8 @@ const MAPS_QUERY = "370,+Thadagam+Main+Road,+K.N.G.Pudur,+Coimbatore+-+641025";
 const heroScenes = [
   { label: "Living Spaces", src: "/videos/pixabay-living-room.mp4", phrase: "Living Space Hall", duration: 15800 },
   { label: "Grand Halls", src: "/videos/pixabay-grand-marble-lobby.mp4", phrase: "Grand Marble Halls", duration: 7000 },
-  { label: "Bedrooms", src: "/videos/pixabay-bedroom-interior.mp4", phrase: "Comfortable Bedrooms", duration: 23000 },
+  { label: "Kitchens", src: "/videos/pixabay-kitchen-cinematic.mp4", phrase: "Timeless Kitchen Floors", duration: 10000 },
+  { label: "Bedrooms", src: "/videos/bedroom-marble-flooring.mp4", phrase: "Comfortable Bedrooms", duration: 10000 },
   { label: "Bathrooms", src: "/videos/pixabay-modern-bathroom-tub.mp4", phrase: "Luxury Bathroom Finishes", duration: 12300 },
   { label: "Home Exteriors", src: "/videos/pixabay-modern-exterior.mp4", phrase: "Striking Home Exteriors", duration: 10200 },
   { label: "Outdoor Spaces", src: "/videos/pixabay-luxury-home-pool.mp4", phrase: "Outdoor & Poolside Stone", duration: 7000 },
