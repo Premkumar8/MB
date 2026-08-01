@@ -13,7 +13,6 @@ import {
   Volume2,
   VolumeX,
   LayoutGrid,
-  Mountain,
   Gem,
   Layers,
   Hexagon,
@@ -27,27 +26,28 @@ import {
   Send,
   CheckCircle2,
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import FeaturedProducts from "@/components/FeaturedProducts";
 import ApplicationAreas from "@/components/ApplicationAreas";
 
 const MAPS_QUERY = "370,+Thadagam+Main+Road,+K.N.G.Pudur,+Coimbatore+-+641025";
 
-const heroPhrases = [
-  "Tile & Marble Store",
-  "Italian Marble Store",
-  "Granite & Quartz Store",
-  "Full Body Tile Store",
+const heroScenes = [
+  { label: "Living Spaces", src: "/videos/pixabay-living-room.mp4", phrase: "Living Space Hall", duration: 15800 },
+  { label: "Grand Halls", src: "/videos/pixabay-grand-marble-lobby.mp4", phrase: "Grand Marble Halls", duration: 7000 },
+  { label: "Bedrooms", src: "/videos/pixabay-bedroom-interior.mp4", phrase: "Comfortable Bedrooms", duration: 23000 },
+  { label: "Bathrooms", src: "/videos/pixabay-modern-bathroom-tub.mp4", phrase: "Luxury Bathroom Finishes", duration: 12300 },
+  { label: "Home Exteriors", src: "/videos/pixabay-modern-exterior.mp4", phrase: "Striking Home Exteriors", duration: 10200 },
+  { label: "Outdoor Spaces", src: "/videos/pixabay-luxury-home-pool.mp4", phrase: "Outdoor & Poolside Stone", duration: 7000 },
 ];
 
 const categories = [
-  { name: "Full Body Tiles", icon: LayoutGrid, image: "/static/real/tile-cream-polished-floor-installation.jpg", desc: "Vitrified tiles built for heavy-traffic floors." },
-  { name: "Wall Tiles", icon: Layers, image: "/static/real/tile-glossy-white-kitchen-wall.jpg", desc: "Elegant finishes for walls & backsplashes." },
-  { name: "PVT", icon: Hexagon, image: "/static/real/tile-mixed-slab-showroom-corridor.jpg", desc: "Polished vitrified tiles, glass-like shine." },
-  { name: "Marble", icon: Gem, image: "/static/real/marble-gray-herringbone-floor.jpg", desc: "Classic domestic marble slabs." },
-  { name: "Imported Marble", icon: Sparkles, image: "/static/real/marble-gray-staircase-installation.jpg", desc: "Italian & European statuario blocks." },
-  { name: "Onyx", icon: Mountain, image: "/static/real/onyx-blue-midnight.jpg", desc: "Translucent, richly veined natural stone." },
-  { name: "Quartzite", icon: Cog, image: "/static/real/quartzite-charcoal-outdoor-walkway.jpg", desc: "Durable stone with marble-like beauty." },
+  { name: "Full Body Tiles", icon: LayoutGrid, image: "/static/real/tile-cream-polished-floor-installation.jpg", secondary: "/static/real/tile-white-grid-texture.jpg", desc: "Vitrified tiles built for heavy-traffic floors." },
+  { name: "Wall Tiles", icon: Layers, image: "/static/real/tile-glossy-white-kitchen-wall.jpg", secondary: "/static/real/tile-wall-tan-subway.jpg", desc: "Elegant finishes for walls & backsplashes." },
+  { name: "PVT", icon: Hexagon, image: "/static/real/tile-pvt-elevator-lobby.jpg", secondary: "/static/real/tile-pvt-diamond-gloss.jpg", desc: "Polished vitrified tiles, glass-like shine." },
+  { name: "Marble", icon: Gem, image: "/static/real/marble-gray-herringbone-floor.jpg", secondary: "/static/real/marble-gray-herringbone-floor-closeup.jpg", desc: "Classic domestic marble slabs." },
+  { name: "Imported Marble", icon: Sparkles, image: "/static/real/marble-imported-statuario-kitchen.jpg", secondary: "/static/real/marble-imported-calacatta.jpg", desc: "Italian & European statuario blocks." },
+  { name: "Quartzite", icon: Cog, image: "/static/real/quartzite-charcoal-outdoor-walkway.jpg", secondary: "/static/real/quartzite-storm-gray.jpg", desc: "Durable stone with marble-like beauty." },
 ];
 
 const valueProps = [
@@ -107,37 +107,16 @@ export default function HomePage() {
     setVideoPlaying(!videoPlaying);
   };
 
-  const [phraseIndex, setPhraseIndex] = useState(0);
-  const [typedText, setTypedText] = useState("");
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [activeScene, setActiveScene] = useState(0);
+  const safeIndex = ((activeScene % heroScenes.length) + heroScenes.length) % heroScenes.length;
 
   useEffect(() => {
-    const currentPhrase = heroPhrases[phraseIndex];
-    let delay = 65;
-
-    if (!isDeleting && typedText.length === currentPhrase.length) {
-      delay = 2000;
-    } else if (isDeleting && typedText.length === 0) {
-      delay = 400;
-    } else if (isDeleting) {
-      delay = 35;
-    }
-
+    const duration = heroScenes[safeIndex].duration;
     const timeout = setTimeout(() => {
-      if (!isDeleting && typedText.length < currentPhrase.length) {
-        setTypedText(currentPhrase.slice(0, typedText.length + 1));
-      } else if (!isDeleting && typedText.length === currentPhrase.length) {
-        setIsDeleting(true);
-      } else if (isDeleting && typedText.length > 0) {
-        setTypedText(currentPhrase.slice(0, typedText.length - 1));
-      } else if (isDeleting && typedText.length === 0) {
-        setIsDeleting(false);
-        setPhraseIndex((prev) => (prev + 1) % heroPhrases.length);
-      }
-    }, delay);
-
+      setActiveScene((prev) => (prev + 1) % heroScenes.length);
+    }, duration);
     return () => clearTimeout(timeout);
-  }, [typedText, isDeleting, phraseIndex]);
+  }, [safeIndex]);
 
   const [form, setForm] = useState({ name: "", phone: "", email: "", interest: categories[0].name, message: "" });
   const [sent, setSent] = useState(false);
@@ -153,29 +132,38 @@ export default function HomePage() {
     setTimeout(() => setSent(false), 4000);
   };
 
+  const handleInquire = (categoryName: string) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    setForm((prev) => ({ ...prev, interest: categoryName }));
+    document.getElementById("inquiry")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   return (
     <div className="relative w-full overflow-hidden min-h-screen page-fade-in bg-white dark:bg-[#070708]">
       {/* HERO */}
       <section id="hero" className="relative w-full h-screen min-h-[600px] flex items-center overflow-hidden bg-black">
-        <motion.video
-          initial={{ opacity: 0, scale: 1 }}
-          animate={{ opacity: 1, scale: [1, 1.09, 1] }}
-          transition={{
-            opacity: { duration: 1.4, ease: "easeOut" },
-            scale: { duration: 26, repeat: Infinity, ease: "easeInOut" },
-          }}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          className="absolute inset-0 w-full h-full object-cover [filter:contrast(1.14)_saturate(1.45)_brightness(1.2)]"
-        >
-          <source src="/videos/banner-showroom-motion.mp4" type="video/mp4" />
-        </motion.video>
+        <AnimatePresence mode="sync">
+          <motion.video
+            key={heroScenes[safeIndex].src}
+            initial={{ opacity: 0, scale: 1.06 }}
+            animate={{ opacity: 1, scale: [1.06, 1.14, 1.06] }}
+            exit={{ opacity: 0 }}
+            transition={{
+              opacity: { duration: 1.2, ease: "easeInOut" },
+              scale: { duration: 6.5, ease: "linear" },
+            }}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            className="absolute inset-0 w-full h-full object-cover [filter:contrast(1.14)_saturate(1.45)_brightness(1.2)]"
+          >
+            <source src={heroScenes[safeIndex].src} type="video/mp4" />
+          </motion.video>
+        </AnimatePresence>
 
-        {/* Focused vignette behind the text, keeps the rest of the frame bright and clear */}
-        <div className="absolute inset-0 bg-[radial-gradient(60%_75%_at_18%_55%,rgba(0,0,0,0.62),transparent_70%)]" />
+        {/* Soft overall darkening for readability, no focused patch behind the text */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-black/10" />
 
         {/* Floating light particles for a premium, mesmerizing feel */}
@@ -200,54 +188,33 @@ export default function HomePage() {
           ))}
         </div>
 
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-12">
-          <div className="max-w-2xl space-y-7">
-            <motion.div
+        <div className="relative z-10 w-full h-full flex items-center px-6 lg:px-12">
+          <div className="max-w-3xl">
+            <motion.span
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7 }}
-              className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full"
+              className="block font-sans text-[10px] sm:text-xs uppercase tracking-[0.5em] text-black font-semibold mb-4 [text-shadow:0_2px_10px_rgba(255,255,255,0.5)]"
             >
-              <Sparkles className="w-4 h-4 text-brand-300" />
-              <span className="text-[10px] tracking-[0.35em] uppercase font-bold text-white">Excellence Since 1986</span>
-            </motion.div>
+              Coimbatore&apos;s Trusted
+            </motion.span>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.1 }}
-              className="font-sans text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-[1.08] [text-shadow:0_4px_24px_rgba(0,0,0,0.55)]"
+            <h1
+              key={heroScenes[safeIndex].phrase}
+              className="font-serif italic text-3xl sm:text-4xl lg:text-5xl text-black leading-[1.15] [text-shadow:0_4px_20px_rgba(255,255,255,0.55)]"
             >
-              Coimbatore&apos;s Trusted<br />
-              <span className="text-brand-300 inline-flex items-center">
-                {typedText}
-                <span className="inline-block w-[3px] sm:w-1 h-[0.85em] bg-brand-300 ml-1.5 animate-pulse" />
-              </span>
-            </motion.h1>
-
-            <motion.p
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-base sm:text-lg text-white/90 leading-relaxed max-w-xl [text-shadow:0_2px_12px_rgba(0,0,0,0.5)]"
-            >
-              Leading supplier of Ceramic Tiles, Granites and Italian Marbles for architects, engineers, builders and homeowners since 1986.
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="flex flex-wrap gap-4 pt-2"
-            >
-              <Link href="/quote" className="btn-brand-solid inline-flex items-center gap-2">
-                Get a Quote
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link href="/collections" className="btn-brand-outline inline-flex items-center gap-2">
-                Explore Collections
-              </Link>
-            </motion.div>
+              {heroScenes[safeIndex].phrase.split(" ").map((word, i) => (
+                <motion.span
+                  key={word + i}
+                  initial={{ opacity: 0, y: 24, filter: "blur(10px)" }}
+                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                  transition={{ duration: 0.6, delay: i * 0.12, ease: [0.16, 1, 0.3, 1] }}
+                  className="inline-block mr-3 last:mr-0 text-black"
+                >
+                  {word}
+                </motion.span>
+              ))}
+            </h1>
           </div>
         </div>
 
@@ -266,6 +233,39 @@ export default function HomePage() {
             <span className="w-1 h-1.5 rounded-full bg-brand-300" />
           </motion.div>
         </motion.div>
+
+        {/* Rotating scene indicator */}
+        <div className="absolute top-28 right-6 lg:right-12 z-10 hidden md:flex flex-col items-end gap-3">
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={heroScenes[safeIndex].label}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.4 }}
+              className="text-[10px] uppercase tracking-[0.25em] font-bold text-white/90 [text-shadow:0_2px_10px_rgba(0,0,0,0.6)]"
+            >
+              {heroScenes[safeIndex].label}
+            </motion.span>
+          </AnimatePresence>
+          <div className="flex items-center gap-2">
+            {heroScenes.map((scene, i) => (
+              <button
+                key={scene.src}
+                type="button"
+                onClick={() => setActiveScene(i)}
+                aria-label={`Show ${scene.label}`}
+                className="group py-2"
+              >
+                <span
+                  className={`block h-[3px] rounded-full transition-all duration-300 ${
+                    i === activeScene ? "w-8 bg-brand-400" : "w-4 bg-white/40 group-hover:bg-white/70"
+                  }`}
+                />
+              </button>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* CATEGORY GRID */}
@@ -287,84 +287,96 @@ export default function HomePage() {
               What We Offer
               <span className="w-8 h-[1px] bg-brand-500/60" />
             </span>
-            <h2 className="font-sans text-3xl sm:text-4xl lg:text-5xl font-bold text-black dark:text-white">
-              Browse By <span className="text-brand-gradient">Category</span>
+            <h2 className="font-sans text-3xl sm:text-4xl lg:text-5xl font-bold text-black dark:text-white leading-tight">
+              Everything You Need To Build Your <span className="text-brand-gradient">Perfect Home</span>
             </h2>
-            <p className="text-sm sm:text-base text-black/55 dark:text-white/55 max-w-lg mx-auto pt-1">
-              Real tiles and marble, shown the way they actually look once installed — floors, walls and finishes from our showroom to your space.
+            <p className="text-sm sm:text-base text-black/55 dark:text-white/55 max-w-xl mx-auto pt-1">
+              From full body and wall tiles to Italian marble, onyx and quartzite — a complete range of surfaces sourced from India&apos;s leading brands, shown the way they actually look once installed.
             </p>
+            <div className="pt-3">
+              <Link href="/collections" className="btn-brand-solid inline-flex items-center gap-2">
+                View Our Premium Products
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
           </motion.div>
 
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-60px" }}
-            variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
-            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5"
+            variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-black/10 dark:bg-white/10 rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 shadow-[0_25px_70px_rgba(15,23,42,0.08)]"
           >
             {categories.map((cat) => {
               const Icon = cat.icon;
               return (
                 <motion.div
                   key={cat.name}
-                  variants={{ hidden: { opacity: 0, y: 32, scale: 0.94 }, visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } } }}
-                  whileHover={{ y: -8 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.5 } } }}
+                  className="grid grid-cols-2 gap-px bg-black/10 dark:bg-white/10"
                 >
-                  <Link
-                    href={`/collections?category=${encodeURIComponent(cat.name)}`}
-                    className="group block relative overflow-hidden rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-[#0f1420] hover:border-brand-400 hover:shadow-2xl hover:shadow-brand-500/10 transition-all duration-300"
-                  >
-                    <div className="relative aspect-[4/5] overflow-hidden">
+                  {/* Left: name + secondary detail shot, stacked */}
+                  <div className="grid grid-rows-2 gap-px bg-black/10 dark:bg-white/10">
+                    <Link
+                      href={`/collections?category=${encodeURIComponent(cat.name)}`}
+                      className="group relative flex flex-col items-center justify-center text-center gap-2 h-32 sm:h-40 px-3 bg-white dark:bg-[#0f1420] hover:bg-brand-50 dark:hover:bg-brand-500/10 transition-colors duration-300 overflow-hidden"
+                    >
+                      <div className="w-9 h-9 rounded-full bg-brand-50 dark:bg-brand-500/10 flex items-center justify-center text-brand-700 dark:text-brand-300 group-hover:bg-brand-600 group-hover:text-white group-hover:scale-110 transition-all duration-300">
+                        <Icon className="w-4 h-4" />
+                      </div>
+                      <h3 className="font-sans text-xs sm:text-sm font-bold uppercase tracking-wide text-black dark:text-white leading-snug">
+                        {cat.name}
+                      </h3>
+                      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] w-0 bg-brand-500 group-hover:w-2/3 transition-all duration-300" />
+                    </Link>
+
+                    <div className="group relative h-32 sm:h-40 overflow-hidden bg-black">
                       <img
-                        src={cat.image}
-                        alt={cat.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out [filter:saturate(1.15)_contrast(1.05)]"
+                        src={cat.secondary}
+                        alt=""
+                        className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700 ease-out [filter:grayscale(25%)_saturate(1.1)_contrast(1.03)] group-hover:[filter:grayscale(0%)_saturate(1.15)_contrast(1.05)]"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-brand-900/90 via-brand-900/15 to-transparent" />
-                      {/* Shine sweep on hover */}
-                      <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out bg-gradient-to-r from-transparent via-white/25 to-transparent skew-x-12 pointer-events-none" />
-                      <div className="absolute top-3 left-3 w-9 h-9 rounded-full bg-white/95 flex items-center justify-center text-brand-700 group-hover:bg-brand-500 group-hover:text-white group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
-                        <Icon className="w-4.5 h-4.5" />
-                      </div>
-                      <div className="absolute bottom-3 left-3 right-3">
-                        <h3 className="font-sans font-semibold text-base text-white leading-snug drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">{cat.name}</h3>
-                      </div>
                     </div>
-                    <div className="p-4">
-                      <p className="text-xs text-black/50 dark:text-white/50 leading-snug">{cat.desc}</p>
-                      <span className="mt-3 inline-flex items-center gap-1.5 text-[10px] uppercase tracking-widest font-bold text-brand-600 group-hover:gap-2.5 transition-all">
-                        Explore <ArrowRight className="w-3 h-3" />
-                      </span>
+                  </div>
+
+                  {/* Right: full-height hero shot */}
+                  <div className="group relative h-64 sm:h-80 overflow-hidden bg-black">
+                    <img
+                      src={cat.image}
+                      alt={cat.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700 ease-out [filter:grayscale(25%)_saturate(1.1)_contrast(1.03)] group-hover:[filter:grayscale(0%)_saturate(1.15)_contrast(1.05)]"
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors duration-300" />
+                    <div className="absolute inset-0 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <button
+                        type="button"
+                        onClick={handleInquire(cat.name)}
+                        aria-label={`Inquire about ${cat.name}`}
+                        className="w-10 h-10 rounded-full bg-white/95 flex items-center justify-center text-brand-700 hover:bg-white shadow-lg transition-transform hover:scale-110"
+                      >
+                        <Mail className="w-4 h-4" />
+                      </button>
+                      <Link
+                        href={`/collections?category=${encodeURIComponent(cat.name)}`}
+                        aria-label={`Explore ${cat.name}`}
+                        className="w-10 h-10 rounded-full bg-brand-600 flex items-center justify-center text-white hover:bg-brand-700 shadow-lg transition-transform hover:scale-110"
+                      >
+                        <ArrowRight className="w-4 h-4" />
+                      </Link>
                     </div>
-                  </Link>
+                  </div>
                 </motion.div>
               );
             })}
-
-            {/* Completes the grid to a clean 8-tile layout */}
-            <motion.div
-              variants={{ hidden: { opacity: 0, y: 32, scale: 0.94 }, visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } } }}
-              whileHover={{ y: -8 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            >
-              <Link
-                href="/collections"
-                className="group flex flex-col items-center justify-center text-center gap-4 h-full min-h-[240px] rounded-xl border border-dashed border-brand-400/50 bg-gradient-to-br from-brand-600 to-brand-800 hover:border-brand-300 hover:shadow-2xl hover:shadow-brand-500/20 transition-all duration-300 p-6"
-              >
-                <div className="w-12 h-12 rounded-full bg-white/15 flex items-center justify-center text-white group-hover:bg-white group-hover:text-brand-700 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
-                  <LayoutGrid className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-sans font-semibold text-base text-white leading-snug">View All Collections</h3>
-                  <p className="text-xs text-white/70 mt-1.5 leading-snug">Browse every tile, marble &amp; stone we carry.</p>
-                </div>
-                <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-widest font-bold text-white group-hover:gap-2.5 transition-all">
-                  See All <ArrowRight className="w-3 h-3" />
-                </span>
-              </Link>
-            </motion.div>
           </motion.div>
+
+          <div className="mt-10 flex justify-center">
+            <Link href="/collections" className="btn-brand-outline inline-flex items-center gap-2 !text-brand-700 dark:!text-brand-300 !border-brand-500/40">
+              View All Collections
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -694,7 +706,7 @@ export default function HomePage() {
       </section>
 
       {/* INQUIRY FORM */}
-      <section className="bg-white dark:bg-[#080809] py-20 lg:py-24">
+      <section id="inquiry" className="bg-white dark:bg-[#080809] py-20 lg:py-24 scroll-mt-24">
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
           <div className="text-center max-w-xl mx-auto mb-12 space-y-3">
             <span className="text-[10px] tracking-[0.3em] uppercase text-brand-600 font-bold">Get In Touch</span>
