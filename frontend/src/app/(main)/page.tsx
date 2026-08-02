@@ -110,6 +110,8 @@ export default function HomePage() {
 
   const [activeScene, setActiveScene] = useState(0);
   const safeIndex = ((activeScene % heroScenes.length) + heroScenes.length) % heroScenes.length;
+  const activeHeroScene = heroScenes[safeIndex];
+  const hideHeroLeftWording = activeHeroScene.src === "/videos/bedroom-marble-flooring.mp4";
 
   useEffect(() => {
     const duration = heroScenes[safeIndex].duration;
@@ -160,7 +162,7 @@ export default function HomePage() {
             preload="auto"
             className="absolute inset-0 w-full h-full object-cover [filter:contrast(1.14)_saturate(1.45)_brightness(1.2)]"
           >
-            <source src={heroScenes[safeIndex].src} type="video/mp4" />
+            <source src={activeHeroScene.src} type="video/mp4" />
           </motion.video>
         </AnimatePresence>
 
@@ -190,33 +192,36 @@ export default function HomePage() {
         </div>
 
         <div className="relative z-10 w-full h-full flex items-center px-6 lg:px-12">
-          <div className="max-w-3xl">
-            <motion.span
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7 }}
-              className="inline-block bg-white px-3 py-1.5 font-sans text-[10px] sm:text-xs uppercase tracking-[0.5em] text-black font-bold mb-4"
-            >
-              Coimbatore&apos;s Trusted
-            </motion.span>
+          {!hideHeroLeftWording && (
+            <div className="max-w-4xl">
+              <motion.span
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+                className="mb-3 block font-sans text-xs sm:text-sm uppercase text-white/90 font-semibold [text-shadow:0_2px_12px_rgba(0,0,0,0.7)]"
+              >
+                Coimbatore&apos;s Trusted
+              </motion.span>
 
-            <h1
-              key={heroScenes[safeIndex].phrase}
-              className="font-serif text-3xl sm:text-4xl lg:text-5xl text-black leading-[1.4]"
-            >
-              {heroScenes[safeIndex].phrase.split(" ").map((word, i) => (
-                <motion.span
-                  key={word + i}
-                  initial={{ opacity: 0, y: 24, filter: "blur(10px)" }}
-                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                  transition={{ duration: 0.6, delay: i * 0.12, ease: [0.16, 1, 0.3, 1] }}
-                  className="inline-block bg-white px-3 py-1 mr-2 mb-2 font-bold text-black box-decoration-clone"
-                >
-                  {word}
-                </motion.span>
-              ))}
-            </h1>
-          </div>
+              <h1
+                key={activeHeroScene.phrase}
+                className="font-sans text-4xl sm:text-5xl lg:text-7xl text-white leading-[1.04] font-semibold [text-shadow:0_4px_24px_rgba(0,0,0,0.78)]"
+              >
+                {activeHeroScene.phrase.split(" ").map((word, i) => (
+                  <span key={word + i} className="inline-block overflow-hidden align-bottom mr-3 pb-1">
+                    <motion.span
+                      initial={{ y: "110%", opacity: 0, filter: "blur(6px)" }}
+                      animate={{ y: "0%", opacity: 1, filter: "blur(0px)" }}
+                      transition={{ duration: 0.75, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+                      className="inline-block"
+                    >
+                      {word}
+                    </motion.span>
+                  </span>
+                ))}
+              </h1>
+            </div>
+          )}
         </div>
 
         <motion.div
