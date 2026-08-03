@@ -77,10 +77,10 @@ const projectReels = [
 ];
 
 const brandsList = [
-  { name: "Lavish Ceramics", category: "Tiles", logo: "/static/logos/lavish-ceramics.png" },
+  { name: "Lavish Ceramics", category: "Tiles", logo: "/static/logos/lavish-ceramics.webp" },
   { name: "Parryware", category: "Sanitaryware", logo: "/static/logos/parryware.png" },
-  { name: "Bonzer 7 Tiles", category: "Tiles", logo: "/static/logos/bonzer-7-tiles.png" },
-  { name: "Orientbell Tiles", category: "Tiles", logo: "/static/logos/orientbell-tiles.png" },
+  { name: "Bonzer 7 Tiles", category: "Tiles", logo: "/static/logos/bonzer-7-tiles.svg" },
+  { name: "Orientbell Tiles", category: "Tiles", logo: "/static/logos/orientbell-tiles-white.png", darkBg: true },
   { name: "Hindware Italian Collection", category: "Tile Division", logo: "/static/logos/hindware.png" },
   { name: "RAK Ceramics", category: "Premium Tiles", logo: "/static/logos/rak-ceramics.svg" },
 ];
@@ -92,7 +92,7 @@ const architects = [
   "CUBOID ARCHITECTS", "A PLUS B ARCHITECTS", "HARRISON ARCHITECT", "SHIVAM ARCHITECT", "IKSHA ARCHITECTS", "JAYABAL ASSOCIATES", "ARUN AND ASSOCIATES", "DESIGN AND ARCH", "DESIGN CONSORTIUM",
 ];
 
-function BrandLogo({ name, category, logo }: { name: string; category: string; logo: string }) {
+function BrandLogo({ name, category, logo, darkBg }: { name: string; category: string; logo: string; darkBg?: boolean }) {
   const [failed, setFailed] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
 
@@ -112,7 +112,13 @@ function BrandLogo({ name, category, logo }: { name: string; category: string; l
     );
   }
 
-  return <img ref={imgRef} src={logo} alt={name} className="h-10 md:h-12 max-w-[80%] object-contain" onError={() => setFailed(true)} />;
+  const img = <img ref={imgRef} src={logo} alt={name} className="h-8 md:h-9 max-w-[85%] object-contain" onError={() => setFailed(true)} />;
+
+  if (darkBg) {
+    return <div className="bg-brand-900 rounded-lg px-5 py-3 flex items-center justify-center">{img}</div>;
+  }
+
+  return img;
 }
 
 export default function HomePage() {
@@ -669,7 +675,7 @@ export default function HomePage() {
                 key={brand.name}
                 className="flex flex-col items-center justify-center text-center gap-3 bg-white dark:bg-[#0f1420] border border-black/10 dark:border-white/10 hover:border-brand-400 rounded-xl py-8 px-4 transition-colors duration-300"
               >
-                <BrandLogo name={brand.name} category={brand.category} logo={brand.logo} />
+                <BrandLogo name={brand.name} category={brand.category} logo={brand.logo} darkBg={brand.darkBg} />
               </div>
             ))}
           </div>
