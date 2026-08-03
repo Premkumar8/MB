@@ -43,12 +43,12 @@ const heroScenes = [
 ];
 
 const categories = [
-  { name: "Full Body Tiles", icon: LayoutGrid, image: "/static/real/tile-cream-polished-floor-installation.jpg", secondary: "/static/real/tile-white-grid-texture.jpg", desc: "Vitrified tiles built for heavy-traffic floors." },
-  { name: "Wall Tiles", icon: Layers, image: "/static/real/tile-glossy-white-kitchen-wall.jpg", secondary: "/static/real/tile-wall-tan-subway.jpg", desc: "Elegant finishes for walls & backsplashes." },
+  { name: "Full Body Tiles", icon: LayoutGrid, image: "/static/real/tile-cream-polished-floor-installation.jpg", secondary: "/static/real/tile-wood-look-bedroom-floor.jpg", desc: "Hall, dining & bedroom floors built for heavy-traffic." },
+  { name: "Wall Tiles", icon: Layers, image: "/static/real/tile-glossy-white-kitchen-wall.jpg", secondary: "/static/real/tile-gray-shower-suite.jpg", desc: "Elegant finishes for kitchen & bathroom walls." },
   { name: "PVT", icon: Hexagon, image: "/static/real/tile-pvt-elevator-lobby.jpg", secondary: "/static/real/tile-pvt-diamond-gloss.jpg", desc: "Polished vitrified tiles, glass-like shine." },
-  { name: "Marble", icon: Gem, image: "/static/real/marble-gray-herringbone-floor.jpg", secondary: "/static/real/marble-gray-herringbone-floor-closeup.jpg", desc: "Classic domestic marble slabs." },
-  { name: "Imported Marble", icon: Sparkles, image: "/static/real/marble-imported-statuario-kitchen.jpg", secondary: "/static/real/marble-imported-calacatta.jpg", desc: "Italian & European statuario blocks." },
-  { name: "Quartzite", icon: Cog, image: "/static/real/quartzite-charcoal-outdoor-walkway.jpg", secondary: "/static/real/quartzite-storm-gray.jpg", desc: "Durable stone with marble-like beauty." },
+  { name: "Marble", icon: Gem, image: "/static/real/marble-gray-herringbone-floor.jpg", secondary: "/static/real/marble-gray-stair-tread-installation.jpg", desc: "Indian marble for floors & staircase steps." },
+  { name: "Imported Marble", icon: Sparkles, image: "/static/real/marble-imported-statuario-kitchen.jpg", secondary: "/static/real/marble-imported-carved-wall.jpg", desc: "Italian marble flooring & wall cladding." },
+  { name: "Quartzite", icon: Cog, image: "/static/real/quartzite-charcoal-outdoor-walkway.jpg", secondary: "/static/real/quartzite-storm-gray.jpg", desc: "Durable natural stone for parking & outdoor areas." },
 ];
 
 const valueProps = [
@@ -77,21 +77,43 @@ const projectReels = [
 ];
 
 const brandsList = [
-  { name: "Lavish Ceramics", category: "Tiles" },
-  { name: "Parryware", category: "Sanitaryware" },
-  { name: "Bonzer 7 Tiles", category: "Tiles" },
-  { name: "Orientbell Tiles", category: "Tiles" },
-  { name: "Hindware Italian Collection", category: "Tile Division" },
-  { name: "RAK Ceramics", category: "Premium Tiles" },
+  { name: "Lavish Ceramics", category: "Tiles", logo: "/static/logos/lavish-ceramics.png" },
+  { name: "Parryware", category: "Sanitaryware", logo: "/static/logos/parryware.png" },
+  { name: "Bonzer 7 Tiles", category: "Tiles", logo: "/static/logos/bonzer-7-tiles.png" },
+  { name: "Orientbell Tiles", category: "Tiles", logo: "/static/logos/orientbell-tiles.png" },
+  { name: "Hindware Italian Collection", category: "Tile Division", logo: "/static/logos/hindware.png" },
+  { name: "RAK Ceramics", category: "Premium Tiles", logo: "/static/logos/rak-ceramics.svg" },
 ];
-const brands = [...brandsList, ...brandsList];
 
 const clients = [
-  "DAKSHA PROPERTIES", "GUJAN", "CASA GRAND", "INFINIUM DEVELOPERS", "DIYA FOUNDATION", "UNITED LIVING SPACE", "TNCD", "INDIA BUILDERS", "A PLUS B", "SUKRA PROPERTIES", "RP CONSTRUCTION", "LANDS AND LANDS", "TIDEL NEO PARK",
+  "DAKSHA PROPERTIES", "GUJAN", "CASA GRAND", "INFINIUM DEVELOPERS", "DIYA FOUNDATION", "UNITED LIVING SPACE", "TNCD", "INDIA BUILDERS", "A PLUS B", "SUKRA PROPERTIES", "RP CONSTRUCTION", "LANDS AND LANDS", "TIDEL NEO PARK", "MCR CONSTRUCTION", "PVK CONSTRUCTION", "BANNARI BUILDERS",
 ];
 const architects = [
   "CUBOID ARCHITECTS", "A PLUS B ARCHITECTS", "HARRISON ARCHITECT", "SHIVAM ARCHITECT", "IKSHA ARCHITECTS", "JAYABAL ASSOCIATES", "ARUN AND ASSOCIATES", "DESIGN AND ARCH", "DESIGN CONSORTIUM",
 ];
+
+function BrandLogo({ name, category, logo }: { name: string; category: string; logo: string }) {
+  const [failed, setFailed] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    const img = imgRef.current;
+    if (img && img.complete && img.naturalWidth === 0) {
+      setFailed(true);
+    }
+  }, []);
+
+  if (failed) {
+    return (
+      <div className="flex flex-col items-center gap-2">
+        <span className="text-[9px] uppercase tracking-[0.2em] font-bold text-brand-500">{category}</span>
+        <span className="font-sans font-bold text-base text-black dark:text-white">{name}</span>
+      </div>
+    );
+  }
+
+  return <img ref={imgRef} src={logo} alt={name} className="h-10 md:h-12 max-w-[80%] object-contain" onError={() => setFailed(true)} />;
+}
 
 export default function HomePage() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -640,17 +662,14 @@ export default function HomePage() {
             The Exclusive Tiles Showroom For
           </h2>
         </div>
-        <div className="relative w-full overflow-hidden py-2">
-          <div className="absolute inset-y-0 left-0 w-16 md:w-32 bg-gradient-to-r from-[#f5f8fc] dark:from-[#0b0f16] to-transparent z-10 pointer-events-none" />
-          <div className="absolute inset-y-0 right-0 w-16 md:w-32 bg-gradient-to-l from-[#f5f8fc] dark:from-[#0b0f16] to-transparent z-10 pointer-events-none" />
-          <div className="flex animate-marquee w-[200%] gap-5 pl-6 md:pl-10">
-            {brands.map((brand, idx) => (
+        <div className="max-w-6xl mx-auto px-6 lg:px-12">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-5">
+            {brandsList.map((brand) => (
               <div
-                key={`${brand.name}-${idx}`}
-                className="shrink-0 w-64 md:w-72 flex flex-col items-center justify-center text-center gap-2 bg-white dark:bg-[#0f1420] border border-black/10 dark:border-white/10 hover:border-brand-400 rounded-xl py-8 px-6 transition-colors duration-300"
+                key={brand.name}
+                className="flex flex-col items-center justify-center text-center gap-3 bg-white dark:bg-[#0f1420] border border-black/10 dark:border-white/10 hover:border-brand-400 rounded-xl py-8 px-4 transition-colors duration-300"
               >
-                <span className="text-[9px] uppercase tracking-[0.2em] font-bold text-brand-500">{brand.category}</span>
-                <span className="font-sans font-bold text-base text-black dark:text-white">{brand.name}</span>
+                <BrandLogo name={brand.name} category={brand.category} logo={brand.logo} />
               </div>
             ))}
           </div>
