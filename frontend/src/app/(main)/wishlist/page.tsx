@@ -34,7 +34,7 @@ export default function WishlistPage() {
           <div className="space-y-2">
             <h3 className="font-serif text-xl">Wishlist Is Empty</h3>
             <p className="text-xs text-black/60 dark:text-white/60 leading-relaxed">
-              Explore our collections yard to bookmark blocks, Onyx slabs, and granite materials.
+              Explore our collections yard to bookmark blocks, quartz slabs, and granite materials.
             </p>
           </div>
           <Link href="/collections" className="btn-gold-solid inline-block text-xs">

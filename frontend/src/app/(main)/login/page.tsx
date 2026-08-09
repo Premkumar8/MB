@@ -17,7 +17,7 @@ export default function LoginPage() {
         <div className="hidden lg:block relative h-full min-h-[600px] bg-black">
           <div 
             className="absolute inset-0 bg-cover bg-center" 
-            style={{ backgroundImage: "url('/static/seed/emerald_onyx.jpg')" }}
+            style={{ backgroundImage: "url('/static/real/hero-marble-hall.jpg')" }}
           ></div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-80"></div>
           

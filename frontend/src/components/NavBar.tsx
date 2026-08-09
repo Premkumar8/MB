@@ -12,7 +12,7 @@ interface SubLink {
   name: string;
   href: string;
   desc: string;
-  image: string;
+  image?: string;
 }
 
 interface MenuItem {
@@ -27,19 +27,33 @@ const tilesDropdown: SubLink[] = [
   { name: "Full Body Tiles", href: category("Full Body Tiles"), desc: "Vitrified tiles built for heavy-traffic floors", image: "/static/real/tile-white-grid-texture.jpg" },
   { name: "Wall Tiles", href: category("Wall Tiles"), desc: "Elegant finishes for walls & backsplashes", image: "/static/real/tile-white-diamond-pattern.jpg" },
   { name: "PVT Tiles", href: category("PVT"), desc: "Polished vitrified tiles, glass-like shine", image: "/static/real/lobby-reflective-building.jpg" },
+  { name: "Elevation Tiles", href: "/quote", desc: "Exterior & compound wall cladding — ask for a quote", image: "/static/real/elevation-tile-exterior.jpg" },
 ];
 
 const marblesDropdown: SubLink[] = [
-  { name: "Indian Marble", href: category("Marble"), desc: "Classic domestic marble slabs", image: "/static/real/marble-white-carrara.jpg" },
-  { name: "Imported Marble", href: category("Imported Marble"), desc: "Italian & European statuario blocks", image: "/static/real/hero-marble-staircase.jpg" },
-  { name: "Onyx", href: category("Onyx"), desc: "Translucent, richly veined natural stone", image: "/static/real/onyx-emerald-green.jpg" },
-  { name: "Quartzite", href: category("Quartzite"), desc: "Durable stone with marble-like beauty", image: "/static/real/quartzite-travertine-beige.jpg" },
+  { name: "Indian Marble — Flooring", href: category("Marble"), desc: "Hall, dining & bedroom marble flooring", image: "/static/real/marble-gray-herringbone-floor.jpg" },
+  { name: "Indian Marble — Staircase", href: category("Marble"), desc: "Staircase & step installations", image: "/static/real/marble-gray-stair-tread-installation.jpg" },
+  { name: "Italian Marble — Flooring", href: category("Imported Marble"), desc: "Statuario & imported slab flooring", image: "/static/real/marble-imported-statuario-kitchen.jpg" },
+  { name: "Italian Marble — Wall Cladding", href: category("Imported Marble"), desc: "Lift walls & decorative cladding", image: "/static/real/marble-imported-carved-wall.jpg" },
+  { name: "Quartz & Natural Stone", href: category("Quartz"), desc: "Durable stone for floors, parking & outdoors", image: "/static/real/quartzite-travertine-beige.jpg" },
+];
+
+const stonesDropdown: SubLink[] = [
+  { name: "Granites — Flooring", href: category("Granite"), desc: "Passage & lobby flooring", image: "/static/real/granite-flooring-lobby.jpg" },
+  { name: "Granites — Staircase", href: category("Granite"), desc: "Staircase & step installations", image: "/static/real/granite-staircase-closeup.jpg" },
+  { name: "Granites — Kitchen Top", href: category("Granite"), desc: "Kitchen counters & table tops", image: "/static/real/granite-kitchen-countertop.jpg" },
+  { name: "Granites — Wall Cladding", href: category("Granite"), desc: "Lift walls & lobby cladding", image: "/static/real/granite-wall-cladding-lobby.jpg" },
+  { name: "Natural Stone (Kota) — Flooring", href: category("Kota Stone"), desc: "Hall & passage flooring", image: "/static/real/kota-stone-flooring-passage.jpg" },
+  { name: "Natural Stone (Kota) — Outdoor", href: category("Kota Stone"), desc: "Courtyard & parking areas", image: "/static/real/kota-stone-outdoor-courtyard.jpg" },
+  { name: "Engineering Marble (Quartz) — Kitchen Top", href: category("Quartz"), desc: "Kitchen counters", image: "/static/real/quartz-countertop-island.jpg" },
+  { name: "Engineering Marble (Quartz) — Flooring", href: category("Quartz"), desc: "Hall & living room flooring", image: "/static/real/quartz-flooring-hall.jpg" },
 ];
 
 const menuItems: MenuItem[] = [
   { name: "Home", href: "/" },
   { name: "Tiles", href: "/collections", dropdown: tilesDropdown },
-  { name: "Marbles", href: "/collections", dropdown: marblesDropdown },
+  { name: "Marbles & Stones", href: "/collections", dropdown: marblesDropdown },
+  { name: "Granites & Quartz", href: "/collections", dropdown: stonesDropdown },
   { name: "Collections", href: "/collections" },
   { name: "Contact", href: "/contact" },
 ];
@@ -168,12 +182,16 @@ export default function NavBar() {
                           href={sub.href}
                           className="group/item flex items-center gap-3 px-3 py-2.5 hover:bg-brand-500/10 transition-colors duration-200"
                         >
-                          <div className="w-14 h-14 shrink-0 rounded-md overflow-hidden border border-black/10 dark:border-white/10">
-                            <img
-                              src={sub.image}
-                              alt={sub.name}
-                              className="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-500"
-                            />
+                          <div className="w-14 h-14 shrink-0 rounded-md overflow-hidden border border-black/10 dark:border-white/10 bg-brand-50 dark:bg-brand-500/10 flex items-center justify-center">
+                            {sub.image ? (
+                              <img
+                                src={sub.image}
+                                alt={sub.name}
+                                className="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-500"
+                              />
+                            ) : (
+                              <ArrowRight className="w-5 h-5 text-brand-500" />
+                            )}
                           </div>
                           <div className="min-w-0 flex-1">
                             <div className="text-xs font-bold uppercase tracking-wider text-black dark:text-white group-hover/item:text-brand-500 transition-colors">

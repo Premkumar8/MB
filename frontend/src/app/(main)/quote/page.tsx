@@ -43,7 +43,7 @@ export default function QuotePage() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitError, setSubmitError] = useState("");
 
-  const stoneOptions = ["Carrara Gold", "Nero Marquina", "Emerald Onyx", "Calacatta Viola", "Taj Mahal"];
+  const stoneOptions = ["Carrara Gold", "Nero Marquina", "Calacatta Viola", "Taj Mahal"];
   const finishOptions = ["Polished", "Honed", "Brushed", "Leathered"];
   const budgetOptions = ["Under $5k", "$5k - $10k", "$10k - $25k", "$25k - $50k", "$50k+"];
 

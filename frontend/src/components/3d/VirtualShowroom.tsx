@@ -163,14 +163,14 @@ export default function VirtualShowroom() {
       desc: "Striking white lightning calcites intersecting pitch black minerals.",
     },
     {
-      name: "Emerald Onyx",
-      origin: "Iran",
-      category: "Onyx",
-      finish: "Polished",
-      price: "$320 / sqft",
-      texture: "/static/seed/textures/emerald_onyx_diff.jpg",
+      name: "Taj Mahal",
+      origin: "Brazil",
+      category: "Quartz",
+      finish: "Leathered",
+      price: "$210 / sqft",
+      texture: "/static/seed/textures/taj_mahal_diff.jpg",
       position: [-2.2, 0, 2.2] as [number, number, number],
-      desc: "Translucent layers of mint and bronze emerald, ideal for backlight grids.",
+      desc: "Soft white background tones with delicate gold-brown veining, marble-look with granite strength.",
     },
     {
       name: "Calacatta Viola",
@@ -282,15 +282,9 @@ export default function VirtualShowroom() {
               {activeData.desc}
             </p>
 
-            <div className="border-t border-b border-white/5 py-4 grid grid-cols-2 gap-4">
-              <div>
-                <span className="text-[9px] text-white/40 uppercase tracking-widest">Finish</span>
-                <p className="text-xs font-semibold text-white mt-0.5">{activeData.finish}</p>
-              </div>
-              <div>
-                <span className="text-[9px] text-white/40 uppercase tracking-widest">Base Estimate</span>
-                <p className="text-xs font-semibold text-gold-500 mt-0.5">{activeData.price}</p>
-              </div>
+            <div className="border-t border-b border-white/5 py-4">
+              <span className="text-[9px] text-white/40 uppercase tracking-widest">Finish</span>
+              <p className="text-xs font-semibold text-white mt-0.5">{activeData.finish}</p>
             </div>
 
             <div className="flex items-center space-x-2 text-[10px] text-white/50 uppercase tracking-wider">

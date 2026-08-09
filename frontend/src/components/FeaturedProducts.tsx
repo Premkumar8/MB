@@ -92,9 +92,6 @@ export function ProductCard({ product }: { product: Product }) {
           <Heart className={`w-4 h-4 ${isFav ? "fill-brand-500 text-brand-500" : ""}`} />
         </button>
 
-        <div className="absolute top-3 right-3 bg-white/90 dark:bg-black/80 backdrop-blur-sm px-3 py-1 rounded-full border border-black/10 dark:border-white/10 shadow-sm z-10">
-          <span className="font-sans font-bold text-sm text-black dark:text-white">₹{product.price} <span className="text-[10px] font-normal text-black/50 dark:text-white/50">/ sq.ft</span></span>
-        </div>
       </div>
 
       <div className="p-5 flex flex-col flex-grow justify-between bg-white dark:bg-[#111]">

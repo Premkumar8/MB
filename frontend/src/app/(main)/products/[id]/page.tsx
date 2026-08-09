@@ -124,9 +124,6 @@ export default function ProductDetailPage() {
                   <span className="px-3 py-1 bg-black/5 dark:bg-white/10 text-[11px] uppercase tracking-widest font-semibold rounded-sm">{product.finish}</span>
                   <span className="px-3 py-1 bg-black/5 dark:bg-white/10 text-[11px] uppercase tracking-widest font-semibold rounded-sm">Wall & Floor</span>
                 </div>
-                <div className="font-sans text-3xl font-bold text-gold-500">
-                  ₹{product.price} <span className="text-sm font-normal text-black/50 dark:text-white/50">/ sq.ft</span>
-                </div>
               </div>
 
               {/* Description */}
@@ -233,9 +230,6 @@ export default function ProductDetailPage() {
                   <Link key={sp.id} href={`/products/${sp.id}`} className="group block bg-white dark:bg-[#111] rounded-lg overflow-hidden border border-black/5 dark:border-white/5 hover:border-gold-500/30 transition-all duration-500 hover:shadow-xl hover:-translate-y-1">
                     <div className="relative aspect-square overflow-hidden bg-[#ecebeb] dark:bg-[#1a1a1a]">
                       <img src={sp.image_url} alt={sp.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                      <div className="absolute top-3 right-3 bg-white/90 dark:bg-black/80 backdrop-blur-sm px-2 py-1 rounded-sm border border-black/10 dark:border-white/10 shadow-sm z-10">
-                        <span className="font-sans font-bold text-xs text-black dark:text-white">₹{sp.price}</span>
-                      </div>
                     </div>
                     <div className="p-4">
                       <div className="text-[9px] uppercase tracking-wider text-black/50 dark:text-white/50 mb-1">{sp.category}</div>

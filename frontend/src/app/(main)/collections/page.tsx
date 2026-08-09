@@ -130,8 +130,9 @@ function CollectionsContent() {
                 <option value="All">All Categories</option>
                 <option value="Marble">Marble</option>
                 <option value="Imported Marble">Imported Marble</option>
-                <option value="Onyx">Onyx</option>
-                <option value="Quartzite">Quartzite</option>
+                <option value="Quartz">Quartz</option>
+                <option value="Granite">Granite</option>
+                <option value="Kota Stone">Kota Stone</option>
                 <option value="Full Body Tiles">Full Body Tiles</option>
                 <option value="Wall Tiles">Wall Tiles</option>
                 <option value="PVT">PVT</option>
@@ -417,10 +418,6 @@ function CollectionsContent() {
                       <div className="flex justify-between py-2 border-b border-white/5 hover:text-white transition-colors">
                         <span>Thickness</span>
                         <span className="font-semibold text-white">{stone.thickness}</span>
-                      </div>
-                      <div className="flex justify-between py-2 border-b border-white/5 hover:text-white transition-colors">
-                        <span>Price Indicator</span>
-                        <span className="font-bold text-gold-500 tracking-wide">${stone.price} / sqft</span>
                       </div>
                       <div className="flex justify-between py-2 border-b border-white/5 hover:text-white transition-colors">
                         <span>Availability</span>

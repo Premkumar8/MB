@@ -17,6 +17,8 @@ import {
   Layers,
   Hexagon,
   Cog,
+  Mountain,
+  Square,
   Heart,
   Star,
   Trophy,
@@ -48,7 +50,9 @@ const categories = [
   { name: "PVT", icon: Hexagon, image: "/static/real/tile-pvt-elevator-lobby.jpg", secondary: "/static/real/tile-pvt-diamond-gloss.jpg", desc: "Polished vitrified tiles, glass-like shine." },
   { name: "Marble", icon: Gem, image: "/static/real/marble-gray-herringbone-floor.jpg", secondary: "/static/real/marble-gray-stair-tread-installation.jpg", desc: "Indian marble for floors & staircase steps." },
   { name: "Imported Marble", icon: Sparkles, image: "/static/real/marble-imported-statuario-kitchen.jpg", secondary: "/static/real/marble-imported-carved-wall.jpg", desc: "Italian marble flooring & wall cladding." },
-  { name: "Quartzite", icon: Cog, image: "/static/real/quartzite-charcoal-outdoor-walkway.jpg", secondary: "/static/real/quartzite-storm-gray.jpg", desc: "Durable natural stone for parking & outdoor areas." },
+  { name: "Quartz", icon: Cog, image: "/static/real/quartzite-charcoal-outdoor-walkway.jpg", secondary: "/static/real/quartzite-storm-gray.jpg", desc: "Durable natural stone for parking & outdoor areas." },
+  { name: "Granite", icon: Mountain, image: "/static/real/granite-wall-cladding-lobby.jpg", secondary: "/static/real/granite-staircase-closeup.jpg", desc: "Kitchen tops, staircases & lift lobby cladding." },
+  { name: "Kota Stone", icon: Square, image: "/static/real/kota-stone-flooring-passage.jpg", secondary: "/static/real/kota-stone-outdoor-courtyard.jpg", desc: "Classic Rajasthani limestone for floors & courtyards." },
 ];
 
 const valueProps = [
@@ -325,7 +329,7 @@ export default function HomePage() {
               Everything You Need To Build Your <span className="text-brand-gradient">Perfect Home</span>
             </h2>
             <p className="text-sm sm:text-base text-black/55 dark:text-white/55 max-w-xl mx-auto pt-1">
-              From full body and wall tiles to Italian marble, onyx and quartzite — a complete range of surfaces sourced from India&apos;s leading brands, shown the way they actually look once installed.
+              From full body and wall tiles to Italian marble and quartz — a complete range of surfaces sourced from India&apos;s leading brands, shown the way they actually look once installed.
             </p>
             <div className="pt-3">
               <Link href="/collections" className="btn-brand-solid inline-flex items-center gap-2">

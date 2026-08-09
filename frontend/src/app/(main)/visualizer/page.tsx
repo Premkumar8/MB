@@ -33,7 +33,6 @@ export default function VisualizerPage() {
       afterUrls: {
         "Carrara Gold": "/static/seed/carrara_gold.jpg",
         "Nero Marquina": "/static/seed/nero_marquina.jpg",
-        "Emerald Onyx": "/static/seed/emerald_onyx.jpg",
         "Calacatta Viola": "/static/seed/calacatta_viola.jpg",
         "Taj Mahal": "/static/seed/taj_mahal.jpg",
       },
@@ -45,7 +44,6 @@ export default function VisualizerPage() {
       afterUrls: {
         "Carrara Gold": "/static/seed/carrara_gold.jpg",
         "Nero Marquina": "/static/seed/nero_marquina.jpg",
-        "Emerald Onyx": "/static/seed/emerald_onyx.jpg",
         "Calacatta Viola": "/static/seed/calacatta_viola.jpg",
         "Taj Mahal": "/static/seed/taj_mahal.jpg",
       },
@@ -55,7 +53,6 @@ export default function VisualizerPage() {
   const stoneTextures = [
     { name: "Carrara Gold", color: "bg-[#f5edd9]" },
     { name: "Nero Marquina", color: "bg-black" },
-    { name: "Emerald Onyx", color: "bg-[#1b4d3e]" },
     { name: "Calacatta Viola", color: "bg-[#4a1525]" },
     { name: "Taj Mahal", color: "bg-[#e8e5dc]" },
   ];

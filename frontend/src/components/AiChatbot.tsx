@@ -62,9 +62,7 @@ export default function AiChatbot() {
       } else if (lower.includes("quantity") || lower.includes("estimate") || lower.includes("calculate")) {
         botResponse = "Calculate square footage by multiplying length × width (in inches) and dividing by 144. For bookmatching veins, we advise adding 15–20% extra slab buffer to align details.";
       } else if (lower.includes("price") || lower.includes("cost")) {
-        botResponse = "Our luxury stones range from $140/sqft (Nero Marquina) up to $320/sqft (Emerald Onyx). Please use the Quote Request form to upload your drawing plans for an exact estimation.";
-      } else if (lower.includes("backlight") || lower.includes("onyx")) {
-        botResponse = "Our translucent Emerald Onyx is ideal for backlighting. We recommend using 4000K CRI LED panels spaced 2 inches behind the stone slab for a uniform, warm glow without hot-spots.";
+        botResponse = "Our luxury stones range from $140/sqft (Nero Marquina) up to $420/sqft (Fiori Di Pesco Carved Marble). Please use the Quote Request form to upload your drawing plans for an exact estimation.";
       }
 
       setMessages((prev) => [

@@ -23,17 +23,6 @@ export default function BlogPage() {
 
   const fallbackPosts: BlogPost[] = [
     {
-      id: 1,
-      title: "The Art of Backlighting Onyx in Modern Architecture",
-      slug: "backlighting-onyx-modern-architecture",
-      content: "Onyx has been revered since antiquity. Today, modern interior designers leverage its unique translucent molecular structure. By integrating high-rendering CRI LED light panel diffusers behind bookmatched Emerald Onyx panels, rooms are transformed with an ethereal glow. In this article, we explain the spacing, heat considerations, and color temperature controls required to achieve a flawless backlit slab install...",
-      author: "Aurelia Design Studio",
-      read_time: "5 min read",
-      category: "Design",
-      image_url: "/static/seed/blog1.jpg",
-      created_at: "2026-07-08T12:00:00Z",
-    },
-    {
       id: 2,
       title: "Caring for Premium Marble: Myths vs. Realities",
       slug: "caring-for-premium-marble-myths-realities",
@@ -81,7 +70,7 @@ export default function BlogPage() {
           Architectural <span className="font-bold text-gold-gradient">Perspectives</span>
         </h1>
         <p className="text-xs text-black/50 dark:text-white/40 max-w-xl mx-auto leading-relaxed">
-          Explore our curator essays on white-glove marble installations, backlit onyx engineering, and luxury interior design essays.
+          Explore our curator essays on white-glove marble installations and luxury interior design essays.
         </p>
       </div>
 
