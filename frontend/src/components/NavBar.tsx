@@ -21,32 +21,39 @@ interface MenuItem {
   dropdown?: SubLink[];
 }
 
-const category = (name: string) => `/collections?category=${encodeURIComponent(name)}`;
+const collection = (categoryName: string, application?: string) => {
+  const params = new URLSearchParams({ category: categoryName });
+  if (application) {
+    params.set("application", application);
+  }
+
+  return `/collections?${params.toString()}`;
+};
 
 const tilesDropdown: SubLink[] = [
-  { name: "Full Body Tiles", href: category("Full Body Tiles"), desc: "Vitrified tiles built for heavy-traffic floors", image: "/static/real/tile-white-grid-texture.jpg" },
-  { name: "Wall Tiles", href: category("Wall Tiles"), desc: "Elegant finishes for walls & backsplashes", image: "/static/real/tile-white-diamond-pattern.jpg" },
-  { name: "PVT Tiles", href: category("PVT"), desc: "Polished vitrified tiles, glass-like shine", image: "/static/real/lobby-reflective-building.jpg" },
+  { name: "Full Body Tiles", href: collection("Full Body Tiles", "Flooring"), desc: "Vitrified tiles built for heavy-traffic floors", image: "/static/real/tile-white-grid-texture.jpg" },
+  { name: "Wall Tiles", href: collection("Wall Tiles", "Wall"), desc: "Elegant finishes for walls & backsplashes", image: "/static/real/tile-white-diamond-pattern.jpg" },
+  { name: "PVT Tiles", href: collection("PVT", "Flooring"), desc: "Polished vitrified tiles, glass-like shine", image: "/static/real/lobby-reflective-building.jpg" },
   { name: "Elevation Tiles", href: "/quote", desc: "Exterior & compound wall cladding — ask for a quote", image: "/static/real/elevation-tile-exterior.jpg" },
 ];
 
 const marblesDropdown: SubLink[] = [
-  { name: "Indian Marble — Flooring", href: category("Marble"), desc: "Hall, dining & bedroom marble flooring", image: "/static/real/marble-gray-herringbone-floor.jpg" },
-  { name: "Indian Marble — Staircase", href: category("Marble"), desc: "Staircase & step installations", image: "/static/real/marble-gray-stair-tread-installation.jpg" },
-  { name: "Italian Marble — Flooring", href: category("Imported Marble"), desc: "Statuario & imported slab flooring", image: "/static/real/marble-imported-statuario-kitchen.jpg" },
-  { name: "Italian Marble — Wall Cladding", href: category("Imported Marble"), desc: "Lift walls & decorative cladding", image: "/static/real/marble-imported-carved-wall.jpg" },
-  { name: "Quartz & Natural Stone", href: category("Quartz"), desc: "Durable stone for floors, parking & outdoors", image: "/static/real/quartzite-travertine-beige.jpg" },
+  { name: "Indian Marble - Flooring", href: collection("Marble", "Flooring"), desc: "Hall, dining & bedroom marble flooring", image: "/static/real/marble-gray-herringbone-floor.jpg" },
+  { name: "Indian Marble - Staircase", href: collection("Marble", "Staircase"), desc: "Staircase & step installations", image: "/static/real/marble-gray-stair-tread-installation.jpg" },
+  { name: "Italian Marble - Flooring", href: collection("Imported Marble", "Flooring"), desc: "Statuario & imported slab flooring", image: "/static/real/marble-imported-statuario-kitchen.jpg" },
+  { name: "Italian Marble - Wall Cladding", href: collection("Imported Marble", "Wall"), desc: "Lift walls & decorative cladding", image: "/static/real/marble-imported-carved-wall.jpg" },
+  { name: "Quartz & Natural Stone", href: collection("Quartz", "Outdoor"), desc: "Durable stone for floors, parking & outdoors", image: "/static/real/quartzite-travertine-beige.jpg" },
 ];
 
 const stonesDropdown: SubLink[] = [
-  { name: "Granites — Flooring", href: category("Granite"), desc: "Passage & lobby flooring", image: "/static/real/granite-flooring-lobby.jpg" },
-  { name: "Granites — Staircase", href: category("Granite"), desc: "Staircase & step installations", image: "/static/real/granite-staircase-closeup.jpg" },
-  { name: "Granites — Kitchen Top", href: category("Granite"), desc: "Kitchen counters & table tops", image: "/static/real/granite-kitchen-countertop.jpg" },
-  { name: "Granites — Wall Cladding", href: category("Granite"), desc: "Lift walls & lobby cladding", image: "/static/real/granite-wall-cladding-lobby.jpg" },
-  { name: "Natural Stone (Kota) — Flooring", href: category("Kota Stone"), desc: "Hall & passage flooring", image: "/static/real/kota-stone-flooring-passage.jpg" },
-  { name: "Natural Stone (Kota) — Outdoor", href: category("Kota Stone"), desc: "Courtyard & parking areas", image: "/static/real/kota-stone-outdoor-courtyard.jpg" },
-  { name: "Engineering Marble (Quartz) — Kitchen Top", href: category("Quartz"), desc: "Kitchen counters", image: "/static/real/quartz-countertop-island.jpg" },
-  { name: "Engineering Marble (Quartz) — Flooring", href: category("Quartz"), desc: "Hall & living room flooring", image: "/static/real/quartz-flooring-hall.jpg" },
+  { name: "Granites - Flooring", href: collection("Granite", "Flooring"), desc: "Passage & lobby flooring", image: "/static/real/granite-flooring-lobby.jpg" },
+  { name: "Granites - Staircase", href: collection("Granite", "Staircase"), desc: "Staircase & step installations", image: "/static/real/granite-staircase-closeup.jpg" },
+  { name: "Granites - Kitchen Top", href: collection("Granite", "Kitchen"), desc: "Kitchen counters & table tops", image: "/static/real/granite-kitchen-countertop.jpg" },
+  { name: "Granites - Wall Cladding", href: collection("Granite", "Wall"), desc: "Lift walls & lobby cladding", image: "/static/real/granite-wall-cladding-lobby.jpg" },
+  { name: "Natural Stone (Kota) - Flooring", href: collection("Kota Stone", "Flooring"), desc: "Hall & passage flooring", image: "/static/real/kota-stone-flooring-passage.jpg" },
+  { name: "Natural Stone (Kota) - Outdoor", href: collection("Kota Stone", "Outdoor"), desc: "Courtyard & parking areas", image: "/static/real/kota-stone-outdoor-courtyard.jpg" },
+  { name: "Engineering Marble (Quartz) - Kitchen Top", href: collection("Quartz", "Kitchen"), desc: "Kitchen counters", image: "/static/real/quartz-countertop-island.jpg" },
+  { name: "Engineering Marble (Quartz) - Flooring", href: collection("Quartz", "Flooring"), desc: "Hall & living room flooring", image: "/static/real/quartz-flooring-hall.jpg" },
 ];
 
 const menuItems: MenuItem[] = [

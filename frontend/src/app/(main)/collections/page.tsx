@@ -44,6 +44,7 @@ function CollectionsContent() {
   const [selectedOrigin, setSelectedOrigin] = useState("All");
   const [selectedFinish, setSelectedFinish] = useState("All");
   const [selectedThickness, setSelectedThickness] = useState("All");
+  const selectedApplication = searchParams.get("application") || "All";
 
   // Active 3D preview item
   const [active3dProduct, setActive3dProduct] = useState<Product | null>(null);
@@ -89,8 +90,20 @@ function CollectionsContent() {
     const matchesOrigin = selectedOrigin === "All" || p.origin.toLowerCase() === selectedOrigin.toLowerCase();
     const matchesFinish = selectedFinish === "All" || p.finish.toLowerCase() === selectedFinish.toLowerCase();
     const matchesThickness = selectedThickness === "All" || p.thickness.toLowerCase() === selectedThickness.toLowerCase();
+    const productApplicationText = `${p.name} ${p.applications} ${p.description || ""}`.toLowerCase();
+    const applicationKeywords: Record<string, string[]> = {
+      Flooring: ["floor", "flooring", "hall", "hallway", "passage", "living", "bedroom"],
+      Staircase: ["stair", "staircase", "steps", "step"],
+      Kitchen: ["kitchen", "counter", "countertop", "backsplash", "table top", "island"],
+      Wall: ["wall", "cladding", "feature", "panel", "mosaic", "subway", "facade"],
+      Outdoor: ["outdoor", "parking", "courtyard", "walkway", "patio", "exterior", "porch"],
+    };
+    const selectedApplicationKeywords = applicationKeywords[selectedApplication] || [selectedApplication.toLowerCase()];
+    const matchesApplication = selectedApplication === "All" || selectedApplicationKeywords.some((keyword) => (
+      productApplicationText.includes(keyword)
+    ));
 
-    return matchesSearch && matchesCategory && matchesOrigin && matchesFinish && matchesThickness;
+    return matchesSearch && matchesCategory && matchesOrigin && matchesFinish && matchesThickness && matchesApplication;
   });
 
   return (

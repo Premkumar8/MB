@@ -5,9 +5,71 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { fallbackProducts } from "@/data/products";
 import { Product, useApp } from "@/context/AppContext";
-import { ArrowLeft, Heart, MessageSquareText, Store } from "lucide-react";
+import { ArrowLeft, Heart, Loader2, MessageSquareText, Store } from "lucide-react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+const productGalleryRules = [
+  {
+    keywords: ["stair", "steps", "staircase"],
+    images: ["/static/nh/granite-staircase-black.jpg", "/static/real/marble-gray-staircase-installation.jpg"],
+  },
+  {
+    keywords: ["kitchen", "counter", "countertop", "backsplash", "table top", "island"],
+    images: ["/static/nh/stone-kitchen-counter.jpg", "/static/nh/stone-living-kitchen.jpg"],
+  },
+  {
+    keywords: ["parking", "outdoor", "courtyard", "walkway", "patio", "exterior", "facade", "porch"],
+    images: ["/static/nh/natural-parking-courtyard.jpg", "/static/real/quartzite-charcoal-outdoor-walkway.jpg"],
+  },
+  {
+    keywords: ["bedroom"],
+    images: ["/static/nh/natural-bedroom.jpg", "/static/nh/stone-bedroom-living.jpg"],
+  },
+  {
+    keywords: ["bathroom", "shower", "vanity", "aqua", "terrazzo", "ribbed"],
+    images: ["/static/nh/stone-bathroom.jpg", "/static/nh/natural-kitchen-bath.jpg"],
+  },
+  {
+    keywords: ["lobby", "hall", "hallway", "passage", "corridor", "elevator", "showroom"],
+    images: ["/static/nh/granite-lobby-gray.jpg", "/static/nh/natural-hall-modern.jpg"],
+  },
+  {
+    keywords: ["wall", "cladding", "feature", "panel", "mosaic", "subway", "botanical"],
+    images: ["/static/nh/stone-bathroom.jpg", "/static/real/tile-stone-mosaic-display-board.jpg"],
+  },
+  {
+    keywords: ["wood"],
+    images: ["/static/real/tile-wood-look-bedroom-floor.jpg", "/static/real/tile-wood-look-bedroom-floor-alt.jpg"],
+  },
+  {
+    keywords: ["black", "nero", "galaxy", "absolute"],
+    images: ["/static/nh/granite-kitchen-black.jpg"],
+  },
+  {
+    keywords: ["white", "statuario", "carrara", "calacatta", "crystal", "kashmir"],
+    images: ["/static/nh/stone-kitchen-counter.jpg"],
+  },
+];
+
+function normalizeImageUrl(imageUrl: string, useApiHost = false) {
+  return useApiHost && imageUrl.startsWith("/static") ? `${API_URL}${imageUrl}` : imageUrl;
+}
+
+function getProductGallery(product: Product, useApiHost = false) {
+  const productText = `${product.name} ${product.category} ${product.applications}`.toLowerCase();
+  const productImages = [product.image_url, ...(product.images || [])]
+    .filter(Boolean)
+    .map((imageUrl) => normalizeImageUrl(imageUrl, useApiHost));
+  const matchedRule = productGalleryRules.find((rule) => (
+    rule.keywords.some((keyword) => productText.includes(keyword))
+  ));
+  const images = matchedRule
+    ? [...productImages, ...matchedRule.images]
+    : productImages;
+
+  return Array.from(new Set(images)).slice(0, 5);
+}
 
 export default function ProductDetailPage() {
   const { id } = useParams();
@@ -15,33 +77,48 @@ export default function ProductDetailPage() {
   const { wishlist, addToWishlist, removeFromWishlist } = useApp();
   const [product, setProduct] = useState<Product | null>(null);
   const [mainImage, setMainImage] = useState<string>("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+
     const fetchProduct = async () => {
+      setLoading(true);
+      setProduct(null);
+      setMainImage("");
+
       try {
         const res = await fetch(`${API_URL}/api/products/${id}`);
         if (res.ok) {
           const data = await res.json();
           const processed: Product = {
             ...data,
-            image_url: data.image_url.startsWith("/static") ? `${API_URL}${data.image_url}` : data.image_url,
-            images: data.images ? data.images.map((img: string) => img.startsWith("/static") ? `${API_URL}${img}` : img) : [data.image_url.startsWith("/static") ? `${API_URL}${data.image_url}` : data.image_url]
+            image_url: normalizeImageUrl(data.image_url, true),
           };
-          setProduct(processed);
-          setMainImage(processed.images?.[0] || processed.image_url);
+          const galleryImages = getProductGallery(processed, true);
+          if (!cancelled) {
+            setProduct({ ...processed, images: galleryImages });
+            setMainImage(galleryImages[0]);
+          }
         } else {
           const found = fallbackProducts.find(p => p.id === Number(id));
-          if (found) {
-            setProduct(found);
-            setMainImage(found.images?.[0] || found.image_url);
+          if (found && !cancelled) {
+            const galleryImages = getProductGallery(found);
+            setProduct({ ...found, images: galleryImages });
+            setMainImage(galleryImages[0]);
           }
         }
       } catch (err) {
         console.error("Error fetching product detail:", err);
         const found = fallbackProducts.find(p => p.id === Number(id));
-        if (found) {
-          setProduct(found);
-          setMainImage(found.images?.[0] || found.image_url);
+        if (found && !cancelled) {
+          const galleryImages = getProductGallery(found);
+          setProduct({ ...found, images: galleryImages });
+          setMainImage(galleryImages[0]);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
         }
       }
     };
@@ -49,7 +126,24 @@ export default function ProductDetailPage() {
     if (id) {
       fetchProduct();
     }
+
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#fcfcfc] dark:bg-[#080809] pt-24">
+        <div className="flex flex-col items-center gap-4 text-black dark:text-white">
+          <Loader2 className="h-8 w-8 animate-spin text-gold-500" />
+          <p className="text-sm uppercase tracking-[0.25em] font-semibold text-black/60 dark:text-white/60">
+            Loading product
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -61,7 +155,12 @@ export default function ProductDetailPage() {
 
   const isFav = wishlist.some((item) => item.id === product.id);
   const toggleWishlist = () => {
-    isFav ? removeFromWishlist(product.id) : addToWishlist(product);
+    if (isFav) {
+      removeFromWishlist(product.id);
+      return;
+    }
+
+    addToWishlist(product);
   };
 
   let suggestedProducts = fallbackProducts
