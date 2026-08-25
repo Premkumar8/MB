@@ -3,72 +3,207 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { fallbackProducts } from "@/data/products";
+import { mergeWithAdminProducts } from "@/data/products";
 import { Product, useApp } from "@/context/AppContext";
 import { ArrowLeft, Heart, Loader2, MessageSquareText, Store } from "lucide-react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-const productGalleryRules = [
-  {
-    keywords: ["stair", "steps", "staircase"],
-    images: ["/static/nh/granite-staircase-black.jpg", "/static/real/marble-gray-staircase-installation.jpg"],
-  },
-  {
-    keywords: ["kitchen", "counter", "countertop", "backsplash", "table top", "island"],
-    images: ["/static/nh/stone-kitchen-counter.jpg", "/static/nh/stone-living-kitchen.jpg"],
-  },
-  {
-    keywords: ["parking", "outdoor", "courtyard", "walkway", "patio", "exterior", "facade", "porch"],
-    images: ["/static/nh/natural-parking-courtyard.jpg", "/static/real/quartzite-charcoal-outdoor-walkway.jpg"],
-  },
-  {
-    keywords: ["bedroom"],
-    images: ["/static/nh/natural-bedroom.jpg", "/static/nh/stone-bedroom-living.jpg"],
-  },
-  {
-    keywords: ["bathroom", "shower", "vanity", "aqua", "terrazzo", "ribbed"],
-    images: ["/static/nh/stone-bathroom.jpg", "/static/nh/natural-kitchen-bath.jpg"],
-  },
-  {
-    keywords: ["lobby", "hall", "hallway", "passage", "corridor", "elevator", "showroom"],
-    images: ["/static/nh/granite-lobby-gray.jpg", "/static/nh/natural-hall-modern.jpg"],
-  },
-  {
-    keywords: ["wall", "cladding", "feature", "panel", "mosaic", "subway", "botanical"],
-    images: ["/static/nh/stone-bathroom.jpg", "/static/real/tile-stone-mosaic-display-board.jpg"],
-  },
-  {
-    keywords: ["wood"],
-    images: ["/static/real/tile-wood-look-bedroom-floor.jpg", "/static/real/tile-wood-look-bedroom-floor-alt.jpg"],
-  },
-  {
-    keywords: ["black", "nero", "galaxy", "absolute"],
-    images: ["/static/nh/granite-kitchen-black.jpg"],
-  },
-  {
-    keywords: ["white", "statuario", "carrara", "calacatta", "crystal", "kashmir"],
-    images: ["/static/nh/stone-kitchen-counter.jpg"],
-  },
-];
+type RoomGallery = {
+  hall?: string;
+  kitchen?: string;
+  bedroom?: string;
+  parking?: string;
+};
+
+type GalleryItem = {
+  label: string;
+  src: string;
+};
+
+const includesAny = (text: string, keywords: string[]) => (
+  keywords.some((keyword) => text.includes(keyword))
+);
 
 function normalizeImageUrl(imageUrl: string, useApiHost = false) {
   return useApiHost && imageUrl.startsWith("/static") ? `${API_URL}${imageUrl}` : imageUrl;
 }
 
-function getProductGallery(product: Product, useApiHost = false) {
-  const productText = `${product.name} ${product.category} ${product.applications}`.toLowerCase();
-  const productImages = [product.image_url, ...(product.images || [])]
-    .filter(Boolean)
-    .map((imageUrl) => normalizeImageUrl(imageUrl, useApiHost));
-  const matchedRule = productGalleryRules.find((rule) => (
-    rule.keywords.some((keyword) => productText.includes(keyword))
-  ));
-  const images = matchedRule
-    ? [...productImages, ...matchedRule.images]
-    : productImages;
+const productSpecificGalleryImages: Record<string, GalleryItem[]> = {
+  "gray marble staircase installation": [
+    { label: "Hall", src: "/static/nh/gray-marble-hall.jpg" },
+    { label: "Kitchen", src: "/static/nh/gray-marble-kitchen.jpg" },
+    { label: "Bedroom", src: "/static/nh/gray-marble-bedroom.jpg" },
+    { label: "Parking", src: "/static/nh/gray-marble-parking.jpg" },
+  ],
+};
 
-  return Array.from(new Set(images)).slice(0, 5);
+const defaultRoomGallery: Required<RoomGallery> = {
+  hall: "/static/nh/natural-hall-modern.jpg",
+  kitchen: "/static/nh/stone-kitchen-counter.jpg",
+  bedroom: "/static/nh/stone-bedroom-living.jpg",
+  parking: "/static/nh/natural-parking-courtyard.jpg",
+};
+
+const materialRoomGalleries: { keywords: string[]; images: RoomGallery }[] = [
+  {
+    keywords: ["gray marble", "grey marble", "ash gray", "ash grey", "gray herringbone", "grey herringbone", "ice rock"],
+    images: {
+      hall: "/static/nh/gray-marble-hall.jpg",
+      kitchen: "/static/nh/gray-marble-kitchen.jpg",
+      bedroom: "/static/nh/gray-marble-bedroom.jpg",
+      parking: "/static/nh/gray-marble-parking.jpg",
+    },
+  },
+  {
+    keywords: ["white", "statuario", "carrara", "calacatta", "crystal", "kashmir", "rak white"],
+    images: {
+      hall: "/static/real/marble-imported-curtain-hall.jpg",
+      kitchen: "/static/nh/stone-kitchen-counter.jpg",
+      bedroom: "/static/nh/stone-bedroom-living.jpg",
+      parking: "/static/real/tile-rak-white-marble-look-slab.jpg",
+    },
+  },
+  {
+    keywords: ["black", "nero", "galaxy", "absolute", "saint laurent", "charcoal", "steel grey", "steel gray"],
+    images: {
+      hall: "/static/nh/granite-lobby-gray.jpg",
+      kitchen: "/static/nh/granite-kitchen-black.jpg",
+      bedroom: "/static/real/bedroom-minimal-modern.jpg",
+      parking: "/static/real/quartzite-charcoal-outdoor-walkway.jpg",
+    },
+  },
+  {
+    keywords: ["beige", "cream", "crema", "botticino", "diano", "travertine", "taj mahal", "shell", "breccia", "tan brown"],
+    images: {
+      hall: "/static/real/hallway-travertine-arched.jpg",
+      kitchen: "/static/nh/stone-living-kitchen.jpg",
+      bedroom: "/static/nh/stone-bedroom-living.jpg",
+      parking: "/static/real/tile-travertine-exterior-cladding.jpg",
+    },
+  },
+  {
+    keywords: ["pink", "rosa", "viola", "purple", "aubergine"],
+    images: {
+      hall: "/static/real/marble-pink-rosa.jpg",
+      kitchen: "/static/nh/stone-kitchen-counter.jpg",
+      bedroom: "/static/real/tile-purple-ribbed-bathroom-wall.jpg",
+      parking: "/static/nh/natural-parking-courtyard.jpg",
+    },
+  },
+  {
+    keywords: ["gold", "giallo", "yellow"],
+    images: {
+      hall: "/static/real/marble-gold-siena.jpg",
+      kitchen: "/static/nh/stone-living-kitchen.jpg",
+      bedroom: "/static/nh/stone-bedroom-living.jpg",
+      parking: "/static/real/tile-travertine-exterior-cladding.jpg",
+    },
+  },
+  {
+    keywords: ["green"],
+    images: {
+      hall: "/static/real/kota-stone-flooring-passage.jpg",
+      kitchen: "/static/nh/natural-kitchen-bath.jpg",
+      bedroom: "/static/nh/natural-bedroom.jpg",
+      parking: "/static/real/kota-stone-outdoor-courtyard.jpg",
+    },
+  },
+  {
+    keywords: ["aqua", "blue", "azulejo"],
+    images: {
+      hall: "/static/real/tile-wall-azulejo-blue.jpg",
+      kitchen: "/static/real/tile-wall-aqua-glass.jpg",
+      bedroom: "/static/nh/natural-bedroom.jpg",
+      parking: "/static/nh/natural-parking-courtyard.jpg",
+    },
+  },
+  {
+    keywords: ["ruby", "red", "mosaic", "patchwork", "botanical", "floral", "cafe", "decorative", "pattern", "checkerboard", "monochrome", "speckled", "terrazzo", "medallion"],
+    images: {
+      hall: "/static/real/tile-medallion-inlay-floor.jpg",
+      kitchen: "/static/real/tile-cafe-print-wall-panel.jpg",
+      bedroom: "/static/real/tile-botanical-matte-wall.jpg",
+      parking: "/static/real/tile-decorative-floor-pattern-board.jpg",
+    },
+  },
+  {
+    keywords: ["pvt", "gloss", "polished vitrified", "salon", "showroom", "corridor", "perspective shine"],
+    images: {
+      hall: "/static/real/tile-pvt-perspective-shine.jpg",
+      kitchen: "/static/nh/stone-kitchen-counter.jpg",
+      bedroom: "/static/real/tile-cream-polished-floor-room.jpg",
+      parking: "/static/nh/natural-parking-courtyard.jpg",
+    },
+  },
+  {
+    keywords: ["wood"],
+    images: {
+      hall: "/static/real/tile-wood-look-floor-installation.jpg",
+      kitchen: "/static/nh/stone-living-kitchen.jpg",
+      bedroom: "/static/real/tile-wood-look-bedroom-floor.jpg",
+      parking: "/static/real/tile-travertine-exterior-cladding.jpg",
+    },
+  },
+  {
+    keywords: ["kota", "limestone", "natural stone", "fossil", "splitface", "outdoor", "walkway", "courtyard"],
+    images: {
+      hall: "/static/real/kota-stone-flooring-passage.jpg",
+      kitchen: "/static/nh/natural-kitchen-bath.jpg",
+      bedroom: "/static/nh/natural-bedroom.jpg",
+      parking: "/static/real/kota-stone-outdoor-courtyard.jpg",
+    },
+  },
+];
+
+const roomLabels: Record<keyof RoomGallery, string> = {
+  hall: "Hall",
+  kitchen: "Kitchen",
+  bedroom: "Bedroom",
+  parking: "Parking",
+};
+
+const getRoomGalleryItems = (productText: string, rooms: (keyof RoomGallery)[]) => {
+  const materialGallery = materialRoomGalleries.find((gallery) => includesAny(productText, gallery.keywords));
+  if (!materialGallery) {
+    return [];
+  }
+
+  return rooms.flatMap((room) => (
+    materialGallery.images[room] ? [{ label: roomLabels[room], src: materialGallery.images[room] }] : []
+  ));
+};
+
+const getCompleteRoomGalleryItems = (productText: string) => {
+  const matchedItems = getRoomGalleryItems(productText, ["hall", "kitchen", "bedroom", "parking"]);
+  const byLabel = new Map(matchedItems.map((item) => [item.label, item.src]));
+
+  return ["Hall", "Kitchen", "Bedroom", "Parking"].map((label) => ({
+    label,
+    src: byLabel.get(label) || defaultRoomGallery[label.toLowerCase() as keyof RoomGallery],
+  }));
+};
+
+function uniqueGalleryItems(items: GalleryItem[]) {
+  const seen = new Set<string>();
+  return items.filter((item) => {
+    if (seen.has(item.src)) {
+      return false;
+    }
+
+    seen.add(item.src);
+    return true;
+  });
+}
+
+function getProductGalleryItems(product: Product) {
+  const productText = `${product.name} ${product.category} ${product.applications} ${product.description || ""}`.toLowerCase();
+  const productSpecificImages = productSpecificGalleryImages[product.name.toLowerCase()];
+  if (productSpecificImages) {
+    return uniqueGalleryItems(productSpecificImages).slice(0, 4);
+  }
+
+  return uniqueGalleryItems(getCompleteRoomGalleryItems(productText)).slice(0, 4);
 }
 
 export default function ProductDetailPage() {
@@ -77,6 +212,7 @@ export default function ProductDetailPage() {
   const { wishlist, addToWishlist, removeFromWishlist } = useApp();
   const [product, setProduct] = useState<Product | null>(null);
   const [mainImage, setMainImage] = useState<string>("");
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -86,40 +222,48 @@ export default function ProductDetailPage() {
       setLoading(true);
       setProduct(null);
       setMainImage("");
+      setGalleryItems([]);
+
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), 3500);
 
       try {
-        const res = await fetch(`${API_URL}/api/products/${id}`);
+        const res = await fetch(`${API_URL}/api/products/${id}`, { signal: controller.signal });
         if (res.ok) {
           const data = await res.json();
           const processed: Product = {
             ...data,
             image_url: normalizeImageUrl(data.image_url, true),
           };
-          const galleryImages = getProductGallery(processed, true);
+          const nextGalleryItems = getProductGalleryItems(processed);
           if (!cancelled) {
-            setProduct({ ...processed, images: galleryImages });
-            setMainImage(galleryImages[0]);
+            setProduct({ ...processed, images: nextGalleryItems.map((item) => item.src) });
+            setGalleryItems(nextGalleryItems);
+            setMainImage(nextGalleryItems[0].src);
           }
         } else {
-          const found = fallbackProducts.find(p => p.id === Number(id));
+          const found = mergeWithAdminProducts([]).find(p => p.id === Number(id));
           if (found && !cancelled) {
-            const galleryImages = getProductGallery(found);
-            setProduct({ ...found, images: galleryImages });
-            setMainImage(galleryImages[0]);
+            const nextGalleryItems = getProductGalleryItems(found);
+            setProduct({ ...found, images: nextGalleryItems.map((item) => item.src) });
+            setGalleryItems(nextGalleryItems);
+            setMainImage(nextGalleryItems[0].src);
           }
         }
-      } catch (err) {
-        console.error("Error fetching product detail:", err);
-        const found = fallbackProducts.find(p => p.id === Number(id));
+      } catch {
+        const found = mergeWithAdminProducts([]).find(p => p.id === Number(id));
         if (found && !cancelled) {
-          const galleryImages = getProductGallery(found);
-          setProduct({ ...found, images: galleryImages });
-          setMainImage(galleryImages[0]);
+          const nextGalleryItems = getProductGalleryItems(found);
+          setProduct({ ...found, images: nextGalleryItems.map((item) => item.src) });
+          setGalleryItems(nextGalleryItems);
+          setMainImage(nextGalleryItems[0].src);
         }
       } finally {
         if (!cancelled) {
           setLoading(false);
         }
+
+        window.clearTimeout(timeoutId);
       }
     };
 
@@ -163,12 +307,13 @@ export default function ProductDetailPage() {
     addToWishlist(product);
   };
 
-  let suggestedProducts = fallbackProducts
+  const catalogProducts = mergeWithAdminProducts([]);
+  let suggestedProducts = catalogProducts
     .filter(p => p.category === product.category && p.id !== product.id)
     .slice(0, 4);
 
   if (suggestedProducts.length < 4) {
-    const more = fallbackProducts
+    const more = catalogProducts
       .filter(p => p.id !== product.id && !suggestedProducts.some(sp => sp.id === p.id))
       .slice(0, 4 - suggestedProducts.length);
     suggestedProducts = [...suggestedProducts, ...more];
@@ -196,15 +341,18 @@ export default function ProductDetailPage() {
                 />
               </div>
               
-              {product.images && product.images.length > 1 && (
+              {galleryItems.length > 1 && (
                 <div className="grid grid-cols-4 gap-4">
-                  {product.images.map((img, idx) => (
+                  {galleryItems.map((item, idx) => (
                     <button 
                       key={idx}
-                      onClick={() => setMainImage(img)}
-                      className={`aspect-square overflow-hidden rounded-md border-2 transition-all ${mainImage === img ? 'border-gold-500 opacity-100' : 'border-transparent opacity-60 hover:opacity-100'}`}
+                      onClick={() => setMainImage(item.src)}
+                      className={`aspect-square overflow-hidden rounded-md border-2 transition-all relative ${mainImage === item.src ? 'border-gold-500 opacity-100' : 'border-transparent opacity-60 hover:opacity-100'}`}
                     >
-                      <img src={img} alt={`${product.name} ${idx+1}`} className="w-full h-full object-cover" />
+                      <img src={item.src} alt={`${product.name} ${item.label}`} className="w-full h-full object-cover" />
+                      <span className="absolute inset-x-0 bottom-0 bg-black/65 px-1.5 py-1 text-[9px] uppercase tracking-wider font-semibold text-white truncate">
+                        {item.label}
+                      </span>
                     </button>
                   ))}
                 </div>

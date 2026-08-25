@@ -1,5 +1,76 @@
 import { Product } from "@/context/AppContext";
 
+export const ADMIN_PRODUCTS_STORAGE_KEY = "sharma-admin-products";
+export const ADMIN_DELETED_PRODUCTS_STORAGE_KEY = "sharma-admin-deleted-products";
+
+function dedupeProducts(products: Product[]) {
+  const seenIds = new Set<number>();
+  const seenNames = new Set<string>();
+
+  return products.filter((product) => {
+    const normalizedName = product.name.toLowerCase();
+    if (seenIds.has(product.id) || seenNames.has(normalizedName)) {
+      return false;
+    }
+
+    seenIds.add(product.id);
+    seenNames.add(normalizedName);
+    return true;
+  });
+}
+
+export function getStoredAdminProducts(): Product[] {
+  if (typeof window === "undefined") {
+    return [];
+  }
+
+  try {
+    const rawProducts = window.localStorage.getItem(ADMIN_PRODUCTS_STORAGE_KEY);
+    if (!rawProducts) {
+      return [];
+    }
+
+    const parsedProducts = JSON.parse(rawProducts);
+    return Array.isArray(parsedProducts) ? parsedProducts : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveStoredAdminProducts(products: Product[]) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.setItem(ADMIN_PRODUCTS_STORAGE_KEY, JSON.stringify(products));
+}
+
+export function getDeletedAdminProductIds(): number[] {
+  if (typeof window === "undefined") {
+    return [];
+  }
+
+  try {
+    const rawIds = window.localStorage.getItem(ADMIN_DELETED_PRODUCTS_STORAGE_KEY);
+    if (!rawIds) {
+      return [];
+    }
+
+    const parsedIds = JSON.parse(rawIds);
+    return Array.isArray(parsedIds) ? parsedIds.filter((id) => typeof id === "number") : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveDeletedAdminProductIds(productIds: number[]) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.setItem(ADMIN_DELETED_PRODUCTS_STORAGE_KEY, JSON.stringify(Array.from(new Set(productIds))));
+}
+
 export const fallbackProducts: Product[] = [
   {
     id: 1,
@@ -1174,13 +1245,10 @@ export const fallbackProducts: Product[] = [
 ];
 
 export function mergeWithFallbackProducts(products: Product[]): Product[] {
-  const seenIds = new Set(products.map((product) => product.id));
-  const seenNames = new Set(products.map((product) => product.name.toLowerCase()));
+  const deletedIds = new Set(getDeletedAdminProductIds());
+  return dedupeProducts([...products, ...fallbackProducts]).filter((product) => !deletedIds.has(product.id));
+}
 
-  return [
-    ...products,
-    ...fallbackProducts.filter((product) => {
-      return !seenIds.has(product.id) && !seenNames.has(product.name.toLowerCase());
-    }),
-  ];
+export function mergeWithAdminProducts(products: Product[]): Product[] {
+  return mergeWithFallbackProducts([...getStoredAdminProducts(), ...products]);
 }

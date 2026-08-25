@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
-import { Lock, Sparkles, Layers, ListTodo, BarChart2, Plus, LogOut, ShieldCheck, UserCircle, Search, MoreVertical, CreditCard, DollarSign, ArrowRight, Tags, Package, Grid, ChevronLeft, ChevronRight, Image as ImageIcon, Filter } from "lucide-react";
+import { Lock, Sparkles, Layers, ListTodo, BarChart2, Plus, LogOut, ShieldCheck, UserCircle, Search, MoreVertical, CreditCard, DollarSign, ArrowRight, Tags, Package, Grid, ChevronLeft, ChevronRight, Image as ImageIcon, Filter, Pencil, Trash2 } from "lucide-react";
+import { Product } from "@/context/AppContext";
 import { useAuth } from "@/context/AuthContext";
+import { getDeletedAdminProductIds, getStoredAdminProducts, mergeWithAdminProducts, saveDeletedAdminProductIds, saveStoredAdminProducts } from "@/data/products";
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -14,9 +16,13 @@ interface AdminProduct {
   category: string | null;
   origin: string | null;
   finish: string | null;
+  thickness?: string | null;
+  applications?: string | null;
+  description?: string | null;
   price: number | null;
   availability: string | null;
   image_url: string | null;
+  images?: string[];
 }
 
 interface AdminQuote {
@@ -36,6 +42,35 @@ interface AdminQuote {
   created_at: string;
 }
 
+const emptyProductForm = {
+  name: "",
+  category: "Marble",
+  origin: "India",
+  finish: "Polished",
+  thickness: "2cm",
+  applications: "",
+  description: "",
+  price: "",
+  availability: "In Stock",
+};
+
+const getAdminImageSrc = (imageUrl: string | null) => {
+  if (!imageUrl) {
+    return "";
+  }
+
+  return imageUrl.startsWith("http") || imageUrl.startsWith("data:") ? imageUrl : imageUrl;
+};
+
+const readFileAsDataUrl = (file: File) => (
+  new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  })
+);
+
 export default function AdminPage() {
   const { user, token, login, logout, loading } = useAuth();
   
@@ -46,7 +81,7 @@ export default function AdminPage() {
   const [authSubmitting, setAuthSubmitting] = useState(false);
 
   // Active module tab
-  const [activeTab, setActiveTab] = useState<"products" | "categories" | "quotes" | "ai3d" | "analytics">("analytics");
+  const [activeTab, setActiveTab] = useState<"products" | "categories" | "quotes" | "ai3d" | "analytics">("products");
 
   // API Data states
   const [quotes, setQuotes] = useState<AdminQuote[]>([]);
@@ -54,6 +89,11 @@ export default function AdminPage() {
 
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [productsLoading, setProductsLoading] = useState(true);
+  const [showProductForm, setShowProductForm] = useState(false);
+  const [editingProductId, setEditingProductId] = useState<number | null>(null);
+  const [productForm, setProductForm] = useState(emptyProductForm);
+  const [productImagePreviews, setProductImagePreviews] = useState<string[]>([]);
+  const [productSaveStatus, setProductSaveStatus] = useState("");
 
   // Products filtering & pagination
   const [searchQuery, setSearchQuery] = useState("");
@@ -122,10 +162,12 @@ export default function AdminPage() {
         const res = await fetch(`${API_URL}/api/products`);
         if (res.ok) {
           const data = await res.json();
-          setProducts(data);
+          setProducts(mergeWithAdminProducts(data));
+        } else {
+          setProducts(mergeWithAdminProducts([]));
         }
-      } catch (err) {
-        console.error("Error loading products:", err);
+      } catch {
+        setProducts(mergeWithAdminProducts([]));
       } finally {
         setProductsLoading(false);
       }
@@ -156,10 +198,92 @@ export default function AdminPage() {
     return filteredProducts.slice(start, start + itemsPerPage);
   }, [filteredProducts, currentPage]);
 
-  // Reset page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, selectedCategory]);
+  const handleProductImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) {
+      setProductImagePreviews([]);
+      return;
+    }
+
+    const previews = await Promise.all(files.slice(0, 8).map(readFileAsDataUrl));
+    setProductImagePreviews(previews);
+  };
+
+  const handleProductSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const parsedPrice = Number(productForm.price);
+    const nextProduct: Product = {
+      id: editingProductId ?? Date.now(),
+      name: productForm.name.trim(),
+      category: productForm.category.trim(),
+      origin: productForm.origin.trim(),
+      finish: productForm.finish.trim(),
+      thickness: productForm.thickness.trim(),
+      applications: productForm.applications.trim(),
+      description: productForm.description.trim(),
+      price: productForm.price.trim() && Number.isFinite(parsedPrice) ? parsedPrice : null,
+      availability: productForm.availability,
+      image_url: productImagePreviews[0] || "/static/real/marble-white-carrara.jpg",
+      images: productImagePreviews,
+      roughness: 0.2,
+      metalness: 0.05,
+    };
+
+    const storedProducts = getStoredAdminProducts();
+    const nextStoredProducts = [
+      nextProduct,
+      ...storedProducts.filter((product) => (
+        product.id !== nextProduct.id && product.name.toLowerCase() !== nextProduct.name.toLowerCase()
+      )),
+    ];
+
+    saveStoredAdminProducts(nextStoredProducts);
+    saveDeletedAdminProductIds(getDeletedAdminProductIds().filter((productId) => productId !== nextProduct.id));
+    setProducts((prev) => [
+      nextProduct,
+      ...prev.filter((product) => (
+        product.id !== nextProduct.id && product.name?.toLowerCase() !== nextProduct.name.toLowerCase()
+      )),
+    ]);
+    setProductForm(emptyProductForm);
+    setProductImagePreviews([]);
+    setEditingProductId(null);
+    setShowProductForm(false);
+    setProductSaveStatus(editingProductId ? "Product updated locally." : "Product saved locally and added to the catalog.");
+  };
+
+  const handleEditProduct = (product: AdminProduct) => {
+    setEditingProductId(product.id);
+    setProductForm({
+      name: product.name || "",
+      category: product.category || "Marble",
+      origin: product.origin || "India",
+      finish: product.finish || "Polished",
+      thickness: product.thickness || "2cm",
+      applications: product.applications || "",
+      description: product.description || "",
+      price: product.price ? String(product.price) : "",
+      availability: product.availability || "In Stock",
+    });
+    setProductImagePreviews(product.images?.length ? product.images : product.image_url ? [product.image_url] : []);
+    setShowProductForm(true);
+    setProductSaveStatus("");
+  };
+
+  const handleDeleteProduct = (productId: number) => {
+    const storedProducts = getStoredAdminProducts().filter((product) => product.id !== productId);
+    saveStoredAdminProducts(storedProducts);
+    saveDeletedAdminProductIds([...getDeletedAdminProductIds(), productId]);
+    setProducts((prev) => prev.filter((product) => product.id !== productId));
+    if (editingProductId === productId) {
+      setEditingProductId(null);
+      setProductForm(emptyProductForm);
+      setProductImagePreviews([]);
+      setShowProductForm(false);
+    }
+    setProductSaveStatus("Product removed from this admin list.");
+  };
 
   const handleUpdateQuoteStatus = async (quoteId: number, statusStr: string) => {
     try {
@@ -397,7 +521,7 @@ export default function AdminPage() {
                     <DollarSign className="w-5 h-5" />
                   </div>
                   <div className="text-right pt-2 pb-1">
-                    <p className="text-sm font-medium text-slate-500">Today's Money</p>
+                    <p className="text-sm font-medium text-slate-500">Today&apos;s Money</p>
                     <h4 className="text-2xl font-bold text-slate-800">$53,000</h4>
                   </div>
                   <div className="border-t border-slate-100 mt-3 pt-3">
@@ -410,7 +534,7 @@ export default function AdminPage() {
                     <UserCircle className="w-5 h-5" />
                   </div>
                   <div className="text-right pt-2 pb-1">
-                    <p className="text-sm font-medium text-slate-500">Today's Users</p>
+                    <p className="text-sm font-medium text-slate-500">Today&apos;s Users</p>
                     <h4 className="text-2xl font-bold text-slate-800">2,300</h4>
                   </div>
                   <div className="border-t border-slate-100 mt-3 pt-3">
@@ -531,13 +655,153 @@ export default function AdminPage() {
                     <h4 className="font-semibold text-lg">Products Overview</h4>
                     <p className="text-xs text-blue-100 mt-1">Manage slab catalog and pricing</p>
                   </div>
-                  <button className="flex items-center space-x-1 px-3 py-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-lg text-sm font-medium transition-colors">
+                  <button
+                    onClick={() => {
+                      setEditingProductId(null);
+                      setProductForm(emptyProductForm);
+                      setProductImagePreviews([]);
+                      setShowProductForm((value) => !value);
+                      setProductSaveStatus("");
+                    }}
+                    className="flex items-center space-x-1 px-3 py-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-lg text-sm font-medium transition-colors"
+                  >
                     <Plus className="w-4 h-4" />
                     <span>Add Product</span>
                   </button>
                 </div>
                 
                 <div className="p-6 pt-20">
+                  {productSaveStatus && (
+                    <div className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+                      {productSaveStatus}
+                    </div>
+                  )}
+
+                  {showProductForm && (
+                    <form onSubmit={handleProductSubmit} className="mb-8 rounded-2xl border border-slate-200 bg-slate-50 p-5 shadow-sm">
+                      <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Product Name</label>
+                            <input
+                              required
+                              value={productForm.name}
+                              onChange={(e) => setProductForm((prev) => ({ ...prev, name: e.target.value }))}
+                              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
+                              placeholder="Gray Marble Staircase"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Category</label>
+                            <select
+                              value={productForm.category}
+                              onChange={(e) => setProductForm((prev) => ({ ...prev, category: e.target.value }))}
+                              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
+                            >
+                              {["Marble", "Imported Marble", "Granite", "Quartz", "Full Body Tiles", "Wall Tiles", "PVT", "Kota Stone"].map((category) => (
+                                <option key={category} value={category}>{category}</option>
+                              ))}
+                            </select>
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Origin</label>
+                            <input
+                              value={productForm.origin}
+                              onChange={(e) => setProductForm((prev) => ({ ...prev, origin: e.target.value }))}
+                              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
+                              placeholder="India"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Finish</label>
+                            <input
+                              value={productForm.finish}
+                              onChange={(e) => setProductForm((prev) => ({ ...prev, finish: e.target.value }))}
+                              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
+                              placeholder="Polished"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Thickness / Size</label>
+                            <input
+                              value={productForm.thickness}
+                              onChange={(e) => setProductForm((prev) => ({ ...prev, thickness: e.target.value }))}
+                              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
+                              placeholder="2cm"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Price</label>
+                            <input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              value={productForm.price}
+                              onChange={(e) => setProductForm((prev) => ({ ...prev, price: e.target.value }))}
+                              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
+                              placeholder="210"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Availability</label>
+                            <select
+                              value={productForm.availability}
+                              onChange={(e) => setProductForm((prev) => ({ ...prev, availability: e.target.value }))}
+                              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
+                            >
+                              <option value="In Stock">In Stock</option>
+                              <option value="Limited">Limited</option>
+                              <option value="Out of Stock">Out of Stock</option>
+                            </select>
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Applications</label>
+                            <input
+                              value={productForm.applications}
+                              onChange={(e) => setProductForm((prev) => ({ ...prev, applications: e.target.value }))}
+                              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
+                              placeholder="Hall, Kitchen, Bedroom, Parking"
+                            />
+                          </div>
+                          <div className="md:col-span-2 space-y-1">
+                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Description</label>
+                            <textarea
+                              required
+                              value={productForm.description}
+                              onChange={(e) => setProductForm((prev) => ({ ...prev, description: e.target.value }))}
+                              rows={3}
+                              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 resize-none"
+                              placeholder="Short product description for the detail page"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-3">
+                          <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Product Images</label>
+                          <label className="flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-white px-4 py-6 text-center text-slate-500 hover:border-blue-400 hover:text-blue-600">
+                            <ImageIcon className="mb-2 h-6 w-6" />
+                            <span className="text-sm font-semibold">Upload Images</span>
+                            <span className="mt-1 text-xs">First image is main image</span>
+                            <input type="file" accept="image/*" multiple onChange={handleProductImageChange} className="hidden" />
+                          </label>
+                          {productImagePreviews.length > 0 && (
+                            <div className="grid grid-cols-4 gap-2">
+                              {productImagePreviews.map((src, index) => (
+                                <img key={src} src={src} alt={`Product preview ${index + 1}`} className="aspect-square rounded-lg border border-slate-200 object-cover" />
+                              ))}
+                            </div>
+                          )}
+                          <button
+                            type="submit"
+                            className="w-full rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-slate-800"
+                          >
+                            {editingProductId ? "Update Product" : "Save Product"}
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                  )}
+
                   {/* Filters and Search */}
                   <div className="flex flex-col sm:flex-row gap-4 justify-between items-center mb-6">
                     <div className="relative w-full sm:w-64">
@@ -546,7 +810,10 @@ export default function AdminPage() {
                         type="text" 
                         placeholder="Search products..." 
                         value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onChange={(e) => {
+                          setSearchQuery(e.target.value);
+                          setCurrentPage(1);
+                        }}
                         className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 rounded-xl text-sm transition-all outline-none text-slate-700"
                       />
                     </div>
@@ -554,7 +821,10 @@ export default function AdminPage() {
                       <Filter className="w-4 h-4 text-slate-400" />
                       <select 
                         value={selectedCategory}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
+                        onChange={(e) => {
+                          setSelectedCategory(e.target.value);
+                          setCurrentPage(1);
+                        }}
                         className="w-full sm:w-48 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
                       >
                         {uniqueCategories.map(cat => (
@@ -580,7 +850,7 @@ export default function AdminPage() {
                             <th className="pb-3 px-4">Category</th>
                             <th className="pb-3 px-4">Origin</th>
                             <th className="pb-3 px-4">Status</th>
-                            <th className="pb-3 px-4 text-right">Price</th>
+                            <th className="pb-3 px-4 text-right">Actions</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
@@ -588,7 +858,7 @@ export default function AdminPage() {
                             <tr key={product.id} className="hover:bg-slate-50 transition-colors">
                               <td className="py-3 px-4">
                                 {product.image_url ? (
-                                  <img src={product.image_url.startsWith('http') ? product.image_url : `${API_URL}${product.image_url}`} alt={product.name} className="w-10 h-10 rounded-lg object-cover border border-slate-200" />
+                                  <img src={getAdminImageSrc(product.image_url)} alt={product.name} className="w-10 h-10 rounded-lg object-cover border border-slate-200" />
                                 ) : (
                                   <div className="w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400">
                                     <ImageIcon className="w-4 h-4" />
@@ -607,7 +877,26 @@ export default function AdminPage() {
                                   {product.availability || "Unknown"}
                                 </span>
                               </td>
-                              <td className="py-4 px-4 text-right font-medium">{product.price ? `$${product.price}` : "POA"}</td>
+                              <td className="py-4 px-4">
+                                <div className="flex justify-end gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleEditProduct(product)}
+                                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
+                                    title="Edit product"
+                                  >
+                                    <Pencil className="h-4 w-4" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteProduct(product.id)}
+                                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+                                    title="Delete product"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </button>
+                                </div>
+                              </td>
                             </tr>
                           ))}
                           {paginatedProducts.length === 0 && (

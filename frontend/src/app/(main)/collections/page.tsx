@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Search, Heart, RefreshCw, Layers, MapPin, Check, Plus, Trash2, ArrowUpRight } from "lucide-react";
 import { useApp, Product } from "@/context/AppContext";
-import { fallbackProducts, mergeWithFallbackProducts } from "@/data/products";
+import { mergeWithAdminProducts } from "@/data/products";
 
 // Load 3D slab viewer dynamically - Removed as requested to keep 3D Showroom as the only 3D section.
 
@@ -40,7 +40,7 @@ function CollectionsContent() {
   
   // Search & Filter state
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") || "All");
   const [selectedOrigin, setSelectedOrigin] = useState("All");
   const [selectedFinish, setSelectedFinish] = useState("All");
   const [selectedThickness, setSelectedThickness] = useState("All");
@@ -52,29 +52,24 @@ function CollectionsContent() {
   const [showCompareModal, setShowCompareModal] = useState(false);
 
   useEffect(() => {
-    const categoryParam = searchParams.get("category");
-    setSelectedCategory(categoryParam || "All");
-  }, [searchParams]);
-
-  useEffect(() => {
     const fetchStones = async () => {
       try {
         const res = await fetch(`${API_URL}/api/products`);
         if (res.ok) {
-          const data = await res.json();
+          const data: Product[] = await res.json();
           // Map local paths to absolute backend URL if needed
-          const processed = data.map((item: any) => ({
+          const processed = data.map((item) => ({
             ...item,
             image_url: item.image_url.startsWith("/static") ? `${API_URL}${item.image_url}` : item.image_url,
             texture_url: item.texture_url && item.texture_url.startsWith("/static") ? `${API_URL}${item.texture_url}` : item.texture_url,
           }));
-          setProducts(processed.length > 0 ? mergeWithFallbackProducts(processed) : fallbackProducts);
+          setProducts(processed.length > 0 ? mergeWithAdminProducts(processed) : mergeWithAdminProducts([]));
         } else {
-          setProducts(fallbackProducts);
+          setProducts(mergeWithAdminProducts([]));
         }
       } catch (err) {
         console.error("Backend fetch error, loading fallback catalog:", err);
-        setProducts(fallbackProducts);
+        setProducts(mergeWithAdminProducts([]));
       } finally {
         setLoading(false);
       }
