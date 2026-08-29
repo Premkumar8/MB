@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
-import { Lock, Sparkles, Layers, ListTodo, BarChart2, Plus, LogOut, ShieldCheck, UserCircle, Search, MoreVertical, CreditCard, DollarSign, ArrowRight, Tags, Package, Grid, ChevronLeft, ChevronRight, Image as ImageIcon, Filter, Pencil, Trash2 } from "lucide-react";
+import { Lock, Sparkles, Layers, ListTodo, BarChart2, Plus, LogOut, ShieldCheck, UserCircle, Search, MoreVertical, CreditCard, DollarSign, ArrowRight, Tags, Package, Grid, ChevronLeft, ChevronRight, Image as ImageIcon, Filter, Pencil, Trash2, X, ZoomIn, UploadCloud, Link as LinkIcon } from "lucide-react";
 import { Product } from "@/context/AppContext";
 import { useAuth } from "@/context/AuthContext";
 import { getDeletedAdminProductIds, getStoredAdminProducts, mergeWithAdminProducts, saveDeletedAdminProductIds, saveStoredAdminProducts } from "@/data/products";
@@ -54,6 +54,29 @@ const emptyProductForm = {
   availability: "In Stock",
 };
 
+type RoomKey = "hall" | "kitchen" | "bedroom" | "parking";
+
+interface RoomImagesState {
+  hall: string;
+  kitchen: string;
+  bedroom: string;
+  parking: string;
+}
+
+const initialRoomImages: RoomImagesState = {
+  hall: "",
+  kitchen: "",
+  bedroom: "",
+  parking: "",
+};
+
+const ROOM_CONFIG: { key: RoomKey; label: string; subtitle: string; icon: string }[] = [
+  { key: "hall", label: "Hall (Main)", subtitle: "Living room / entrance", icon: "🏛️" },
+  { key: "kitchen", label: "Kitchen", subtitle: "Countertop & backsplash", icon: "🍳" },
+  { key: "bedroom", label: "Bedroom", subtitle: "Master bedroom suite", icon: "🛏️" },
+  { key: "parking", label: "Parking", subtitle: "Driveway & courtyard", icon: "🚗" },
+];
+
 const getAdminImageSrc = (imageUrl: string | null) => {
   if (!imageUrl) {
     return "";
@@ -62,10 +85,44 @@ const getAdminImageSrc = (imageUrl: string | null) => {
   return imageUrl.startsWith("http") || imageUrl.startsWith("data:") ? imageUrl : imageUrl;
 };
 
-const readFileAsDataUrl = (file: File) => (
+const readFileAsDataUrl = (file: File, maxWidth = 1000, quality = 0.8): Promise<string> => (
   new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
+    reader.onload = (e) => {
+      const resultStr = e.target?.result as string;
+      if (!resultStr || !file.type.startsWith("image/")) {
+        resolve(resultStr || "");
+        return;
+      }
+
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        let { width, height } = img;
+        if (width > maxWidth || height > maxWidth) {
+          if (width > height) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          } else {
+            width = Math.round((width * maxWidth) / height);
+            height = maxWidth;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          resolve(resultStr);
+          return;
+        }
+        ctx.drawImage(img, 0, 0, width, height);
+        // Compress as JPEG to dramatically reduce base64 size
+        const compressed = canvas.toDataURL("image/jpeg", quality);
+        resolve(compressed);
+      };
+      img.onerror = () => resolve(resultStr);
+      img.src = resultStr;
+    };
     reader.onerror = reject;
     reader.readAsDataURL(file);
   })
@@ -92,8 +149,21 @@ export default function AdminPage() {
   const [showProductForm, setShowProductForm] = useState(false);
   const [editingProductId, setEditingProductId] = useState<number | null>(null);
   const [productForm, setProductForm] = useState(emptyProductForm);
-  const [productImagePreviews, setProductImagePreviews] = useState<string[]>([]);
+  const [roomImages, setRoomImages] = useState<RoomImagesState>(initialRoomImages);
   const [productSaveStatus, setProductSaveStatus] = useState("");
+  const [zoomImage, setZoomImage] = useState<{ src: string; label?: string; roomKey?: RoomKey } | null>(null);
+  const [roomUrlInputs, setRoomUrlInputs] = useState<Record<RoomKey, string>>({
+    hall: "",
+    kitchen: "",
+    bedroom: "",
+    parking: "",
+  });
+  const [showRoomUrlInput, setShowRoomUrlInput] = useState<Record<RoomKey, boolean>>({
+    hall: false,
+    kitchen: false,
+    bedroom: false,
+    parking: false,
+  });
 
   // Products filtering & pagination
   const [searchQuery, setSearchQuery] = useState("");
@@ -198,21 +268,63 @@ export default function AdminPage() {
     return filteredProducts.slice(start, start + itemsPerPage);
   }, [filteredProducts, currentPage]);
 
-  const handleProductImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0) {
-      setProductImagePreviews([]);
+  const handleRoomImageUpload = async (roomKey: RoomKey, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) {
       return;
     }
 
-    const previews = await Promise.all(files.slice(0, 8).map(readFileAsDataUrl));
-    setProductImagePreviews(previews);
+    const dataUrl = await readFileAsDataUrl(file);
+    setRoomImages((prev) => ({ ...prev, [roomKey]: dataUrl }));
+    e.target.value = "";
+  };
+
+  const handleRoomUrlAdd = (roomKey: RoomKey) => {
+    const val = roomUrlInputs[roomKey]?.trim();
+    if (val) {
+      setRoomImages((prev) => ({ ...prev, [roomKey]: val }));
+      setRoomUrlInputs((prev) => ({ ...prev, [roomKey]: "" }));
+      setShowRoomUrlInput((prev) => ({ ...prev, [roomKey]: false }));
+    }
+  };
+
+  const handleRemoveRoomImage = (roomKey: RoomKey, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+    }
+    setRoomImages((prev) => ({ ...prev, [roomKey]: "" }));
+    if (zoomImage?.roomKey === roomKey) {
+      setZoomImage(null);
+    }
+  };
+
+  const handleBatchUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) {
+      return;
+    }
+
+    const previews = await Promise.all(files.slice(0, 4).map((file) => readFileAsDataUrl(file)));
+    const keys: RoomKey[] = ["hall", "kitchen", "bedroom", "parking"];
+    setRoomImages((prev) => {
+      const updated = { ...prev };
+      previews.forEach((p, idx) => {
+        if (keys[idx]) {
+          updated[keys[idx]] = p;
+        }
+      });
+      return updated;
+    });
+    e.target.value = "";
   };
 
   const handleProductSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     const parsedPrice = Number(productForm.price);
+    const validImages = [roomImages.hall, roomImages.kitchen, roomImages.bedroom, roomImages.parking];
+    const mainImageUrl = roomImages.hall || validImages.find(Boolean) || "/static/real/marble-white-carrara.jpg";
+
     const nextProduct: Product = {
       id: editingProductId ?? Date.now(),
       name: productForm.name.trim(),
@@ -224,8 +336,13 @@ export default function AdminPage() {
       description: productForm.description.trim(),
       price: productForm.price.trim() && Number.isFinite(parsedPrice) ? parsedPrice : null,
       availability: productForm.availability,
-      image_url: productImagePreviews[0] || "/static/real/marble-white-carrara.jpg",
-      images: productImagePreviews,
+      image_url: mainImageUrl,
+      images: [
+        roomImages.hall || mainImageUrl,
+        roomImages.kitchen || mainImageUrl,
+        roomImages.bedroom || mainImageUrl,
+        roomImages.parking || mainImageUrl,
+      ],
       roughness: 0.2,
       metalness: 0.05,
     };
@@ -247,10 +364,10 @@ export default function AdminPage() {
       )),
     ]);
     setProductForm(emptyProductForm);
-    setProductImagePreviews([]);
+    setRoomImages(initialRoomImages);
     setEditingProductId(null);
     setShowProductForm(false);
-    setProductSaveStatus(editingProductId ? "Product updated locally." : "Product saved locally and added to the catalog.");
+    setProductSaveStatus(editingProductId ? "Product and room application images updated." : "Product and room application images saved to catalog.");
   };
 
   const handleEditProduct = (product: AdminProduct) => {
@@ -266,7 +383,13 @@ export default function AdminPage() {
       price: product.price ? String(product.price) : "",
       availability: product.availability || "In Stock",
     });
-    setProductImagePreviews(product.images?.length ? product.images : product.image_url ? [product.image_url] : []);
+    const imgs = product.images?.length ? product.images : product.image_url ? [product.image_url] : [];
+    setRoomImages({
+      hall: imgs[0] || product.image_url || "",
+      kitchen: imgs[1] || "",
+      bedroom: imgs[2] || "",
+      parking: imgs[3] || "",
+    });
     setShowProductForm(true);
     setProductSaveStatus("");
   };
@@ -279,7 +402,7 @@ export default function AdminPage() {
     if (editingProductId === productId) {
       setEditingProductId(null);
       setProductForm(emptyProductForm);
-      setProductImagePreviews([]);
+      setRoomImages(initialRoomImages);
       setShowProductForm(false);
     }
     setProductSaveStatus("Product removed from this admin list.");
@@ -659,7 +782,7 @@ export default function AdminPage() {
                     onClick={() => {
                       setEditingProductId(null);
                       setProductForm(emptyProductForm);
-                      setProductImagePreviews([]);
+                      setRoomImages(initialRoomImages);
                       setShowProductForm((value) => !value);
                       setProductSaveStatus("");
                     }}
@@ -679,124 +802,237 @@ export default function AdminPage() {
 
                   {showProductForm && (
                     <form onSubmit={handleProductSubmit} className="mb-8 rounded-2xl border border-slate-200 bg-slate-50 p-5 shadow-sm">
-                      <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="space-y-1">
-                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Product Name</label>
-                            <input
-                              required
-                              value={productForm.name}
-                              onChange={(e) => setProductForm((prev) => ({ ...prev, name: e.target.value }))}
-                              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
-                              placeholder="Gray Marble Staircase"
-                            />
+                      <div className="grid grid-cols-1 xl:grid-cols-[1fr_480px] gap-6">
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Product Name</label>
+                              <input
+                                required
+                                value={productForm.name}
+                                onChange={(e) => setProductForm((prev) => ({ ...prev, name: e.target.value }))}
+                                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
+                                placeholder="Gray Marble Staircase"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Category</label>
+                              <select
+                                value={productForm.category}
+                                onChange={(e) => setProductForm((prev) => ({ ...prev, category: e.target.value }))}
+                                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
+                              >
+                                {["Marble", "Imported Marble", "Granite", "Quartz", "Full Body Tiles", "Wall Tiles", "PVT", "Kota Stone"].map((category) => (
+                                  <option key={category} value={category}>{category}</option>
+                                ))}
+                              </select>
+                            </div>
+                            <div className="space-y-1">
+                              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Origin</label>
+                              <input
+                                value={productForm.origin}
+                                onChange={(e) => setProductForm((prev) => ({ ...prev, origin: e.target.value }))}
+                                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
+                                placeholder="India"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Finish</label>
+                              <input
+                                value={productForm.finish}
+                                onChange={(e) => setProductForm((prev) => ({ ...prev, finish: e.target.value }))}
+                                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
+                                placeholder="Polished"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Thickness / Size</label>
+                              <input
+                                value={productForm.thickness}
+                                onChange={(e) => setProductForm((prev) => ({ ...prev, thickness: e.target.value }))}
+                                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
+                                placeholder="2cm"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Price</label>
+                              <input
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                value={productForm.price}
+                                onChange={(e) => setProductForm((prev) => ({ ...prev, price: e.target.value }))}
+                                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
+                                placeholder="210"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Availability</label>
+                              <select
+                                value={productForm.availability}
+                                onChange={(e) => setProductForm((prev) => ({ ...prev, availability: e.target.value }))}
+                                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
+                              >
+                                <option value="In Stock">In Stock</option>
+                                <option value="Limited">Limited</option>
+                                <option value="Out of Stock">Out of Stock</option>
+                              </select>
+                            </div>
+                            <div className="space-y-1">
+                              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Applications</label>
+                              <input
+                                value={productForm.applications}
+                                onChange={(e) => setProductForm((prev) => ({ ...prev, applications: e.target.value }))}
+                                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
+                                placeholder="Hall, Kitchen, Bedroom, Parking"
+                              />
+                            </div>
+                            <div className="md:col-span-2 space-y-1">
+                              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Description</label>
+                              <textarea
+                                required
+                                value={productForm.description}
+                                onChange={(e) => setProductForm((prev) => ({ ...prev, description: e.target.value }))}
+                                rows={3}
+                                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 resize-none"
+                                placeholder="Short product description for the detail page"
+                              />
+                            </div>
                           </div>
-                          <div className="space-y-1">
-                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Category</label>
-                            <select
-                              value={productForm.category}
-                              onChange={(e) => setProductForm((prev) => ({ ...prev, category: e.target.value }))}
-                              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
+
+                          <div className="flex gap-3 pt-2">
+                            <button
+                              type="submit"
+                              className="flex-1 rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-slate-800"
                             >
-                              {["Marble", "Imported Marble", "Granite", "Quartz", "Full Body Tiles", "Wall Tiles", "PVT", "Kota Stone"].map((category) => (
-                                <option key={category} value={category}>{category}</option>
-                              ))}
-                            </select>
-                          </div>
-                          <div className="space-y-1">
-                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Origin</label>
-                            <input
-                              value={productForm.origin}
-                              onChange={(e) => setProductForm((prev) => ({ ...prev, origin: e.target.value }))}
-                              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
-                              placeholder="India"
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Finish</label>
-                            <input
-                              value={productForm.finish}
-                              onChange={(e) => setProductForm((prev) => ({ ...prev, finish: e.target.value }))}
-                              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
-                              placeholder="Polished"
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Thickness / Size</label>
-                            <input
-                              value={productForm.thickness}
-                              onChange={(e) => setProductForm((prev) => ({ ...prev, thickness: e.target.value }))}
-                              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
-                              placeholder="2cm"
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Price</label>
-                            <input
-                              type="number"
-                              min="0"
-                              step="0.01"
-                              value={productForm.price}
-                              onChange={(e) => setProductForm((prev) => ({ ...prev, price: e.target.value }))}
-                              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
-                              placeholder="210"
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Availability</label>
-                            <select
-                              value={productForm.availability}
-                              onChange={(e) => setProductForm((prev) => ({ ...prev, availability: e.target.value }))}
-                              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
+                              {editingProductId ? "Update Product" : "Save Product"}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowProductForm(false);
+                                setEditingProductId(null);
+                                setProductForm(emptyProductForm);
+                                setRoomImages(initialRoomImages);
+                              }}
+                              className="px-5 py-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-sm font-semibold text-slate-700 transition-colors"
                             >
-                              <option value="In Stock">In Stock</option>
-                              <option value="Limited">Limited</option>
-                              <option value="Out of Stock">Out of Stock</option>
-                            </select>
-                          </div>
-                          <div className="space-y-1">
-                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Applications</label>
-                            <input
-                              value={productForm.applications}
-                              onChange={(e) => setProductForm((prev) => ({ ...prev, applications: e.target.value }))}
-                              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
-                              placeholder="Hall, Kitchen, Bedroom, Parking"
-                            />
-                          </div>
-                          <div className="md:col-span-2 space-y-1">
-                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Description</label>
-                            <textarea
-                              required
-                              value={productForm.description}
-                              onChange={(e) => setProductForm((prev) => ({ ...prev, description: e.target.value }))}
-                              rows={3}
-                              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 resize-none"
-                              placeholder="Short product description for the detail page"
-                            />
+                              Cancel
+                            </button>
                           </div>
                         </div>
 
-                        <div className="space-y-3">
-                          <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Product Images</label>
-                          <label className="flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-white px-4 py-6 text-center text-slate-500 hover:border-blue-400 hover:text-blue-600">
-                            <ImageIcon className="mb-2 h-6 w-6" />
-                            <span className="text-sm font-semibold">Upload Images</span>
-                            <span className="mt-1 text-xs">First image is main image</span>
-                            <input type="file" accept="image/*" multiple onChange={handleProductImageChange} className="hidden" />
-                          </label>
-                          {productImagePreviews.length > 0 && (
-                            <div className="grid grid-cols-4 gap-2">
-                              {productImagePreviews.map((src, index) => (
-                                <img key={src} src={src} alt={`Product preview ${index + 1}`} className="aspect-square rounded-lg border border-slate-200 object-cover" />
-                              ))}
+                        {/* Dedicated 4-Room Grid (Hall, Kitchen, Bedroom, Parking) */}
+                        <div className="space-y-3.5 bg-white/80 backdrop-blur-sm border border-slate-200 rounded-2xl p-4 shadow-xs">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/80 pb-3">
+                            <div>
+                              <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block">Room Application Views</label>
+                              <p className="text-[11px] text-slate-500">Hall, Kitchen, Bedroom & Parking visualizers</p>
                             </div>
-                          )}
-                          <button
-                            type="submit"
-                            className="w-full rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-slate-800"
-                          >
-                            {editingProductId ? "Update Product" : "Save Product"}
-                          </button>
+                            <label className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-semibold cursor-pointer transition-colors border border-blue-200 shadow-xs">
+                              <UploadCloud className="w-3.5 h-3.5" />
+                              <span>Upload All 4 Rooms</span>
+                              <input type="file" accept="image/*" multiple onChange={handleBatchUpload} className="hidden" />
+                            </label>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {ROOM_CONFIG.map(({ key, label, subtitle, icon }) => {
+                              const src = roomImages[key];
+                              const isUrlOpen = showRoomUrlInput[key];
+                              const urlVal = roomUrlInputs[key];
+
+                              return (
+                                <div key={key} className="bg-slate-50/70 rounded-xl border border-slate-200 p-3 shadow-xs flex flex-col space-y-2 relative group/card">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-1.5">
+                                      <span className="text-sm">{icon}</span>
+                                      <div>
+                                        <span className="text-xs font-bold text-slate-800 uppercase tracking-wide">{label}</span>
+                                        <p className="text-[10px] text-slate-400 leading-none">{subtitle}</p>
+                                      </div>
+                                    </div>
+                                    {src && (
+                                      <button
+                                        type="button"
+                                        onClick={(e) => handleRemoveRoomImage(key, e)}
+                                        title={`Remove ${label} image`}
+                                        className="p-1 bg-red-50 hover:bg-red-500 text-red-500 hover:text-white rounded-full transition-colors border border-red-200 hover:border-red-500 shadow-xs"
+                                      >
+                                        <X className="w-3 h-3" />
+                                      </button>
+                                    )}
+                                  </div>
+
+                                  {src ? (
+                                    <div
+                                      onClick={() => setZoomImage({ src, label, roomKey: key })}
+                                      className="group relative aspect-video bg-slate-900 rounded-lg overflow-hidden cursor-pointer border border-slate-200 hover:border-blue-500 transition-all shadow-inner"
+                                    >
+                                      <img src={src} alt={label} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                      <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
+                                        <div className="bg-white/95 text-slate-900 px-2.5 py-1 rounded-full text-[11px] font-semibold shadow-md flex items-center gap-1">
+                                          <ZoomIn className="w-3 h-3" />
+                                          <span>View Bigger</span>
+                                        </div>
+                                      </div>
+                                      <label 
+                                        onClick={(e) => e.stopPropagation()} 
+                                        className="absolute bottom-1.5 right-1.5 bg-slate-900/85 hover:bg-blue-600 text-white px-2 py-0.5 rounded text-[10px] font-semibold backdrop-blur-md cursor-pointer transition-colors shadow border border-white/10"
+                                      >
+                                        Change
+                                        <input type="file" accept="image/*" onChange={(e) => handleRoomImageUpload(key, e)} className="hidden" />
+                                      </label>
+                                    </div>
+                                  ) : (
+                                    <div className="space-y-1.5">
+                                      <label className="flex flex-col items-center justify-center aspect-video rounded-lg border-2 border-dashed border-slate-300 hover:border-blue-500 hover:bg-blue-50/40 cursor-pointer text-slate-400 hover:text-blue-600 transition-all p-2 text-center group">
+                                        <UploadCloud className="w-5 h-5 mb-0.5 text-slate-300 group-hover:text-blue-500 transition-colors" />
+                                        <span className="text-[11px] font-semibold text-slate-600 group-hover:text-blue-600">+ Add {label}</span>
+                                        <input type="file" accept="image/*" onChange={(e) => handleRoomImageUpload(key, e)} className="hidden" />
+                                      </label>
+
+                                      {isUrlOpen ? (
+                                        <div className="flex gap-1 pt-0.5">
+                                          <input
+                                            type="text"
+                                            placeholder="Image URL..."
+                                            value={urlVal}
+                                            onChange={(e) => setRoomUrlInputs(prev => ({ ...prev, [key]: e.target.value }))}
+                                            onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleRoomUrlAdd(key); } }}
+                                            className="flex-1 px-2 py-1 bg-white border border-slate-200 rounded-md text-[11px] text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                          />
+                                          <button
+                                            type="button"
+                                            onClick={() => handleRoomUrlAdd(key)}
+                                            className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-semibold rounded-md shadow-xs transition-colors"
+                                          >
+                                            Add
+                                          </button>
+                                          <button
+                                            type="button"
+                                            onClick={() => setShowRoomUrlInput(prev => ({ ...prev, [key]: false }))}
+                                            className="px-1.5 py-1 text-slate-400 hover:text-slate-600 text-[11px]"
+                                          >
+                                            Cancel
+                                          </button>
+                                        </div>
+                                      ) : (
+                                        <button
+                                          type="button"
+                                          onClick={() => setShowRoomUrlInput(prev => ({ ...prev, [key]: true }))}
+                                          className="text-[10px] text-blue-600 hover:text-blue-700 flex items-center justify-center gap-1 w-full py-0.5 font-medium hover:underline"
+                                        >
+                                          <LinkIcon className="w-2.5 h-2.5" />
+                                          <span>or add by URL</span>
+                                        </button>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
                         </div>
                       </div>
                     </form>
@@ -1139,7 +1375,7 @@ export default function AdminPage() {
 
                   <div className="bg-slate-900 rounded-2xl shadow-inner border border-slate-800 flex items-center justify-center min-h-[300px] relative overflow-hidden">
                     {aiProcessing && (
-                      <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm flex flex-col items-center justify-center z-20 text-white">
+              <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm flex flex-col items-center justify-center z-20 text-white">
                         <Sparkles className="w-8 h-8 text-emerald-400 animate-spin mb-4" />
                         <p className="text-sm font-semibold tracking-wider">COMPILING MESH</p>
                         <p className="text-xs text-slate-400 mt-1">Generating UV maps...</p>
@@ -1174,6 +1410,64 @@ export default function AdminPage() {
 
         </main>
       </div>
+
+      {/* Image Zoom / Lightbox Modal */}
+      {zoomImage && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 sm:p-8 animate-in fade-in duration-200"
+          onClick={() => setZoomImage(null)}
+        >
+          <div 
+            className="relative max-w-5xl w-full max-h-[90vh] bg-slate-900 rounded-2xl overflow-hidden shadow-2xl border border-white/10 flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-slate-900/90 backdrop-blur-md">
+              <div className="flex items-center gap-3">
+                <span className="px-2.5 py-1 bg-blue-600 text-white text-xs font-semibold uppercase tracking-wider rounded-md">
+                  {zoomImage.label || "Room View"}
+                </span>
+                <span className="text-sm font-medium text-slate-300 truncate max-w-md">
+                  {productForm.name || "Product Image Preview"}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                {zoomImage.roomKey && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (zoomImage.roomKey) {
+                        handleRemoveRoomImage(zoomImage.roomKey);
+                      }
+                      setZoomImage(null);
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white text-xs font-semibold rounded-lg transition-colors border border-red-500/30"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Remove {zoomImage.label || "Image"}</span>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setZoomImage(null)}
+                  className="p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Body / Image */}
+            <div className="flex-1 flex items-center justify-center p-4 sm:p-6 overflow-hidden bg-black/40">
+              <img
+                src={zoomImage.src}
+                alt={zoomImage.label || "Zoomed preview"}
+                className="max-h-[72vh] w-auto max-w-full object-contain rounded-lg shadow-lg border border-white/5"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

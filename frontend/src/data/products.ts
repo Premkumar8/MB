@@ -42,7 +42,18 @@ export function saveStoredAdminProducts(products: Product[]) {
     return;
   }
 
-  window.localStorage.setItem(ADMIN_PRODUCTS_STORAGE_KEY, JSON.stringify(products));
+  try {
+    window.localStorage.setItem(ADMIN_PRODUCTS_STORAGE_KEY, JSON.stringify(products));
+  } catch (error) {
+    console.warn("Storage quota warning, recovering admin products cache:", error);
+    try {
+      // If quota exceeded, keep only the most recent 5 products to avoid browser storage limit
+      const trimmed = products.slice(0, 5);
+      window.localStorage.setItem(ADMIN_PRODUCTS_STORAGE_KEY, JSON.stringify(trimmed));
+    } catch (secondError) {
+      console.warn("Could not write all products to localStorage due to browser quota:", secondError);
+    }
+  }
 }
 
 export function getDeletedAdminProductIds(): number[] {
@@ -85,7 +96,10 @@ export const fallbackProducts: Product[] = [
     availability: "In Stock",
     image_url: "/static/real/marble-white-carrara.jpg",
     images: [
-      "/static/real/marble-white-carrara.jpg"
+      "/static/real/hero-marble-hall.jpg",
+      "/static/real/kitchen-white-marble-island.jpg",
+      "/static/real/project-residential-bedroom.jpg",
+      "/static/rooms/white-marble/parking.jpg"
     ],
     glb_url: "/static/seed/carrara_gold.glb",
     texture_url: "/static/seed/textures/carrara_gold_diff.jpg",
@@ -105,7 +119,10 @@ export const fallbackProducts: Product[] = [
     availability: "In Stock",
     image_url: "/static/real/marble-black-nero.jpg",
     images: [
-      "/static/real/marble-black-nero.jpg"
+      "/static/real/hero-office-lobby.jpg",
+      "/static/nh/granite-kitchen-black.jpg",
+      "/static/real/bedroom-minimal-modern.jpg",
+      "/static/real/quartzite-charcoal-outdoor-walkway.jpg"
     ],
     glb_url: "/static/seed/nero_marquina.glb",
     texture_url: "/static/seed/textures/nero_marquina_diff.jpg",
@@ -123,9 +140,12 @@ export const fallbackProducts: Product[] = [
     description: "One of the oldest quarried marbles, Calacatta Viola features bold, rich purple-burgundy veins flowing through a creamy white canvas. Highly sought after by modern luxury designers.",
     price: 245.00,
     availability: "In Stock",
-    image_url: "/static/real/marble-bathroom-calacatta.jpg",
+    image_url: "/static/seed/calacatta_viola.jpg",
     images: [
-      "/static/real/marble-bathroom-calacatta.jpg"
+      "/static/rooms/viola-pink/hall.jpg",
+      "/static/rooms/viola-pink/kitchen.jpg",
+      "/static/rooms/viola-pink/bedroom.jpg",
+      "/static/rooms/viola-pink/parking.jpg"
     ],
     glb_url: "/static/seed/calacatta_viola.glb",
     texture_url: "/static/seed/textures/calacatta_viola_diff.jpg",
@@ -145,7 +165,10 @@ export const fallbackProducts: Product[] = [
     availability: "In Stock",
     image_url: "/static/real/quartzite-travertine-beige.jpg",
     images: [
-      "/static/real/quartzite-travertine-beige.jpg"
+      "/static/real/hallway-travertine-arched.jpg",
+      "/static/real/quartz-countertop-island.jpg",
+      "/static/rooms/taj-mahal-gold/bedroom.jpg",
+      "/static/real/quartzite-speckled-courtyard-floor.jpg"
     ],
     glb_url: "/static/seed/taj_mahal.glb",
     texture_url: "/static/seed/textures/taj_mahal_diff.jpg",
@@ -165,7 +188,10 @@ export const fallbackProducts: Product[] = [
     availability: "In Stock",
     image_url: "/static/real/tile-floor-bright-white.jpg",
     images: [
-      "/static/real/tile-floor-bright-white.jpg"
+      "/static/real/hero-marble-hall.jpg",
+      "/static/real/kitchen-white-marble-island.jpg",
+      "/static/real/project-residential-bedroom.jpg",
+      "/static/rooms/white-marble/parking.jpg"
     ],
     glb_url: "/static/seed/carrara_gold.glb",
     texture_url: "/static/seed/textures/carrara_gold_diff.jpg",
@@ -185,7 +211,10 @@ export const fallbackProducts: Product[] = [
     availability: "In Stock",
     image_url: "/static/real/granite-black-veined.jpg",
     images: [
-      "/static/real/granite-black-veined.jpg"
+      "/static/real/hero-office-lobby.jpg",
+      "/static/nh/granite-kitchen-black.jpg",
+      "/static/real/bedroom-minimal-modern.jpg",
+      "/static/real/quartzite-charcoal-outdoor-walkway.jpg"
     ],
     glb_url: "/static/seed/nero_marquina.glb",
     texture_url: "/static/seed/textures/nero_marquina_diff.jpg",
@@ -205,7 +234,10 @@ export const fallbackProducts: Product[] = [
     availability: "In Stock",
     image_url: "/static/real/marble-white-countertop-gold.jpg",
     images: [
-      "/static/real/marble-white-countertop-gold.jpg"
+      "/static/real/hero-marble-hall.jpg",
+      "/static/real/kitchen-white-marble-island.jpg",
+      "/static/real/project-residential-bedroom.jpg",
+      "/static/rooms/white-marble/parking.jpg"
     ],
     glb_url: "/static/seed/carrara_gold.glb",
     texture_url: "/static/seed/textures/carrara_gold_diff.jpg",
@@ -223,9 +255,12 @@ export const fallbackProducts: Product[] = [
     description: "Color: Blacks. Premium full body tiles.",
     price: 250.00,
     availability: "In Stock",
-    image_url: "/static/real/tile-floor-light-herringbone.jpg",
+    image_url: "/static/real/granite-black-veined.jpg",
     images: [
-      "/static/real/tile-floor-light-herringbone.jpg"
+      "/static/real/hero-office-lobby.jpg",
+      "/static/nh/granite-kitchen-black.jpg",
+      "/static/real/bedroom-minimal-modern.jpg",
+      "/static/real/quartzite-charcoal-outdoor-walkway.jpg"
     ],
     glb_url: "/static/seed/nero_marquina.glb",
     texture_url: "/static/seed/textures/nero_marquina_diff.jpg",
@@ -245,7 +280,10 @@ export const fallbackProducts: Product[] = [
     availability: "In Stock",
     image_url: "/static/real/tile-floor-beige-large.jpg",
     images: [
-      "/static/real/tile-floor-beige-large.jpg"
+      "/static/real/hallway-travertine-arched.jpg",
+      "/static/nh/stone-living-kitchen.jpg",
+      "/static/nh/stone-bedroom-living.jpg",
+      "/static/rooms/beige-marble/parking.jpg"
     ],
     glb_url: "/static/seed/taj_mahal.glb",
     texture_url: "/static/seed/textures/taj_mahal_diff.jpg",
@@ -265,7 +303,10 @@ export const fallbackProducts: Product[] = [
     availability: "In Stock",
     image_url: "/static/real/marble-gray-floor-plain.jpg",
     images: [
-      "/static/real/marble-gray-floor-plain.jpg"
+      "/static/nh/gray-marble-hall.jpg",
+      "/static/nh/gray-marble-kitchen.jpg",
+      "/static/nh/gray-marble-bedroom.jpg",
+      "/static/nh/gray-marble-parking.jpg"
     ],
     glb_url: "/static/seed/carrara_gold.glb",
     texture_url: "/static/seed/textures/carrara_gold_diff.jpg",
@@ -285,7 +326,10 @@ export const fallbackProducts: Product[] = [
     availability: "In Stock",
     image_url: "/static/real/marble-white-bold-veins.jpg",
     images: [
-      "/static/real/marble-white-bold-veins.jpg"
+      "/static/real/hero-marble-hall.jpg",
+      "/static/real/kitchen-white-marble-island.jpg",
+      "/static/real/project-residential-bedroom.jpg",
+      "/static/rooms/white-marble/parking.jpg"
     ],
     glb_url: "/static/seed/carrara_gold.glb",
     texture_url: "/static/seed/textures/carrara_gold_diff.jpg",
@@ -297,8 +341,13 @@ export const fallbackProducts: Product[] = [
     name: "Lyra White",
     category: "Full Body Tiles",
     price: 350,
-    image_url: "/static/real/kitchen-white-marble-island.jpg",
-    images: ["/static/real/kitchen-white-marble-island.jpg"],
+    image_url: "/static/somany/lyra-white_1.webp",
+    images: [
+      "/static/real/hero-marble-hall.jpg",
+      "/static/real/kitchen-white-marble-island.jpg",
+      "/static/real/project-residential-bedroom.jpg",
+      "/static/rooms/white-marble/parking.jpg"
+    ],
     origin: "India",
     finish: "Full Polished",
     thickness: "1200 X 1800 mm",
@@ -311,8 +360,13 @@ export const fallbackProducts: Product[] = [
     name: "Canis White",
     category: "Full Body Tiles",
     price: 351,
-    image_url: "/static/real/lobby-reflective-building.jpg",
-    images: ["/static/real/lobby-reflective-building.jpg"],
+    image_url: "/static/somany/canis-white_1.webp",
+    images: [
+      "/static/real/hero-marble-hall.jpg",
+      "/static/real/kitchen-white-marble-island.jpg",
+      "/static/real/project-residential-bedroom.jpg",
+      "/static/rooms/white-marble/parking.jpg"
+    ],
     origin: "India",
     finish: "Full Polished",
     thickness: "1200 X 1800 mm",
@@ -325,8 +379,13 @@ export const fallbackProducts: Product[] = [
     name: "Lyra Crema",
     category: "Full Body Tiles",
     price: 352,
-    image_url: "/static/real/hallway-travertine-arched.jpg",
-    images: ["/static/real/hallway-travertine-arched.jpg"],
+    image_url: "/static/somany/lyra-crema_1.webp",
+    images: [
+      "/static/real/hallway-travertine-arched.jpg",
+      "/static/nh/stone-living-kitchen.jpg",
+      "/static/nh/stone-bedroom-living.jpg",
+      "/static/rooms/beige-marble/parking.jpg"
+    ],
     origin: "India",
     finish: "Full Polished",
     thickness: "1200 X 1800 mm",
@@ -339,8 +398,13 @@ export const fallbackProducts: Product[] = [
     name: "Nyota White",
     category: "Full Body Tiles",
     price: 353,
-    image_url: "/static/real/bedroom-minimal-modern.jpg",
-    images: ["/static/real/bedroom-minimal-modern.jpg"],
+    image_url: "/static/somany/nyota-white_1.webp",
+    images: [
+      "/static/real/hero-marble-hall.jpg",
+      "/static/real/kitchen-white-marble-island.jpg",
+      "/static/real/project-residential-bedroom.jpg",
+      "/static/rooms/white-marble/parking.jpg"
+    ],
     origin: "India",
     finish: "Full Polished",
     thickness: "1200 X 1800 mm",
@@ -360,7 +424,12 @@ export const fallbackProducts: Product[] = [
     price: 165.00,
     availability: "In Stock",
     image_url: "/static/real/marble-beige-botticino.jpg",
-    images: ["/static/real/marble-beige-botticino.jpg"]
+    images: [
+      "/static/real/hallway-travertine-arched.jpg",
+      "/static/nh/stone-living-kitchen.jpg",
+      "/static/nh/stone-bedroom-living.jpg",
+      "/static/rooms/beige-marble/parking.jpg"
+    ]
   },
   {
     id: 205,
@@ -374,7 +443,12 @@ export const fallbackProducts: Product[] = [
     price: 275.00,
     availability: "In Stock",
     image_url: "/static/real/marble-pink-rosa.jpg",
-    images: ["/static/real/marble-pink-rosa.jpg"]
+    images: [
+      "/static/rooms/viola-pink/hall.jpg",
+      "/static/rooms/viola-pink/kitchen.jpg",
+      "/static/rooms/viola-pink/bedroom.jpg",
+      "/static/rooms/viola-pink/parking.jpg"
+    ]
   },
   {
     id: 206,
@@ -388,7 +462,12 @@ export const fallbackProducts: Product[] = [
     price: 230.00,
     availability: "In Stock",
     image_url: "/static/real/marble-gold-siena.jpg",
-    images: ["/static/real/marble-gold-siena.jpg"]
+    images: [
+      "/static/real/quartz-flooring-hall.jpg",
+      "/static/real/quartz-countertop-island.jpg",
+      "/static/rooms/taj-mahal-gold/bedroom.jpg",
+      "/static/real/quartzite-speckled-courtyard-floor.jpg"
+    ]
   },
   {
     id: 212,
@@ -402,7 +481,12 @@ export const fallbackProducts: Product[] = [
     price: 195.00,
     availability: "In Stock",
     image_url: "/static/real/quartzite-silver-wave.jpg",
-    images: ["/static/real/quartzite-silver-wave.jpg"]
+    images: [
+      "/static/nh/gray-marble-hall.jpg",
+      "/static/nh/gray-marble-kitchen.jpg",
+      "/static/nh/gray-marble-bedroom.jpg",
+      "/static/nh/gray-marble-parking.jpg"
+    ]
   },
   {
     id: 213,
@@ -416,7 +500,12 @@ export const fallbackProducts: Product[] = [
     price: 175.00,
     availability: "In Stock",
     image_url: "/static/real/quartzite-storm-gray.jpg",
-    images: ["/static/real/quartzite-storm-gray.jpg"]
+    images: [
+      "/static/nh/gray-marble-hall.jpg",
+      "/static/nh/gray-marble-kitchen.jpg",
+      "/static/nh/gray-marble-bedroom.jpg",
+      "/static/nh/gray-marble-parking.jpg"
+    ]
   },
   {
     id: 214,
@@ -430,7 +519,12 @@ export const fallbackProducts: Product[] = [
     price: 205.00,
     availability: "In Stock",
     image_url: "/static/real/quartzite-shell-beige.jpg",
-    images: ["/static/real/quartzite-shell-beige.jpg"]
+    images: [
+      "/static/real/hallway-travertine-arched.jpg",
+      "/static/nh/stone-living-kitchen.jpg",
+      "/static/nh/stone-bedroom-living.jpg",
+      "/static/rooms/beige-marble/parking.jpg"
+    ]
   },
   {
     id: 215,
@@ -444,7 +538,12 @@ export const fallbackProducts: Product[] = [
     price: 180.00,
     availability: "In Stock",
     image_url: "/static/real/quartzite-fossil-stone.jpg",
-    images: ["/static/real/quartzite-fossil-stone.jpg"]
+    images: [
+      "/static/real/hallway-travertine-arched.jpg",
+      "/static/nh/stone-living-kitchen.jpg",
+      "/static/nh/stone-bedroom-living.jpg",
+      "/static/rooms/beige-marble/parking.jpg"
+    ]
   },
   {
     id: 216,
@@ -458,7 +557,12 @@ export const fallbackProducts: Product[] = [
     price: 190.00,
     availability: "In Stock",
     image_url: "/static/real/quartzite-checkered-floor.jpg",
-    images: ["/static/real/quartzite-checkered-floor.jpg"]
+    images: [
+      "/static/real/tile-pvt-checkerboard-1.jpg",
+      "/static/real/hero-kitchen-tiles.jpg",
+      "/static/real/tile-cream-polished-floor-room.jpg",
+      "/static/rooms/pvt-gloss/parking.jpg"
+    ]
   },
   {
     id: 217,
@@ -472,7 +576,12 @@ export const fallbackProducts: Product[] = [
     price: 380.00,
     availability: "In Stock",
     image_url: "/static/real/marble-imported-calacatta.jpg",
-    images: ["/static/real/marble-imported-calacatta.jpg"]
+    images: [
+      "/static/real/hero-marble-hall.jpg",
+      "/static/real/kitchen-white-marble-island.jpg",
+      "/static/real/project-residential-bedroom.jpg",
+      "/static/rooms/white-marble/parking.jpg"
+    ]
   },
   {
     id: 218,
@@ -486,7 +595,12 @@ export const fallbackProducts: Product[] = [
     price: 395.00,
     availability: "In Stock",
     image_url: "/static/real/marble-imported-statuario-kitchen.jpg",
-    images: ["/static/real/marble-imported-statuario-kitchen.jpg"]
+    images: [
+      "/static/real/marble-imported-curtain-hall.jpg",
+      "/static/real/marble-imported-statuario-kitchen.jpg",
+      "/static/real/project-residential-bedroom.jpg",
+      "/static/rooms/white-marble/parking.jpg"
+    ]
   },
   {
     id: 219,
@@ -500,7 +614,12 @@ export const fallbackProducts: Product[] = [
     price: 340.00,
     availability: "In Stock",
     image_url: "/static/real/marble-imported-diano-reale.jpg",
-    images: ["/static/real/marble-imported-diano-reale.jpg"]
+    images: [
+      "/static/real/hallway-travertine-arched.jpg",
+      "/static/nh/stone-living-kitchen.jpg",
+      "/static/nh/stone-bedroom-living.jpg",
+      "/static/rooms/beige-marble/parking.jpg"
+    ]
   },
   {
     id: 220,
@@ -514,7 +633,12 @@ export const fallbackProducts: Product[] = [
     price: 260.00,
     availability: "In Stock",
     image_url: "/static/real/marble-imported-showroom.jpg",
-    images: ["/static/real/marble-imported-showroom.jpg"]
+    images: [
+      "/static/real/hero-marble-hall.jpg",
+      "/static/real/kitchen-white-marble-island.jpg",
+      "/static/real/project-residential-bedroom.jpg",
+      "/static/rooms/white-marble/parking.jpg"
+    ]
   },
   {
     id: 221,
@@ -528,7 +652,12 @@ export const fallbackProducts: Product[] = [
     price: 420.00,
     availability: "Limited",
     image_url: "/static/real/marble-imported-carved-wall.jpg",
-    images: ["/static/real/marble-imported-carved-wall.jpg"]
+    images: [
+      "/static/real/hero-marble-hall.jpg",
+      "/static/real/kitchen-white-marble-island.jpg",
+      "/static/real/project-residential-bedroom.jpg",
+      "/static/rooms/white-marble/parking.jpg"
+    ]
   },
   {
     id: 222,
@@ -542,7 +671,12 @@ export const fallbackProducts: Product[] = [
     price: 350.00,
     availability: "In Stock",
     image_url: "/static/real/marble-imported-curtain-hall.jpg",
-    images: ["/static/real/marble-imported-curtain-hall.jpg"]
+    images: [
+      "/static/real/marble-imported-curtain-hall.jpg",
+      "/static/real/kitchen-white-marble-island.jpg",
+      "/static/real/project-residential-bedroom.jpg",
+      "/static/rooms/white-marble/parking.jpg"
+    ]
   },
   {
     id: 223,
@@ -556,7 +690,12 @@ export const fallbackProducts: Product[] = [
     price: 32.00,
     availability: "In Stock",
     image_url: "/static/real/tile-wall-white-square.jpg",
-    images: ["/static/real/tile-wall-white-square.jpg"]
+    images: [
+      "/static/real/hero-marble-hall.jpg",
+      "/static/real/tile-glossy-white-kitchen-wall.jpg",
+      "/static/real/project-residential-bedroom.jpg",
+      "/static/rooms/decorative/parking.jpg"
+    ]
   },
   {
     id: 224,
@@ -570,7 +709,12 @@ export const fallbackProducts: Product[] = [
     price: 28.00,
     availability: "In Stock",
     image_url: "/static/real/tile-wall-tan-subway.jpg",
-    images: ["/static/real/tile-wall-tan-subway.jpg"]
+    images: [
+      "/static/real/hallway-travertine-arched.jpg",
+      "/static/real/tile-wall-tan-subway.jpg",
+      "/static/nh/stone-bedroom-living.jpg",
+      "/static/rooms/decorative/parking.jpg"
+    ]
   },
   {
     id: 225,
@@ -584,7 +728,12 @@ export const fallbackProducts: Product[] = [
     price: 45.00,
     availability: "In Stock",
     image_url: "/static/real/tile-wall-ruby-mosaic.jpg",
-    images: ["/static/real/tile-wall-ruby-mosaic.jpg"]
+    images: [
+      "/static/rooms/viola-pink/hall.jpg",
+      "/static/real/tile-wall-ruby-mosaic.jpg",
+      "/static/rooms/viola-pink/bedroom.jpg",
+      "/static/rooms/decorative/parking.jpg"
+    ]
   },
   {
     id: 226,
@@ -598,7 +747,12 @@ export const fallbackProducts: Product[] = [
     price: 50.00,
     availability: "In Stock",
     image_url: "/static/real/tile-wall-aqua-glass.jpg",
-    images: ["/static/real/tile-wall-aqua-glass.jpg"]
+    images: [
+      "/static/real/hero-marble-hall.jpg",
+      "/static/real/tile-wall-aqua-glass.jpg",
+      "/static/real/project-residential-bedroom.jpg",
+      "/static/rooms/decorative/parking.jpg"
+    ]
   },
   {
     id: 227,
@@ -612,7 +766,12 @@ export const fallbackProducts: Product[] = [
     price: 55.00,
     availability: "In Stock",
     image_url: "/static/real/tile-wall-azulejo-blue.jpg",
-    images: ["/static/real/tile-wall-azulejo-blue.jpg"]
+    images: [
+      "/static/real/hero-marble-hall.jpg",
+      "/static/real/tile-wall-azulejo-blue.jpg",
+      "/static/real/project-residential-bedroom.jpg",
+      "/static/rooms/decorative/parking.jpg"
+    ]
   },
   {
     id: 228,
@@ -626,7 +785,12 @@ export const fallbackProducts: Product[] = [
     price: 60.00,
     availability: "In Stock",
     image_url: "/static/real/tile-wall-patchwork-marble.jpg",
-    images: ["/static/real/tile-wall-patchwork-marble.jpg"]
+    images: [
+      "/static/real/hero-marble-hall.jpg",
+      "/static/real/tile-wall-patchwork-marble.jpg",
+      "/static/real/project-residential-bedroom.jpg",
+      "/static/rooms/decorative/parking.jpg"
+    ]
   },
   {
     id: 229,
@@ -640,7 +804,12 @@ export const fallbackProducts: Product[] = [
     price: 65.00,
     availability: "In Stock",
     image_url: "/static/real/tile-pvt-checkerboard-1.jpg",
-    images: ["/static/real/tile-pvt-checkerboard-1.jpg"]
+    images: [
+      "/static/real/tile-pvt-checkerboard-1.jpg",
+      "/static/real/hero-kitchen-tiles.jpg",
+      "/static/real/tile-cream-polished-floor-room.jpg",
+      "/static/rooms/pvt-gloss/parking.jpg"
+    ]
   },
   {
     id: 230,
@@ -654,7 +823,12 @@ export const fallbackProducts: Product[] = [
     price: 65.00,
     availability: "In Stock",
     image_url: "/static/real/tile-pvt-checkerboard-2.jpg",
-    images: ["/static/real/tile-pvt-checkerboard-2.jpg"]
+    images: [
+      "/static/real/tile-pvt-checkerboard-2.jpg",
+      "/static/real/hero-kitchen-tiles.jpg",
+      "/static/real/tile-cream-polished-floor-room.jpg",
+      "/static/rooms/pvt-gloss/parking.jpg"
+    ]
   },
   {
     id: 231,
@@ -668,7 +842,12 @@ export const fallbackProducts: Product[] = [
     price: 70.00,
     availability: "In Stock",
     image_url: "/static/real/tile-pvt-diamond-gloss.jpg",
-    images: ["/static/real/tile-pvt-diamond-gloss.jpg"]
+    images: [
+      "/static/real/tile-pvt-diamond-gloss.jpg",
+      "/static/real/hero-kitchen-tiles.jpg",
+      "/static/real/tile-cream-polished-floor-room.jpg",
+      "/static/rooms/pvt-gloss/parking.jpg"
+    ]
   },
   {
     id: 232,
@@ -682,7 +861,12 @@ export const fallbackProducts: Product[] = [
     price: 72.00,
     availability: "In Stock",
     image_url: "/static/real/tile-pvt-perspective-shine.jpg",
-    images: ["/static/real/tile-pvt-perspective-shine.jpg"]
+    images: [
+      "/static/real/tile-pvt-perspective-shine.jpg",
+      "/static/real/hero-kitchen-tiles.jpg",
+      "/static/real/tile-cream-polished-floor-room.jpg",
+      "/static/rooms/pvt-gloss/parking.jpg"
+    ]
   },
   {
     id: 233,
@@ -696,7 +880,12 @@ export const fallbackProducts: Product[] = [
     price: 68.00,
     availability: "In Stock",
     image_url: "/static/real/tile-pvt-salon-gloss.jpg",
-    images: ["/static/real/tile-pvt-salon-gloss.jpg"]
+    images: [
+      "/static/real/tile-pvt-salon-gloss.jpg",
+      "/static/real/hero-kitchen-tiles.jpg",
+      "/static/real/tile-cream-polished-floor-room.jpg",
+      "/static/rooms/pvt-gloss/parking.jpg"
+    ]
   },
   {
     id: 234,
@@ -710,7 +899,12 @@ export const fallbackProducts: Product[] = [
     price: 75.00,
     availability: "In Stock",
     image_url: "/static/real/tile-pvt-elevator-lobby.jpg",
-    images: ["/static/real/tile-pvt-elevator-lobby.jpg"]
+    images: [
+      "/static/real/tile-pvt-elevator-lobby.jpg",
+      "/static/real/hero-kitchen-tiles.jpg",
+      "/static/real/tile-cream-polished-floor-room.jpg",
+      "/static/rooms/pvt-gloss/parking.jpg"
+    ]
   },
   {
     id: 235,
@@ -724,7 +918,12 @@ export const fallbackProducts: Product[] = [
     price: 42.00,
     availability: "In Stock",
     image_url: "/static/real/tile-terrazzo-speckled-wall.jpg",
-    images: ["/static/real/tile-terrazzo-speckled-wall.jpg"]
+    images: [
+      "/static/real/tile-medallion-inlay-floor.jpg",
+      "/static/real/tile-terrazzo-speckled-wall.jpg",
+      "/static/real/tile-botanical-matte-wall.jpg",
+      "/static/rooms/decorative/parking.jpg"
+    ]
   },
   {
     id: 236,
@@ -738,7 +937,12 @@ export const fallbackProducts: Product[] = [
     price: 48.00,
     availability: "In Stock",
     image_url: "/static/real/tile-aubergine-fluted-wall.jpg",
-    images: ["/static/real/tile-aubergine-fluted-wall.jpg"]
+    images: [
+      "/static/rooms/viola-pink/hall.jpg",
+      "/static/rooms/viola-pink/kitchen.jpg",
+      "/static/real/tile-aubergine-fluted-wall.jpg",
+      "/static/rooms/viola-pink/parking.jpg"
+    ]
   },
   {
     id: 237,
@@ -752,7 +956,12 @@ export const fallbackProducts: Product[] = [
     price: 85.00,
     availability: "In Stock",
     image_url: "/static/real/tile-medallion-inlay-floor.jpg",
-    images: ["/static/real/tile-medallion-inlay-floor.jpg"]
+    images: [
+      "/static/real/tile-medallion-inlay-floor.jpg",
+      "/static/real/kitchen-white-marble-island.jpg",
+      "/static/real/project-residential-bedroom.jpg",
+      "/static/rooms/decorative/parking.jpg"
+    ]
   },
   {
     id: 238,
@@ -766,7 +975,12 @@ export const fallbackProducts: Product[] = [
     price: 220.00,
     availability: "In Stock",
     image_url: "/static/real/marble-ash-gray-bookmatch.jpg",
-    images: ["/static/real/marble-ash-gray-bookmatch.jpg"]
+    images: [
+      "/static/real/marble-ash-gray-bookmatch.jpg",
+      "/static/nh/gray-marble-kitchen.jpg",
+      "/static/nh/gray-marble-bedroom.jpg",
+      "/static/nh/gray-marble-parking.jpg"
+    ]
   },
   {
     id: 239,
@@ -780,7 +994,12 @@ export const fallbackProducts: Product[] = [
     price: 175.00,
     availability: "In Stock",
     image_url: "/static/real/marble-beige-slab-display.jpg",
-    images: ["/static/real/marble-beige-slab-display.jpg"]
+    images: [
+      "/static/real/hallway-travertine-arched.jpg",
+      "/static/nh/stone-living-kitchen.jpg",
+      "/static/nh/stone-bedroom-living.jpg",
+      "/static/rooms/beige-marble/parking.jpg"
+    ]
   },
   {
     id: 240,
@@ -794,7 +1013,12 @@ export const fallbackProducts: Product[] = [
     price: 200.00,
     availability: "In Stock",
     image_url: "/static/real/quartzite-charcoal-stair-tread.jpg",
-    images: ["/static/real/quartzite-charcoal-stair-tread.jpg"]
+    images: [
+      "/static/real/hero-office-lobby.jpg",
+      "/static/nh/granite-kitchen-black.jpg",
+      "/static/real/bedroom-minimal-modern.jpg",
+      "/static/real/quartzite-charcoal-outdoor-walkway.jpg"
+    ]
   },
   {
     id: 241,
@@ -810,8 +1034,9 @@ export const fallbackProducts: Product[] = [
     image_url: "/static/real/tile-wood-look-floor-installation.jpg",
     images: [
       "/static/real/tile-wood-look-floor-installation.jpg",
+      "/static/rooms/wood-look/kitchen.jpg",
       "/static/real/tile-wood-look-bedroom-floor.jpg",
-      "/static/real/tile-wood-look-bedroom-floor-alt.jpg"
+      "/static/rooms/wood-look/parking.jpg"
     ]
   },
   {
@@ -826,7 +1051,12 @@ export const fallbackProducts: Product[] = [
     price: 46.00,
     availability: "In Stock",
     image_url: "/static/real/tile-color-subway-display.jpg",
-    images: ["/static/real/tile-color-subway-display.jpg"]
+    images: [
+      "/static/real/tile-medallion-inlay-floor.jpg",
+      "/static/real/tile-color-subway-display.jpg",
+      "/static/real/tile-botanical-matte-wall.jpg",
+      "/static/rooms/decorative/parking.jpg"
+    ]
   },
   {
     id: 243,
@@ -840,7 +1070,12 @@ export const fallbackProducts: Product[] = [
     price: 44.00,
     availability: "In Stock",
     image_url: "/static/real/tile-cafe-print-wall-panel.jpg",
-    images: ["/static/real/tile-cafe-print-wall-panel.jpg"]
+    images: [
+      "/static/real/tile-medallion-inlay-floor.jpg",
+      "/static/real/tile-cafe-print-wall-panel.jpg",
+      "/static/real/tile-botanical-matte-wall.jpg",
+      "/static/rooms/decorative/parking.jpg"
+    ]
   },
   {
     id: 244,
@@ -854,7 +1089,12 @@ export const fallbackProducts: Product[] = [
     price: 62.00,
     availability: "In Stock",
     image_url: "/static/real/tile-stone-mosaic-display-board.jpg",
-    images: ["/static/real/tile-stone-mosaic-display-board.jpg"]
+    images: [
+      "/static/real/tile-medallion-inlay-floor.jpg",
+      "/static/real/tile-stone-mosaic-display-board.jpg",
+      "/static/real/tile-botanical-matte-wall.jpg",
+      "/static/rooms/decorative/parking.jpg"
+    ]
   },
   {
     id: 245,
@@ -868,7 +1108,12 @@ export const fallbackProducts: Product[] = [
     price: 78.00,
     availability: "In Stock",
     image_url: "/static/real/quartzite-splitface-wall-cladding.jpg",
-    images: ["/static/real/quartzite-splitface-wall-cladding.jpg"]
+    images: [
+      "/static/nh/gray-marble-hall.jpg",
+      "/static/nh/gray-marble-kitchen.jpg",
+      "/static/nh/gray-marble-bedroom.jpg",
+      "/static/real/quartzite-charcoal-outdoor-walkway.jpg"
+    ]
   },
   {
     id: 246,
@@ -882,7 +1127,12 @@ export const fallbackProducts: Product[] = [
     price: 190.00,
     availability: "In Stock",
     image_url: "/static/real/marble-green-polished-slab.jpg",
-    images: ["/static/real/marble-green-polished-slab.jpg"]
+    images: [
+      "/static/real/kota-stone-flooring-passage.jpg",
+      "/static/nh/natural-kitchen-bath.jpg",
+      "/static/nh/natural-bedroom.jpg",
+      "/static/real/kota-stone-outdoor-courtyard.jpg"
+    ]
   },
   {
     id: 247,
@@ -896,7 +1146,12 @@ export const fallbackProducts: Product[] = [
     price: 82.00,
     availability: "In Stock",
     image_url: "/static/real/tile-rak-white-marble-look-slab.jpg",
-    images: ["/static/real/tile-rak-white-marble-look-slab.jpg"]
+    images: [
+      "/static/real/hero-marble-hall.jpg",
+      "/static/real/kitchen-white-marble-island.jpg",
+      "/static/real/project-residential-bedroom.jpg",
+      "/static/rooms/white-marble/parking.jpg"
+    ]
   },
   {
     id: 248,
@@ -910,7 +1165,12 @@ export const fallbackProducts: Product[] = [
     price: 39.00,
     availability: "In Stock",
     image_url: "/static/real/tile-glossy-white-kitchen-wall.jpg",
-    images: ["/static/real/tile-glossy-white-kitchen-wall.jpg"]
+    images: [
+      "/static/real/hero-marble-hall.jpg",
+      "/static/real/tile-glossy-white-kitchen-wall.jpg",
+      "/static/real/project-residential-bedroom.jpg",
+      "/static/rooms/decorative/parking.jpg"
+    ]
   },
   {
     id: 249,
@@ -924,7 +1184,12 @@ export const fallbackProducts: Product[] = [
     price: 52.00,
     availability: "In Stock",
     image_url: "/static/real/tile-gray-shower-suite.jpg",
-    images: ["/static/real/tile-gray-shower-suite.jpg"]
+    images: [
+      "/static/nh/gray-marble-hall.jpg",
+      "/static/nh/gray-marble-kitchen.jpg",
+      "/static/nh/gray-marble-bedroom.jpg",
+      "/static/nh/gray-marble-parking.jpg"
+    ]
   },
   {
     id: 250,
@@ -938,7 +1203,12 @@ export const fallbackProducts: Product[] = [
     price: 56.00,
     availability: "In Stock",
     image_url: "/static/real/tile-monochrome-feature-display.jpg",
-    images: ["/static/real/tile-monochrome-feature-display.jpg"]
+    images: [
+      "/static/real/tile-pvt-checkerboard-1.jpg",
+      "/static/real/hero-kitchen-tiles.jpg",
+      "/static/real/bedroom-minimal-modern.jpg",
+      "/static/rooms/pvt-gloss/parking.jpg"
+    ]
   },
   {
     id: 251,
@@ -952,7 +1222,12 @@ export const fallbackProducts: Product[] = [
     price: 84.00,
     availability: "In Stock",
     image_url: "/static/real/tile-white-marble-look-slab-display.jpg",
-    images: ["/static/real/tile-white-marble-look-slab-display.jpg"]
+    images: [
+      "/static/real/hero-marble-hall.jpg",
+      "/static/real/kitchen-white-marble-island.jpg",
+      "/static/real/project-residential-bedroom.jpg",
+      "/static/rooms/white-marble/parking.jpg"
+    ]
   },
   {
     id: 252,
@@ -966,7 +1241,12 @@ export const fallbackProducts: Product[] = [
     price: 50.00,
     availability: "In Stock",
     image_url: "/static/real/tile-botanical-matte-wall.jpg",
-    images: ["/static/real/tile-botanical-matte-wall.jpg"]
+    images: [
+      "/static/real/tile-medallion-inlay-floor.jpg",
+      "/static/real/tile-cafe-print-wall-panel.jpg",
+      "/static/real/tile-botanical-matte-wall.jpg",
+      "/static/rooms/decorative/parking.jpg"
+    ]
   },
   {
     id: 253,
@@ -982,7 +1262,9 @@ export const fallbackProducts: Product[] = [
     image_url: "/static/real/tile-decorative-floor-pattern-board.jpg",
     images: [
       "/static/real/tile-decorative-floor-pattern-board.jpg",
-      "/static/real/tile-geometric-floor-pattern-display.jpg"
+      "/static/real/hero-kitchen-tiles.jpg",
+      "/static/real/tile-botanical-matte-wall.jpg",
+      "/static/rooms/decorative/parking.jpg"
     ]
   },
   {
@@ -997,7 +1279,12 @@ export const fallbackProducts: Product[] = [
     price: 47.00,
     availability: "In Stock",
     image_url: "/static/real/tile-wood-floral-wall-panel.jpg",
-    images: ["/static/real/tile-wood-floral-wall-panel.jpg"]
+    images: [
+      "/static/real/tile-wood-look-floor-installation.jpg",
+      "/static/rooms/wood-look/kitchen.jpg",
+      "/static/real/tile-wood-floral-wall-panel.jpg",
+      "/static/rooms/wood-look/parking.jpg"
+    ]
   },
   {
     id: 255,
@@ -1013,7 +1300,9 @@ export const fallbackProducts: Product[] = [
     image_url: "/static/real/tile-showroom-glossy-corridor.jpg",
     images: [
       "/static/real/tile-showroom-glossy-corridor.jpg",
-      "/static/real/tile-mixed-slab-showroom-corridor.jpg"
+      "/static/real/hero-kitchen-tiles.jpg",
+      "/static/real/tile-cream-polished-floor-room.jpg",
+      "/static/rooms/pvt-gloss/parking.jpg"
     ]
   },
   {
@@ -1030,9 +1319,9 @@ export const fallbackProducts: Product[] = [
     image_url: "/static/real/marble-gray-herringbone-floor.jpg",
     images: [
       "/static/real/marble-gray-herringbone-floor.jpg",
-      "/static/real/marble-gray-herringbone-floor-closeup.jpg",
-      "/static/real/marble-gray-herringbone-floor-alt.jpg",
-      "/static/real/marble-gray-herringbone-floor-wide.jpg"
+      "/static/nh/gray-marble-kitchen.jpg",
+      "/static/nh/gray-marble-bedroom.jpg",
+      "/static/nh/gray-marble-parking.jpg"
     ]
   },
   {
@@ -1048,9 +1337,10 @@ export const fallbackProducts: Product[] = [
     availability: "In Stock",
     image_url: "/static/real/quartzite-charcoal-outdoor-walkway.jpg",
     images: [
-      "/static/real/quartzite-charcoal-outdoor-walkway.jpg",
-      "/static/real/quartzite-speckled-courtyard-floor.jpg",
-      "/static/real/quartzite-speckled-courtyard-floor-detail.jpg"
+      "/static/real/hero-office-lobby.jpg",
+      "/static/nh/granite-kitchen-black.jpg",
+      "/static/real/bedroom-minimal-modern.jpg",
+      "/static/real/quartzite-charcoal-outdoor-walkway.jpg"
     ]
   },
   {
@@ -1065,7 +1355,12 @@ export const fallbackProducts: Product[] = [
     price: 66.00,
     availability: "In Stock",
     image_url: "/static/real/tile-travertine-exterior-cladding.jpg",
-    images: ["/static/real/tile-travertine-exterior-cladding.jpg"]
+    images: [
+      "/static/real/hallway-travertine-arched.jpg",
+      "/static/nh/stone-living-kitchen.jpg",
+      "/static/nh/stone-bedroom-living.jpg",
+      "/static/rooms/beige-marble/parking.jpg"
+    ]
   },
   {
     id: 259,
@@ -1080,8 +1375,10 @@ export const fallbackProducts: Product[] = [
     availability: "In Stock",
     image_url: "/static/real/marble-gray-staircase-installation.jpg",
     images: [
-      "/static/real/marble-gray-staircase-installation.jpg",
-      "/static/real/marble-gray-stair-tread-installation.jpg"
+      "/static/nh/gray-marble-hall.jpg",
+      "/static/nh/gray-marble-kitchen.jpg",
+      "/static/nh/gray-marble-bedroom.jpg",
+      "/static/nh/gray-marble-parking.jpg"
     ]
   },
   {
@@ -1096,7 +1393,12 @@ export const fallbackProducts: Product[] = [
     price: 205.00,
     availability: "In Stock",
     image_url: "/static/real/marble-gray-elevator-cladding.jpg",
-    images: ["/static/real/marble-gray-elevator-cladding.jpg"]
+    images: [
+      "/static/nh/gray-marble-hall.jpg",
+      "/static/nh/gray-marble-kitchen.jpg",
+      "/static/nh/gray-marble-bedroom.jpg",
+      "/static/nh/gray-marble-parking.jpg"
+    ]
   },
   {
     id: 261,
@@ -1110,7 +1412,12 @@ export const fallbackProducts: Product[] = [
     price: 43.00,
     availability: "In Stock",
     image_url: "/static/real/tile-speckled-bathroom-wall.jpg",
-    images: ["/static/real/tile-speckled-bathroom-wall.jpg"]
+    images: [
+      "/static/real/tile-medallion-inlay-floor.jpg",
+      "/static/real/tile-glossy-white-kitchen-wall.jpg",
+      "/static/real/tile-speckled-bathroom-wall.jpg",
+      "/static/rooms/decorative/parking.jpg"
+    ]
   },
   {
     id: 262,
@@ -1124,7 +1431,12 @@ export const fallbackProducts: Product[] = [
     price: 49.00,
     availability: "In Stock",
     image_url: "/static/real/tile-purple-ribbed-bathroom-wall.jpg",
-    images: ["/static/real/tile-purple-ribbed-bathroom-wall.jpg"]
+    images: [
+      "/static/rooms/viola-pink/hall.jpg",
+      "/static/rooms/viola-pink/kitchen.jpg",
+      "/static/real/tile-purple-ribbed-bathroom-wall.jpg",
+      "/static/rooms/viola-pink/parking.jpg"
+    ]
   },
   {
     id: 263,
@@ -1140,8 +1452,9 @@ export const fallbackProducts: Product[] = [
     image_url: "/static/real/tile-cream-polished-floor-installation.jpg",
     images: [
       "/static/real/tile-cream-polished-floor-installation.jpg",
+      "/static/real/hero-kitchen-tiles.jpg",
       "/static/real/tile-cream-polished-floor-room.jpg",
-      "/static/real/tile-cream-polished-floor-living-room.jpg"
+      "/static/rooms/pvt-gloss/parking.jpg"
     ]
   },
   {
@@ -1156,7 +1469,12 @@ export const fallbackProducts: Product[] = [
     price: 95.00,
     availability: "In Stock",
     image_url: "/static/real/granite-black-veined.jpg",
-    images: ["/static/real/granite-black-veined.jpg"]
+    images: [
+      "/static/real/hero-office-lobby.jpg",
+      "/static/nh/granite-kitchen-black.jpg",
+      "/static/real/bedroom-minimal-modern.jpg",
+      "/static/real/quartzite-charcoal-outdoor-walkway.jpg"
+    ]
   },
   {
     id: 301,
@@ -1170,7 +1488,12 @@ export const fallbackProducts: Product[] = [
     price: 78.00,
     availability: "In Stock",
     image_url: "/static/real/granite-flooring-lobby.jpg",
-    images: ["/static/real/granite-flooring-lobby.jpg"]
+    images: [
+      "/static/real/granite-flooring-lobby.jpg",
+      "/static/nh/gray-marble-kitchen.jpg",
+      "/static/nh/gray-marble-bedroom.jpg",
+      "/static/nh/gray-marble-parking.jpg"
+    ]
   },
   {
     id: 302,
@@ -1184,7 +1507,12 @@ export const fallbackProducts: Product[] = [
     price: 82.00,
     availability: "In Stock",
     image_url: "/static/real/granite-kitchen-countertop.jpg",
-    images: ["/static/real/granite-kitchen-countertop.jpg"]
+    images: [
+      "/static/real/hallway-travertine-arched.jpg",
+      "/static/real/granite-kitchen-countertop.jpg",
+      "/static/nh/stone-bedroom-living.jpg",
+      "/static/rooms/beige-marble/parking.jpg"
+    ]
   },
   {
     id: 303,
@@ -1198,7 +1526,12 @@ export const fallbackProducts: Product[] = [
     price: 105.00,
     availability: "In Stock",
     image_url: "/static/real/granite-wall-cladding-lobby.jpg",
-    images: ["/static/real/granite-wall-cladding-lobby.jpg"]
+    images: [
+      "/static/real/hero-marble-hall.jpg",
+      "/static/real/kitchen-white-marble-island.jpg",
+      "/static/real/project-residential-bedroom.jpg",
+      "/static/rooms/white-marble/parking.jpg"
+    ]
   },
   {
     id: 304,
@@ -1212,7 +1545,12 @@ export const fallbackProducts: Product[] = [
     price: 110.00,
     availability: "In Stock",
     image_url: "/static/real/granite-staircase-closeup.jpg",
-    images: ["/static/real/granite-staircase-closeup.jpg"]
+    images: [
+      "/static/real/hero-office-lobby.jpg",
+      "/static/nh/granite-kitchen-black.jpg",
+      "/static/real/bedroom-minimal-modern.jpg",
+      "/static/real/quartzite-charcoal-outdoor-walkway.jpg"
+    ]
   },
   {
     id: 305,
@@ -1226,7 +1564,12 @@ export const fallbackProducts: Product[] = [
     price: 45.00,
     availability: "In Stock",
     image_url: "/static/real/kota-stone-flooring-passage.jpg",
-    images: ["/static/real/kota-stone-flooring-passage.jpg"]
+    images: [
+      "/static/real/kota-stone-flooring-passage.jpg",
+      "/static/nh/natural-kitchen-bath.jpg",
+      "/static/nh/natural-bedroom.jpg",
+      "/static/real/kota-stone-outdoor-courtyard.jpg"
+    ]
   },
   {
     id: 306,
@@ -1240,7 +1583,12 @@ export const fallbackProducts: Product[] = [
     price: 38.00,
     availability: "In Stock",
     image_url: "/static/real/kota-stone-outdoor-courtyard.jpg",
-    images: ["/static/real/kota-stone-outdoor-courtyard.jpg"]
+    images: [
+      "/static/nh/gray-marble-hall.jpg",
+      "/static/nh/gray-marble-kitchen.jpg",
+      "/static/nh/gray-marble-bedroom.jpg",
+      "/static/real/kota-stone-outdoor-courtyard.jpg"
+    ]
   }
 ];
 

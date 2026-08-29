@@ -142,22 +142,6 @@ def seed_database():
                     metalness=0.1
                 ),
                 models.Product(
-                    name="Emerald Onyx",
-                    category="Onyx",
-                    origin="Iran",
-                    finish="Polished",
-                    thickness="2cm",
-                    applications="Backlit Walls, Countertops, Decorative Panels",
-                    description="A highly translucent green stone with mesmerizing bands of mint, emerald, and golden bronze. When backlit, it emits a warm, ethereal luminescence perfect for high-end boutique designs.",
-                    price=320.00,
-                    availability="Limited",
-                    image_url="/static/seed/emerald_onyx.jpg",
-                    glb_url="/static/seed/emerald_onyx.glb",
-                    texture_url="/static/seed/textures/emerald_onyx_diff.jpg",
-                    roughness=0.08,
-                    metalness=0.15
-                ),
-                models.Product(
                     name="Calacatta Viola",
                     category="Marble",
                     origin="Italy",
@@ -253,39 +237,6 @@ def seed_database():
                     texture_url=None,
                     roughness=0.6,
                     metalness=0.1
-                ),
-                # Somany Ceramics Products
-                models.Product(
-                    name="Elita Collection",
-                    category="Tiles",
-                    origin="India",
-                    finish="Glossy",
-                    thickness="1cm",
-                    applications="Living Room, Kitchen, Wall",
-                    description="Marble-inspired ceramic tiles from Somany's Elita Collection. Introduces richness, clarity, and quiet luxury.",
-                    price=45.00,
-                    availability="In Stock",
-                    image_url="/static/seed/elita_collection.jpg",
-                    glb_url=None,
-                    texture_url=None,
-                    roughness=0.2,
-                    metalness=0.0
-                ),
-                models.Product(
-                    name="Somany Bathware",
-                    category="Bathware",
-                    origin="India",
-                    finish="Matte",
-                    thickness="N/A",
-                    applications="Washroom",
-                    description="Premium sanitaryware and vanity alternatives, along with sophisticated fittings and fixtures from Somany.",
-                    price=350.00,
-                    availability="In Stock",
-                    image_url="/static/seed/somany_bathware.jpg",
-                    glb_url=None,
-                    texture_url=None,
-                    roughness=0.3,
-                    metalness=0.2
                 )
             ]
             db.add_all(products_seed)

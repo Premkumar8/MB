@@ -39,15 +39,33 @@ const productSpecificGalleryImages: Record<string, GalleryItem[]> = {
 };
 
 const defaultRoomGallery: Required<RoomGallery> = {
-  hall: "/static/nh/natural-hall-modern.jpg",
-  kitchen: "/static/nh/stone-kitchen-counter.jpg",
-  bedroom: "/static/nh/stone-bedroom-living.jpg",
-  parking: "/static/nh/natural-parking-courtyard.jpg",
+  hall: "/static/rooms/white-marble/hall.jpg",
+  kitchen: "/static/rooms/white-marble/kitchen.jpg",
+  bedroom: "/static/rooms/white-marble/bedroom.jpg",
+  parking: "/static/rooms/white-marble/parking.jpg",
 };
 
 const materialRoomGalleries: { keywords: string[]; images: RoomGallery }[] = [
   {
-    keywords: ["gray marble", "grey marble", "ash gray", "ash grey", "gray herringbone", "grey herringbone", "ice rock"],
+    keywords: ["carrara", "statuario", "calacatta", "crystal", "flawless", "kashmir", "rak white", "lyra white", "canis white", "nyota white", "white"],
+    images: {
+      hall: "/static/real/hero-marble-hall.jpg",
+      kitchen: "/static/real/kitchen-white-marble-island.jpg",
+      bedroom: "/static/real/project-residential-bedroom.jpg",
+      parking: "/static/rooms/white-marble/parking.jpg",
+    },
+  },
+  {
+    keywords: ["black", "nero", "galaxy", "absolute", "saint laurent", "charcoal", "estara"],
+    images: {
+      hall: "/static/real/hero-office-lobby.jpg",
+      kitchen: "/static/nh/granite-kitchen-black.jpg",
+      bedroom: "/static/real/bedroom-minimal-modern.jpg",
+      parking: "/static/real/quartzite-charcoal-outdoor-walkway.jpg",
+    },
+  },
+  {
+    keywords: ["gray marble", "grey marble", "ash gray", "ash grey", "gray herringbone", "grey herringbone", "ice rock", "steel grey", "steel gray", "storm gray", "silver wave", "gray", "grey"],
     images: {
       hall: "/static/nh/gray-marble-hall.jpg",
       kitchen: "/static/nh/gray-marble-kitchen.jpg",
@@ -56,52 +74,34 @@ const materialRoomGalleries: { keywords: string[]; images: RoomGallery }[] = [
     },
   },
   {
-    keywords: ["white", "statuario", "carrara", "calacatta", "crystal", "kashmir", "rak white"],
-    images: {
-      hall: "/static/real/marble-imported-curtain-hall.jpg",
-      kitchen: "/static/nh/stone-kitchen-counter.jpg",
-      bedroom: "/static/nh/stone-bedroom-living.jpg",
-      parking: "/static/real/tile-rak-white-marble-look-slab.jpg",
-    },
-  },
-  {
-    keywords: ["black", "nero", "galaxy", "absolute", "saint laurent", "charcoal", "steel grey", "steel gray"],
-    images: {
-      hall: "/static/nh/granite-lobby-gray.jpg",
-      kitchen: "/static/nh/granite-kitchen-black.jpg",
-      bedroom: "/static/real/bedroom-minimal-modern.jpg",
-      parking: "/static/real/quartzite-charcoal-outdoor-walkway.jpg",
-    },
-  },
-  {
-    keywords: ["beige", "cream", "crema", "botticino", "diano", "travertine", "taj mahal", "shell", "breccia", "tan brown"],
+    keywords: ["beige", "cream", "crema", "botticino", "diano", "travertine", "shell", "breccia", "tan brown", "lyra crema"],
     images: {
       hall: "/static/real/hallway-travertine-arched.jpg",
       kitchen: "/static/nh/stone-living-kitchen.jpg",
       bedroom: "/static/nh/stone-bedroom-living.jpg",
-      parking: "/static/real/tile-travertine-exterior-cladding.jpg",
+      parking: "/static/rooms/beige-marble/parking.jpg",
     },
   },
   {
-    keywords: ["pink", "rosa", "viola", "purple", "aubergine"],
+    keywords: ["taj mahal", "giallo", "siena", "gold", "yellow"],
     images: {
-      hall: "/static/real/marble-pink-rosa.jpg",
-      kitchen: "/static/nh/stone-kitchen-counter.jpg",
-      bedroom: "/static/real/tile-purple-ribbed-bathroom-wall.jpg",
-      parking: "/static/nh/natural-parking-courtyard.jpg",
+      hall: "/static/real/quartz-flooring-hall.jpg",
+      kitchen: "/static/real/quartz-countertop-island.jpg",
+      bedroom: "/static/rooms/taj-mahal-gold/bedroom.jpg",
+      parking: "/static/real/quartzite-speckled-courtyard-floor.jpg",
     },
   },
   {
-    keywords: ["gold", "giallo", "yellow"],
+    keywords: ["pink", "rosa", "viola", "purple", "aubergine", "ruby", "red"],
     images: {
-      hall: "/static/real/marble-gold-siena.jpg",
-      kitchen: "/static/nh/stone-living-kitchen.jpg",
-      bedroom: "/static/nh/stone-bedroom-living.jpg",
-      parking: "/static/real/tile-travertine-exterior-cladding.jpg",
+      hall: "/static/rooms/viola-pink/hall.jpg",
+      kitchen: "/static/rooms/viola-pink/kitchen.jpg",
+      bedroom: "/static/rooms/viola-pink/bedroom.jpg",
+      parking: "/static/rooms/viola-pink/parking.jpg",
     },
   },
   {
-    keywords: ["green"],
+    keywords: ["green", "kota green", "kota"],
     images: {
       hall: "/static/real/kota-stone-flooring-passage.jpg",
       kitchen: "/static/nh/natural-kitchen-bath.jpg",
@@ -110,48 +110,30 @@ const materialRoomGalleries: { keywords: string[]; images: RoomGallery }[] = [
     },
   },
   {
-    keywords: ["aqua", "blue", "azulejo"],
-    images: {
-      hall: "/static/real/tile-wall-azulejo-blue.jpg",
-      kitchen: "/static/real/tile-wall-aqua-glass.jpg",
-      bedroom: "/static/nh/natural-bedroom.jpg",
-      parking: "/static/nh/natural-parking-courtyard.jpg",
-    },
-  },
-  {
-    keywords: ["ruby", "red", "mosaic", "patchwork", "botanical", "floral", "cafe", "decorative", "pattern", "checkerboard", "monochrome", "speckled", "terrazzo", "medallion"],
-    images: {
-      hall: "/static/real/tile-medallion-inlay-floor.jpg",
-      kitchen: "/static/real/tile-cafe-print-wall-panel.jpg",
-      bedroom: "/static/real/tile-botanical-matte-wall.jpg",
-      parking: "/static/real/tile-decorative-floor-pattern-board.jpg",
-    },
-  },
-  {
-    keywords: ["pvt", "gloss", "polished vitrified", "salon", "showroom", "corridor", "perspective shine"],
-    images: {
-      hall: "/static/real/tile-pvt-perspective-shine.jpg",
-      kitchen: "/static/nh/stone-kitchen-counter.jpg",
-      bedroom: "/static/real/tile-cream-polished-floor-room.jpg",
-      parking: "/static/nh/natural-parking-courtyard.jpg",
-    },
-  },
-  {
-    keywords: ["wood"],
+    keywords: ["wood", "timber", "plank", "floral"],
     images: {
       hall: "/static/real/tile-wood-look-floor-installation.jpg",
-      kitchen: "/static/nh/stone-living-kitchen.jpg",
+      kitchen: "/static/rooms/wood-look/kitchen.jpg",
       bedroom: "/static/real/tile-wood-look-bedroom-floor.jpg",
-      parking: "/static/real/tile-travertine-exterior-cladding.jpg",
+      parking: "/static/rooms/wood-look/parking.jpg",
     },
   },
   {
-    keywords: ["kota", "limestone", "natural stone", "fossil", "splitface", "outdoor", "walkway", "courtyard"],
+    keywords: ["pvt", "gloss", "polished vitrified", "salon", "showroom", "corridor", "perspective shine", "diamond gloss"],
     images: {
-      hall: "/static/real/kota-stone-flooring-passage.jpg",
-      kitchen: "/static/nh/natural-kitchen-bath.jpg",
-      bedroom: "/static/nh/natural-bedroom.jpg",
-      parking: "/static/real/kota-stone-outdoor-courtyard.jpg",
+      hall: "/static/real/tile-pvt-perspective-shine.jpg",
+      kitchen: "/static/real/hero-kitchen-tiles.jpg",
+      bedroom: "/static/real/tile-cream-polished-floor-room.jpg",
+      parking: "/static/rooms/pvt-gloss/parking.jpg",
+    },
+  },
+  {
+    keywords: ["aqua", "blue", "azulejo", "mosaic", "patchwork", "subway", "cafe", "decorative", "pattern", "checkerboard", "monochrome", "speckled", "terrazzo", "medallion", "wall"],
+    images: {
+      hall: "/static/real/tile-medallion-inlay-floor.jpg",
+      kitchen: "/static/real/tile-glossy-white-kitchen-wall.jpg",
+      bedroom: "/static/real/tile-botanical-matte-wall.jpg",
+      parking: "/static/rooms/decorative/parking.jpg",
     },
   },
 ];
@@ -197,12 +179,20 @@ function uniqueGalleryItems(items: GalleryItem[]) {
 }
 
 function getProductGalleryItems(product: Product) {
-  const productText = `${product.name} ${product.category} ${product.applications} ${product.description || ""}`.toLowerCase();
   const productSpecificImages = productSpecificGalleryImages[product.name.toLowerCase()];
   if (productSpecificImages) {
     return uniqueGalleryItems(productSpecificImages).slice(0, 4);
   }
 
+  if (Array.isArray(product.images) && product.images.length === 4) {
+    const labels = ["Hall", "Kitchen", "Bedroom", "Parking"];
+    return product.images.map((src, idx) => ({
+      label: labels[idx],
+      src: normalizeImageUrl(src, true)
+    }));
+  }
+
+  const productText = `${product.name} ${product.category} ${product.applications} ${product.description || ""}`.toLowerCase();
   return uniqueGalleryItems(getCompleteRoomGalleryItems(productText)).slice(0, 4);
 }
 

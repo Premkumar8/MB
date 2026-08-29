@@ -35,6 +35,10 @@ class Product(Base):
     availability = Column(String, nullable=True)
     image_url = Column(String, nullable=True)
     images = Column(JSON, nullable=True)
+    glb_url = Column(String, nullable=True)
+    texture_url = Column(String, nullable=True)
+    roughness = Column(Float, nullable=True)
+    metalness = Column(Float, nullable=True)
 
 class Customer(Base):
     __tablename__ = "customers"
@@ -86,3 +90,28 @@ class QuoteRequest(Base):
     room_image_url = Column(String, nullable=True)
     status = Column(String, default="Pending")
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+class BlogPost(Base):
+    __tablename__ = "blog_posts"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, unique=True, nullable=False)
+    slug = Column(String, unique=True, index=True, nullable=False)
+    content = Column(Text, nullable=False)
+    author = Column(String, default="Aurelia Design Studio")
+    read_time = Column(String, default="4 min read")
+    category = Column(String, default="Architecture") # Design, Care, Architecture
+    image_url = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+class Testimonial(Base):
+    __tablename__ = "testimonials"
+
+    id = Column(Integer, primary_key=True, index=True)
+    client_name = Column(String, nullable=False)
+    company_or_title = Column(String, nullable=True)
+    content = Column(Text, nullable=False)
+    rating = Column(Integer, default=5)
+    image_url = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
