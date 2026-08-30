@@ -25,8 +25,9 @@ const includesAny = (text: string, keywords: string[]) => (
   keywords.some((keyword) => text.includes(keyword))
 );
 
-function normalizeImageUrl(imageUrl: string, useApiHost = false) {
-  return useApiHost && imageUrl.startsWith("/static") ? `${API_URL}${imageUrl}` : imageUrl;
+function normalizeImageUrl(imageUrl: string) {
+  if (!imageUrl) return "";
+  return imageUrl;
 }
 
 const productSpecificGalleryImages: Record<string, GalleryItem[]> = {
@@ -188,7 +189,7 @@ function getProductGalleryItems(product: Product) {
     const labels = ["Hall", "Kitchen", "Bedroom", "Parking"];
     return product.images.map((src, idx) => ({
       label: labels[idx],
-      src: normalizeImageUrl(src, true)
+      src: normalizeImageUrl(src)
     }));
   }
 
@@ -223,7 +224,7 @@ export default function ProductDetailPage() {
           const data = await res.json();
           const processed: Product = {
             ...data,
-            image_url: normalizeImageUrl(data.image_url, true),
+            image_url: normalizeImageUrl(data.image_url),
           };
           const nextGalleryItems = getProductGalleryItems(processed);
           if (!cancelled) {

@@ -44,7 +44,7 @@ export default function BlogPage() {
           // Map local paths to absolute backend URL if needed
           const processed = data.map((item: any) => ({
             ...item,
-            image_url: item.image_url.startsWith("/static") ? `${API_URL}${item.image_url}` : item.image_url,
+            image_url: item.image_url,
           }));
           setPosts(processed.length > 0 ? processed : fallbackPosts);
         } else {

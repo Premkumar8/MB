@@ -46,6 +46,7 @@ function CollectionsContent() {
   const [selectedThickness, setSelectedThickness] = useState("All");
   const selectedApplication = searchParams.get("application") || "All";
 
+
   // Active 3D preview item
   const [active3dProduct, setActive3dProduct] = useState<Product | null>(null);
   // Show Comparison Modal
@@ -60,8 +61,8 @@ function CollectionsContent() {
           // Map local paths to absolute backend URL if needed
           const processed = data.map((item) => ({
             ...item,
-            image_url: item.image_url.startsWith("/static") ? `${API_URL}${item.image_url}` : item.image_url,
-            texture_url: item.texture_url && item.texture_url.startsWith("/static") ? `${API_URL}${item.texture_url}` : item.texture_url,
+            image_url: item.image_url,
+            texture_url: item.texture_url,
           }));
           setProducts(processed.length > 0 ? mergeWithAdminProducts(processed) : mergeWithAdminProducts([]));
         } else {

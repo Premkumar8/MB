@@ -48,7 +48,7 @@ export default function ApplicationAreas() {
           const data = await res.json();
           const processed = data.map((item: any) => ({
             ...item,
-            image_url: item.image_url?.startsWith("/static") ? `${API_URL}${item.image_url}` : item.image_url,
+            image_url: item.image_url,
           }));
           if (processed.length > 0) {
             setProducts(processed);

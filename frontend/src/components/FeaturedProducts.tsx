@@ -22,7 +22,7 @@ export default function FeaturedProducts() {
           const data = await res.json();
           const processed = data.map((item: any) => ({
             ...item,
-            image_url: item.image_url.startsWith("/static") ? `${API_URL}${item.image_url}` : item.image_url,
+            image_url: item.image_url,
           }));
           const merged = mergeWithFallbackProducts(processed);
           const filtered = merged.filter((p: Product) => p.category === "Full Body Tiles").reverse().slice(0, 8);
