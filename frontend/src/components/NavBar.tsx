@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Sun, Moon, Heart, RefreshCw, ChevronDown, ArrowRight } from "lucide-react";
+import { Menu, X, Sun, Moon, Heart, RefreshCw, ChevronDown, ArrowRight, Loader2 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { useApp } from "@/context/AppContext";
 import { motion, AnimatePresence } from "framer-motion";
@@ -72,6 +72,7 @@ export default function NavBar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [openMobileGroup, setOpenMobileGroup] = useState<string | null>(null);
+  const [navigatingHref, setNavigatingHref] = useState<string | null>(null);
 
   const [activeSection, setActiveSection] = useState("hero");
 
@@ -107,7 +108,14 @@ export default function NavBar() {
   useEffect(() => {
     setIsOpen(false);
     setOpenMobileGroup(null);
+    setNavigatingHref(null);
   }, [pathname]);
+
+  const handleMenuClick = (href: string) => {
+    if (href !== pathname) {
+      setNavigatingHref(href);
+    }
+  };
 
   const sectionLinks = [
     { name: "Top", id: "hero" },
@@ -128,13 +136,21 @@ export default function NavBar() {
       >
         <div className="max-w-[1600px] mx-auto px-6 lg:px-10 flex justify-between items-center gap-6">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-1 lg:space-x-2 group cursor-pointer h-10 lg:h-14 shrink-0">
+          <Link 
+            href="/" 
+            onClick={() => handleMenuClick("/")}
+            className="flex items-center space-x-1 lg:space-x-2 group cursor-pointer h-10 lg:h-14 shrink-0"
+          >
             <div className="relative flex items-center justify-center w-10 h-10 lg:w-14 lg:h-14 rounded-full bg-brand-700 group-hover:bg-brand-600 transition-colors duration-500">
-              <svg className="w-6 h-6 lg:w-8 lg:h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="white" fillOpacity="0.95" />
-                <path d="M2 17L12 22L22 17" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M2 12L12 17L22 12" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+              {navigatingHref === "/" ? (
+                <Loader2 className="w-5 h-5 lg:w-7 lg:h-7 text-white animate-spin" />
+              ) : (
+                <svg className="w-6 h-6 lg:w-8 lg:h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="white" fillOpacity="0.95" />
+                  <path d="M2 17L12 22L22 17" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M2 12L12 17L22 12" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              )}
             </div>
             <div className="flex flex-col justify-center ml-1">
               <span className="font-sans text-xl lg:text-3xl tracking-[0.1em] uppercase font-bold text-brand-800 dark:text-white leading-none mb-1 group-hover:text-brand-500 transition-colors duration-500">
@@ -153,17 +169,23 @@ export default function NavBar() {
           <div className="hidden xl:flex items-center flex-1 justify-center">
             {menuItems.map((item) => {
               const isActive = pathname === item.href;
+              const isItemNavigating = navigatingHref === item.href;
+
               if (!item.dropdown) {
                 return (
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`relative px-2.5 2xl:px-3.5 py-2 text-[10.5px] 2xl:text-[11px] tracking-[0.12em] 2xl:tracking-[0.15em] uppercase font-semibold transition-colors duration-300 whitespace-nowrap ${
+                    onClick={() => handleMenuClick(item.href)}
+                    className={`relative flex items-center gap-1.5 px-2.5 2xl:px-3.5 py-2 text-[10.5px] 2xl:text-[11px] tracking-[0.12em] 2xl:tracking-[0.15em] uppercase font-semibold transition-colors duration-300 whitespace-nowrap ${
                       isActive ? "text-brand-500" : "text-black/75 dark:text-white/75 hover:text-brand-500"
                     }`}
                   >
-                    {item.name}
-                    {isActive && (
+                    <span>{item.name}</span>
+                    {isItemNavigating && (
+                      <Loader2 className="w-3 h-3 animate-spin text-brand-500" />
+                    )}
+                    {isActive && !isItemNavigating && (
                       <span className="absolute left-1/2 -translate-x-1/2 -bottom-1 w-1 h-1 rounded-full bg-brand-500" />
                     )}
                   </Link>
@@ -174,47 +196,67 @@ export default function NavBar() {
                 <div key={item.name} className="relative group">
                   <Link
                     href={item.href}
-                    className="flex items-center gap-1 px-2.5 2xl:px-3.5 py-2 text-[10.5px] 2xl:text-[11px] tracking-[0.12em] 2xl:tracking-[0.15em] uppercase font-semibold text-black/75 dark:text-white/75 group-hover:text-brand-500 transition-colors duration-300 whitespace-nowrap"
+                    onClick={() => handleMenuClick(item.href)}
+                    className="flex items-center gap-1.5 px-2.5 2xl:px-3.5 py-2 text-[10.5px] 2xl:text-[11px] tracking-[0.12em] 2xl:tracking-[0.15em] uppercase font-semibold text-black/75 dark:text-white/75 group-hover:text-brand-500 transition-colors duration-300 whitespace-nowrap"
                   >
-                    {item.name}
-                    <ChevronDown className="w-3 h-3 transition-transform duration-300 group-hover:rotate-180" />
+                    <span>{item.name}</span>
+                    {isItemNavigating ? (
+                      <Loader2 className="w-3 h-3 animate-spin text-brand-500" />
+                    ) : (
+                      <ChevronDown className="w-3 h-3 transition-transform duration-300 group-hover:rotate-180" />
+                    )}
                   </Link>
 
                   {/* Dropdown Panel */}
                   <div className="invisible opacity-0 translate-y-2 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 absolute top-full left-1/2 -translate-x-1/2 pt-4 z-50">
                     <div className="w-96 bg-white dark:bg-[#111113] border-t-2 border-brand-500 shadow-[0_20px_60px_rgba(0,0,0,0.25)] p-2">
-                      {item.dropdown.map((sub) => (
-                        <Link
-                          key={sub.name}
-                          href={sub.href}
-                          className="group/item flex items-center gap-3 px-3 py-2.5 hover:bg-brand-500/10 transition-colors duration-200"
-                        >
-                          <div className="w-14 h-14 shrink-0 rounded-md overflow-hidden border border-black/10 dark:border-white/10 bg-brand-50 dark:bg-brand-500/10 flex items-center justify-center">
-                            {sub.image ? (
-                              <img
-                                src={sub.image}
-                                alt={sub.name}
-                                className="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-500"
-                              />
-                            ) : (
-                              <ArrowRight className="w-5 h-5 text-brand-500" />
+                      {item.dropdown.map((sub) => {
+                        const isSubNavigating = navigatingHref === sub.href;
+                        return (
+                          <Link
+                            key={sub.name}
+                            href={sub.href}
+                            onClick={() => handleMenuClick(sub.href)}
+                            className="group/item flex items-center gap-3 px-3 py-2.5 hover:bg-brand-500/10 transition-colors duration-200"
+                          >
+                            <div className="w-14 h-14 shrink-0 rounded-md overflow-hidden border border-black/10 dark:border-white/10 bg-brand-50 dark:bg-brand-500/10 flex items-center justify-center">
+                              {sub.image ? (
+                                <img
+                                  src={sub.image}
+                                  alt={sub.name}
+                                  className="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-500"
+                                />
+                              ) : (
+                                <ArrowRight className="w-5 h-5 text-brand-500" />
+                              )}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center justify-between">
+                                <div className="text-xs font-bold uppercase tracking-wider text-black dark:text-white group-hover/item:text-brand-500 transition-colors">
+                                  {sub.name}
+                                </div>
+                                {isSubNavigating && (
+                                  <Loader2 className="w-3.5 h-3.5 animate-spin text-brand-500 ml-2" />
+                                )}
+                              </div>
+                              <div className="text-[11px] text-black/50 dark:text-white/50 mt-1 leading-snug truncate">
+                                {sub.desc}
+                              </div>
+                            </div>
+                            {!isSubNavigating && (
+                              <ArrowRight className="w-3.5 h-3.5 shrink-0 text-brand-500 opacity-0 -translate-x-1 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-200" />
                             )}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="text-xs font-bold uppercase tracking-wider text-black dark:text-white group-hover/item:text-brand-500 transition-colors">
-                              {sub.name}
-                            </div>
-                            <div className="text-[11px] text-black/50 dark:text-white/50 mt-1 leading-snug truncate">
-                              {sub.desc}
-                            </div>
-                          </div>
-                          <ArrowRight className="w-3.5 h-3.5 shrink-0 text-brand-500 opacity-0 -translate-x-1 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-200" />
-                        </Link>
-                      ))}
+                          </Link>
+                        );
+                      })}
                       <Link
                         href={item.href}
+                        onClick={() => handleMenuClick(item.href)}
                         className="mt-1 flex items-center justify-center gap-2 bg-black dark:bg-white text-white dark:text-black py-3 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-brand-500 dark:hover:bg-brand-500 hover:text-white transition-colors duration-300"
                       >
+                        {navigatingHref === item.href ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : null}
                         View All {item.name}
                       </Link>
                     </div>
@@ -342,12 +384,15 @@ export default function NavBar() {
                     <Link
                       key={item.name}
                       href={item.href}
-                      onClick={() => setIsOpen(false)}
-                      className={`py-3 font-serif text-2xl tracking-wider hover:text-brand-500 transition-colors duration-300 border-b border-black/5 dark:border-white/5 ${
+                      onClick={() => handleMenuClick(item.href)}
+                      className={`py-3 font-serif text-2xl tracking-wider hover:text-brand-500 transition-colors duration-300 border-b border-black/5 dark:border-white/5 flex items-center justify-between ${
                         pathname === item.href ? "text-brand-500" : "text-black/80 dark:text-white/80"
                       }`}
                     >
-                      {item.name}
+                      <span>{item.name}</span>
+                      {navigatingHref === item.href && (
+                        <Loader2 className="w-5 h-5 animate-spin text-brand-500" />
+                      )}
                     </Link>
                   );
                 }
@@ -375,18 +420,24 @@ export default function NavBar() {
                             <Link
                               key={sub.name}
                               href={sub.href}
-                              onClick={() => setIsOpen(false)}
-                              className="block py-2.5 text-sm tracking-wide text-black/60 dark:text-white/60 hover:text-brand-500 transition-colors"
+                              onClick={() => handleMenuClick(sub.href)}
+                              className="py-2.5 text-sm tracking-wide text-black/60 dark:text-white/60 hover:text-brand-500 transition-colors flex items-center justify-between pr-2"
                             >
-                              {sub.name}
+                              <span>{sub.name}</span>
+                              {navigatingHref === sub.href && (
+                                <Loader2 className="w-4 h-4 animate-spin text-brand-500" />
+                              )}
                             </Link>
                           ))}
                           <Link
                             href={item.href}
-                            onClick={() => setIsOpen(false)}
-                            className="block py-2.5 text-sm font-bold tracking-wide text-brand-500"
+                            onClick={() => handleMenuClick(item.href)}
+                            className="py-2.5 text-sm font-bold tracking-wide text-brand-500 flex items-center justify-between pr-2"
                           >
-                            View All {item.name} →
+                            <span>View All {item.name} →</span>
+                            {navigatingHref === item.href && (
+                              <Loader2 className="w-4 h-4 animate-spin text-brand-500" />
+                            )}
                           </Link>
                         </motion.div>
                       )}

@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Poppins, Inter } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { AppProvider } from "@/context/AppContext";
+import RouteLoadingIndicator from "@/components/RouteLoadingIndicator";
 
 // Load premium fonts
 const playfair = Playfair_Display({
@@ -71,6 +73,9 @@ export default function RootLayout({
         <AuthProvider>
           <ThemeProvider>
             <AppProvider>
+              <Suspense fallback={null}>
+                <RouteLoadingIndicator />
+              </Suspense>
               {children}
             </AppProvider>
           </ThemeProvider>

@@ -6,7 +6,7 @@ import { Lock, Sparkles, Layers, ListTodo, BarChart2, Plus, LogOut, ShieldCheck,
 import { Product } from "@/context/AppContext";
 import { useAuth } from "@/context/AuthContext";
 import { getDeletedAdminProductIds, getStoredAdminProducts, mergeWithAdminProducts, saveDeletedAdminProductIds, saveStoredAdminProducts } from "@/data/products";
-import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Cell } from "recharts";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -76,6 +76,31 @@ const ROOM_CONFIG: { key: RoomKey; label: string; subtitle: string; icon: string
   { key: "bedroom", label: "Bedroom", subtitle: "Master bedroom suite", icon: "🛏️" },
   { key: "parking", label: "Parking", subtitle: "Driveway & courtyard", icon: "🚗" },
 ];
+
+const CATEGORY_PALETTE = [
+  { bg: "from-blue-600 to-indigo-600", shadow: "shadow-blue-500/20", text: "text-blue-600", badgeBg: "bg-blue-50", badgeText: "text-blue-700", border: "border-blue-200", fill: "#3b82f6" },
+  { bg: "from-emerald-500 to-teal-600", shadow: "shadow-emerald-500/20", text: "text-emerald-600", badgeBg: "bg-emerald-50", badgeText: "text-emerald-700", border: "border-emerald-200", fill: "#10b981" },
+  { bg: "from-purple-600 to-pink-600", shadow: "shadow-purple-500/20", text: "text-purple-600", badgeBg: "bg-purple-50", badgeText: "text-purple-700", border: "border-purple-200", fill: "#8b5cf6" },
+  { bg: "from-amber-500 to-orange-600", shadow: "shadow-amber-500/20", text: "text-amber-600", badgeBg: "bg-amber-50", badgeText: "text-amber-700", border: "border-amber-200", fill: "#f59e0b" },
+  { bg: "from-rose-500 to-red-600", shadow: "shadow-rose-500/20", text: "text-rose-600", badgeBg: "bg-rose-50", badgeText: "text-rose-700", border: "border-rose-200", fill: "#f43f5e" },
+  { bg: "from-cyan-500 to-sky-600", shadow: "shadow-cyan-500/20", text: "text-cyan-600", badgeBg: "bg-cyan-50", badgeText: "text-cyan-700", border: "border-cyan-200", fill: "#06b6d4" },
+  { bg: "from-slate-700 to-slate-900", shadow: "shadow-slate-700/20", text: "text-slate-700", badgeBg: "bg-slate-100", badgeText: "text-slate-700", border: "border-slate-200", fill: "#475569" },
+  { bg: "from-violet-600 to-purple-700", shadow: "shadow-violet-500/20", text: "text-violet-600", badgeBg: "bg-violet-50", badgeText: "text-violet-700", border: "border-violet-200", fill: "#7c3aed" },
+];
+
+const CATEGORY_ICONS: Record<string, string> = {
+  "Marble": "🏛️",
+  "Imported Marble": "✨",
+  "Granite": "🪨",
+  "Quartz": "💎",
+  "Full Body Tiles": "🧱",
+  "Wall Tiles": "🖼️",
+  "PVT": "🌟",
+  "Kota Stone": "🍃",
+  "Onyx": "🔮",
+  "Travertine": "🏺",
+  "Limestone": "⛰️",
+};
 
 const getAdminImageSrc = (imageUrl: string | null) => {
   if (!imageUrl) {
@@ -252,6 +277,29 @@ export default function AdminPage() {
     return ["All", ...Array.from(new Set(products.map(p => p.category).filter(Boolean)))];
   }, [products]);
 
+  const categoryStats = useMemo(() => {
+    const counts: Record<string, number> = {};
+    products.forEach((p) => {
+      const cat = p.category?.trim() || "Uncategorized";
+      counts[cat] = (counts[cat] || 0) + 1;
+    });
+
+    const entries = Object.entries(counts).map(([name, count], index) => {
+      const color = CATEGORY_PALETTE[index % CATEGORY_PALETTE.length];
+      const icon = CATEGORY_ICONS[name] || "📦";
+      const percentage = products.length > 0 ? Math.round((count / products.length) * 100) : 0;
+      return {
+        name,
+        count,
+        percentage,
+        icon,
+        color,
+      };
+    });
+
+    return entries.sort((a, b) => b.count - a.count);
+  }, [products]);
+
   const filteredProducts = useMemo(() => {
     return products.filter(p => {
       const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -363,6 +411,33 @@ export default function AdminPage() {
         product.id !== nextProduct.id && product.name?.toLowerCase() !== nextProduct.name.toLowerCase()
       )),
     ]);
+
+    // If online with backend API token, sync to server
+    if (token && !token.startsWith("mock-")) {
+      const endpoint = editingProductId ? `${API_URL}/api/products/${editingProductId}` : `${API_URL}/api/products`;
+      const method = editingProductId ? "PUT" : "POST";
+      fetch(endpoint, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          name: nextProduct.name,
+          category: nextProduct.category,
+          origin: nextProduct.origin,
+          finish: nextProduct.finish,
+          thickness: nextProduct.thickness,
+          applications: nextProduct.applications,
+          description: nextProduct.description,
+          price: nextProduct.price,
+          availability: nextProduct.availability,
+          image_url: nextProduct.image_url,
+          images: nextProduct.images
+        })
+      }).catch((e) => console.warn("Backend sync skipped:", e));
+    }
+
     setProductForm(emptyProductForm);
     setRoomImages(initialRoomImages);
     setEditingProductId(null);
@@ -399,6 +474,14 @@ export default function AdminPage() {
     saveStoredAdminProducts(storedProducts);
     saveDeletedAdminProductIds([...getDeletedAdminProductIds(), productId]);
     setProducts((prev) => prev.filter((product) => product.id !== productId));
+
+    if (token && !token.startsWith("mock-")) {
+      fetch(`${API_URL}/api/products/${productId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` }
+      }).catch((e) => console.warn("Backend delete skipped:", e));
+    }
+
     if (editingProductId === productId) {
       setEditingProductId(null);
       setProductForm(emptyProductForm);
@@ -632,136 +715,204 @@ export default function AdminPage() {
         {/* Scrollable Content Viewport */}
         <main className="flex-1 overflow-y-auto p-6 lg:p-8">
           
-          {/* TAB 1: ANALYTICS (DASHBOARD) */}
+          {/* TAB 1: CATEGORY-WISE ANALYTICS & DASHBOARD */}
           {activeTab === "analytics" && (
             <div className="space-y-6 max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
               
-              {/* Top KPI Cards - Material Dashboard Style */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-4">
-                
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 relative flex flex-col justify-between">
-                  <div className="absolute -top-4 left-4 bg-slate-900 text-white rounded-xl w-12 h-12 flex items-center justify-center shadow-lg shadow-slate-900/20">
-                    <DollarSign className="w-5 h-5" />
+              {/* Category-Wise Product Widgets */}
+              <div className="pt-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                  <div>
+                    <h3 className="text-base font-bold text-slate-800">Category-Wise Product Overview</h3>
+                    <p className="text-xs text-slate-500">Live total number of products across each material category</p>
                   </div>
-                  <div className="text-right pt-2 pb-1">
-                    <p className="text-sm font-medium text-slate-500">Today&apos;s Money</p>
-                    <h4 className="text-2xl font-bold text-slate-800">$53,000</h4>
-                  </div>
-                  <div className="border-t border-slate-100 mt-3 pt-3">
-                    <p className="text-sm text-slate-500"><span className="text-emerald-500 font-bold">+55%</span> than last week</p>
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 relative flex flex-col justify-between">
-                  <div className="absolute -top-4 left-4 bg-blue-600 text-white rounded-xl w-12 h-12 flex items-center justify-center shadow-lg shadow-blue-600/20">
-                    <UserCircle className="w-5 h-5" />
-                  </div>
-                  <div className="text-right pt-2 pb-1">
-                    <p className="text-sm font-medium text-slate-500">Today&apos;s Users</p>
-                    <h4 className="text-2xl font-bold text-slate-800">2,300</h4>
-                  </div>
-                  <div className="border-t border-slate-100 mt-3 pt-3">
-                    <p className="text-sm text-slate-500"><span className="text-emerald-500 font-bold">+3%</span> than last month</p>
+                  <div className="flex items-center gap-2">
+                    <span className="px-3 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg text-xs font-semibold">
+                      Total: {products.length} Products
+                    </span>
+                    <span className="px-3 py-1 bg-slate-100 text-slate-700 border border-slate-200 rounded-lg text-xs font-semibold">
+                      {categoryStats.length} Categories
+                    </span>
                   </div>
                 </div>
 
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 relative flex flex-col justify-between">
-                  <div className="absolute -top-4 left-4 bg-emerald-500 text-white rounded-xl w-12 h-12 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                    <ListTodo className="w-5 h-5" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                  {/* Master Total Card */}
+                  <div 
+                    onClick={() => {
+                      setSelectedCategory("All");
+                      setActiveTab("products");
+                    }}
+                    className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all border border-slate-200/80 p-5 relative flex flex-col justify-between cursor-pointer group"
+                  >
+                    <div className="absolute -top-3.5 left-4 bg-gradient-to-r from-slate-800 to-slate-900 text-white rounded-xl w-11 h-11 flex items-center justify-center shadow-lg shadow-slate-900/20 group-hover:scale-105 transition-transform">
+                      <Package className="w-5 h-5" />
+                    </div>
+                    <div className="text-right pt-1 pb-1">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Products</p>
+                      <h4 className="text-3xl font-extrabold text-slate-900 mt-1">{products.length}</h4>
+                    </div>
+                    <div className="border-t border-slate-100 mt-3 pt-2.5 flex items-center justify-between text-xs text-slate-500">
+                      <span>Across {categoryStats.length} categories</span>
+                      <span className="font-semibold text-blue-600 group-hover:underline">View All &rarr;</span>
+                    </div>
                   </div>
-                  <div className="text-right pt-2 pb-1">
-                    <p className="text-sm font-medium text-slate-500">New Quotes</p>
-                    <h4 className="text-2xl font-bold text-slate-800">84</h4>
-                  </div>
-                  <div className="border-t border-slate-100 mt-3 pt-3">
-                    <p className="text-sm text-slate-500"><span className="text-red-500 font-bold">-2%</span> than yesterday</p>
-                  </div>
-                </div>
 
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 relative flex flex-col justify-between">
-                  <div className="absolute -top-4 left-4 bg-rose-500 text-white rounded-xl w-12 h-12 flex items-center justify-center shadow-lg shadow-rose-500/20">
-                    <CreditCard className="w-5 h-5" />
-                  </div>
-                  <div className="text-right pt-2 pb-1">
-                    <p className="text-sm font-medium text-slate-500">Sales</p>
-                    <h4 className="text-2xl font-bold text-slate-800">$103,430</h4>
-                  </div>
-                  <div className="border-t border-slate-100 mt-3 pt-3">
-                    <p className="text-sm text-slate-500"><span className="text-emerald-500 font-bold">+5%</span> than yesterday</p>
-                  </div>
+                  {/* Individual Dynamic Category Cards */}
+                  {categoryStats.map((cat) => (
+                    <div 
+                      key={cat.name}
+                      onClick={() => {
+                        setSelectedCategory(cat.name);
+                        setActiveTab("products");
+                      }}
+                      className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all border border-slate-200/80 p-5 relative flex flex-col justify-between cursor-pointer group"
+                    >
+                      <div className={`absolute -top-3.5 left-4 bg-gradient-to-r ${cat.color.bg} text-white rounded-xl w-11 h-11 flex items-center justify-center shadow-lg ${cat.color.shadow} group-hover:scale-105 transition-transform text-lg`}>
+                        {cat.icon}
+                      </div>
+                      <div className="text-right pt-1 pb-1">
+                        <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 truncate max-w-[150px] ml-auto" title={cat.name}>
+                          {cat.name}
+                        </p>
+                        <h4 className="text-3xl font-extrabold text-slate-900 mt-1">{cat.count}</h4>
+                      </div>
+                      <div className="border-t border-slate-100 mt-3 pt-2.5 flex items-center justify-between text-xs">
+                        <span className={`px-2 py-0.5 rounded font-bold text-[11px] ${cat.color.badgeBg} ${cat.color.badgeText}`}>
+                          {cat.percentage}% of catalog
+                        </span>
+                        <span className="font-semibold text-slate-400 group-hover:text-blue-600 transition-colors">
+                          Filter &rarr;
+                        </span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-
               </div>
 
-              {/* Charts Section */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-4">
+              {/* Dynamic Category-Wise Graphs Section */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
                 
-                {/* Main Area Chart */}
-                <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden relative pt-12 pb-4 px-4">
-                  {/* Colored Box for Chart Title */}
-                  <div className="absolute -top-4 left-4 right-4 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-lg shadow-blue-500/20 p-4 text-white z-10">
-                    <h4 className="font-semibold">Monthly Revenue</h4>
-                    <p className="text-xs text-blue-100 flex items-center mt-1"><ArrowRight className="w-3 h-3 mr-1" /> Performance overview</p>
+                {/* Main Category Bar Chart */}
+                <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden relative pt-12 pb-4 px-5">
+                  <div className="absolute -top-4 left-4 right-4 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-lg shadow-blue-500/20 p-4 text-white z-10 flex items-center justify-between">
+                    <div>
+                      <h4 className="font-semibold text-base">Total Products by Category</h4>
+                      <p className="text-xs text-blue-100 flex items-center mt-0.5">
+                        <BarChart2 className="w-3.5 h-3.5 mr-1" /> Category-wise inventory comparison
+                      </p>
+                    </div>
+                    <span className="text-xs bg-white/20 backdrop-blur-md px-2.5 py-1 rounded-md font-semibold">
+                      {products.length} Total Slabs / Tiles
+                    </span>
                   </div>
-                  <div className="h-72 mt-8">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={[
-                        { name: "Apr", revenue: 50 },
-                        { name: "May", revenue: 40 },
-                        { name: "Jun", revenue: 300 },
-                        { name: "Jul", revenue: 220 },
-                        { name: "Aug", revenue: 500 },
-                        { name: "Sep", revenue: 250 },
-                        { name: "Oct", revenue: 400 },
-                        { name: "Nov", revenue: 230 },
-                        { name: "Dec", revenue: 500 }
-                      ]} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                        <defs>
-                          <linearGradient id="colorRevBlue" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                            <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                          </linearGradient>
-                        </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                        <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-                        <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-                        <Tooltip 
-                          contentStyle={{ backgroundColor: "#fff", borderColor: "#e2e8f0", borderRadius: "8px", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }}
-                          itemStyle={{ color: "#3b82f6", fontWeight: "bold" }}
-                        />
-                        <Area type="monotone" dataKey="revenue" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorRevBlue)" />
-                      </AreaChart>
-                    </ResponsiveContainer>
+
+                  <div className="h-80 mt-6">
+                    {categoryStats.length > 0 ? (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={categoryStats} margin={{ top: 20, right: 20, left: -10, bottom: 40 }}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                          <XAxis 
+                            dataKey="name" 
+                            stroke="#64748b" 
+                            fontSize={11} 
+                            tickLine={false} 
+                            axisLine={false}
+                            interval={0}
+                            angle={-25}
+                            textAnchor="end"
+                            height={50}
+                          />
+                          <YAxis 
+                            stroke="#64748b" 
+                            fontSize={11} 
+                            tickLine={false} 
+                            axisLine={false}
+                            allowDecimals={false}
+                          />
+                          <Tooltip 
+                            cursor={{ fill: "#f8fafc" }} 
+                            content={({ active, payload }) => {
+                              if (active && payload && payload.length) {
+                                const data = payload[0].payload;
+                                return (
+                                  <div className="bg-slate-900 text-white px-3.5 py-2.5 rounded-xl shadow-xl border border-white/10 text-xs space-y-1">
+                                    <div className="flex items-center gap-1.5 font-bold text-sm">
+                                      <span>{data.icon}</span>
+                                      <span>{data.name}</span>
+                                    </div>
+                                    <p className="text-slate-300">
+                                      Total Products: <span className="font-bold text-emerald-400">{data.count}</span>
+                                    </p>
+                                    <p className="text-slate-400 text-[11px]">
+                                      Share: <span className="font-semibold text-blue-300">{data.percentage}%</span> of catalog
+                                    </p>
+                                  </div>
+                                );
+                              }
+                              return null;
+                            }}
+                          />
+                          <Bar dataKey="count" radius={[6, 6, 0, 0]} barSize={28}>
+                            {categoryStats.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color.fill} />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="h-full flex items-center justify-center text-slate-400 text-sm">
+                        No product category data available
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                {/* Bar Chart */}
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden relative pt-12 pb-4 px-4">
+                {/* Category Inventory Share & Ranking Breakdown */}
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden relative pt-12 pb-4 px-5">
                   <div className="absolute -top-4 left-4 right-4 bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl shadow-lg shadow-slate-800/20 p-4 text-white z-10">
-                    <h4 className="font-semibold">Popular Stones</h4>
-                    <p className="text-xs text-slate-300 flex items-center mt-1"><ArrowRight className="w-3 h-3 mr-1" /> Request volume</p>
+                    <h4 className="font-semibold text-base">Category Share</h4>
+                    <p className="text-xs text-slate-300 flex items-center mt-0.5">
+                      <Tags className="w-3.5 h-3.5 mr-1" /> Inventory distribution breakdown
+                    </p>
                   </div>
-                  <div className="h-72 mt-8">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={[
-                        { name: "M", views: 50 },
-                        { name: "T", views: 20 },
-                        { name: "W", views: 10 },
-                        { name: "T", views: 22 },
-                        { name: "F", views: 50 },
-                        { name: "S", views: 10 },
-                        { name: "S", views: 40 }
-                      ]} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                        <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-                        <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-                        <Tooltip 
-                          cursor={{ fill: "#f8fafc" }} 
-                          contentStyle={{ backgroundColor: "#fff", borderColor: "#e2e8f0", borderRadius: "8px", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }}
-                        />
-                        <Bar dataKey="views" fill="#1e293b" radius={[4, 4, 0, 0]} barSize={12} />
-                      </BarChart>
-                    </ResponsiveContainer>
+
+                  <div className="mt-6 space-y-3.5 max-h-80 overflow-y-auto pr-1">
+                    {categoryStats.map((cat, idx) => (
+                      <div 
+                        key={cat.name} 
+                        onClick={() => {
+                          setSelectedCategory(cat.name);
+                          setActiveTab("products");
+                        }}
+                        className="p-2.5 rounded-xl hover:bg-slate-50 transition-colors border border-slate-100 cursor-pointer group"
+                      >
+                        <div className="flex items-center justify-between text-xs font-semibold text-slate-700 mb-1.5">
+                          <div className="flex items-center gap-2">
+                            <span className="w-5 h-5 rounded-full bg-slate-100 text-[11px] flex items-center justify-center font-bold text-slate-500">
+                              #{idx + 1}
+                            </span>
+                            <span className="font-bold text-slate-800 group-hover:text-blue-600 transition-colors">{cat.name}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-slate-900">{cat.count} items</span>
+                            <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${cat.color.badgeBg} ${cat.color.badgeText}`}>
+                              {cat.percentage}%
+                            </span>
+                          </div>
+                        </div>
+                        {/* Visual Share Bar */}
+                        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                          <div 
+                            className={`h-full rounded-full bg-gradient-to-r ${cat.color.bg}`}
+                            style={{ width: `${Math.max(cat.percentage, 4)}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                    {categoryStats.length === 0 && (
+                      <p className="text-center text-slate-400 text-xs py-8">No categories found.</p>
+                    )}
                   </div>
                 </div>
 
