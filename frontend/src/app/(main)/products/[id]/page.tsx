@@ -31,6 +31,12 @@ function normalizeImageUrl(imageUrl: string) {
 }
 
 const productSpecificGalleryImages: Record<string, GalleryItem[]> = {
+  "beige marble": [
+    { label: "Hall", src: "/static/rooms/beige-marble/hall.jpg" },
+    { label: "Kitchen", src: "/static/rooms/beige-marble/kitchen.jpg" },
+    { label: "Bedroom", src: "/static/rooms/beige-marble/bedroom.jpg" },
+    { label: "Parking", src: "/static/rooms/beige-marble/parking.jpg" },
+  ],
   "gray marble staircase installation": [
     { label: "Hall", src: "/static/nh/gray-marble-hall.jpg" },
     { label: "Kitchen", src: "/static/nh/gray-marble-kitchen.jpg" },
@@ -77,9 +83,9 @@ const materialRoomGalleries: { keywords: string[]; images: RoomGallery }[] = [
   {
     keywords: ["beige", "cream", "crema", "botticino", "diano", "travertine", "shell", "breccia", "tan brown", "lyra crema"],
     images: {
-      hall: "/static/real/hallway-travertine-arched.jpg",
-      kitchen: "/static/nh/stone-living-kitchen.jpg",
-      bedroom: "/static/nh/stone-bedroom-living.jpg",
+      hall: "/static/rooms/beige-marble/hall.jpg",
+      kitchen: "/static/rooms/beige-marble/kitchen.jpg",
+      bedroom: "/static/rooms/beige-marble/bedroom.jpg",
       parking: "/static/rooms/beige-marble/parking.jpg",
     },
   },

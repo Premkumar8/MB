@@ -1,23 +1,7 @@
 import { Product } from "@/context/AppContext";
 
 export const ADMIN_PRODUCTS_STORAGE_KEY = "sharma-admin-products";
-export const ADMIN_DELETED_PRODUCTS_STORAGE_KEY = "sharma-admin-deleted-products";
-
-function dedupeProducts(products: Product[]) {
-  const seenIds = new Set<number>();
-  const seenNames = new Set<string>();
-
-  return products.filter((product) => {
-    const normalizedName = product.name.toLowerCase();
-    if (seenIds.has(product.id) || seenNames.has(normalizedName)) {
-      return false;
-    }
-
-    seenIds.add(product.id);
-    seenNames.add(normalizedName);
-    return true;
-  });
-}
+export const ADMIN_DELETED_PRODUCTS_STORAGE_KEY = "sharma-admin-deleted-product-ids";
 
 export function getStoredAdminProducts(): Product[] {
   if (typeof window === "undefined") {
@@ -25,13 +9,13 @@ export function getStoredAdminProducts(): Product[] {
   }
 
   try {
-    const rawProducts = window.localStorage.getItem(ADMIN_PRODUCTS_STORAGE_KEY);
-    if (!rawProducts) {
+    const raw = window.localStorage.getItem(ADMIN_PRODUCTS_STORAGE_KEY);
+    if (!raw) {
       return [];
     }
 
-    const parsedProducts = JSON.parse(rawProducts);
-    return Array.isArray(parsedProducts) ? parsedProducts : [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
   }
@@ -45,9 +29,7 @@ export function saveStoredAdminProducts(products: Product[]) {
   try {
     window.localStorage.setItem(ADMIN_PRODUCTS_STORAGE_KEY, JSON.stringify(products));
   } catch (error) {
-    console.warn("Storage quota warning, recovering admin products cache:", error);
     try {
-      // If quota exceeded, keep only the most recent 5 products to avoid browser storage limit
       const trimmed = products.slice(0, 5);
       window.localStorage.setItem(ADMIN_PRODUCTS_STORAGE_KEY, JSON.stringify(trimmed));
     } catch (secondError) {
@@ -80,6 +62,32 @@ export function saveDeletedAdminProductIds(productIds: number[]) {
   }
 
   window.localStorage.setItem(ADMIN_DELETED_PRODUCTS_STORAGE_KEY, JSON.stringify(Array.from(new Set(productIds))));
+}
+
+export function mergeWithAdminProducts(serverProducts: Product[]): Product[] {
+  const adminProducts = getStoredAdminProducts();
+  const deletedIds = new Set(getDeletedAdminProductIds());
+  const base = serverProducts.length > 0 ? serverProducts : fallbackProducts;
+  
+  const mergedMap = new Map<number, Product>();
+  
+  base.forEach((p) => {
+    if (!deletedIds.has(p.id)) {
+      mergedMap.set(p.id, p);
+    }
+  });
+
+  adminProducts.forEach((p) => {
+    if (!deletedIds.has(p.id)) {
+      mergedMap.set(p.id, p);
+    }
+  });
+
+  return Array.from(mergedMap.values());
+}
+
+export function mergeWithFallbackProducts(serverProducts: Product[]): Product[] {
+  return mergeWithAdminProducts(serverProducts);
 }
 
 export const fallbackProducts: Product[] = [
@@ -1589,14 +1597,1271 @@ export const fallbackProducts: Product[] = [
       "/static/nh/gray-marble-bedroom.jpg",
       "/static/real/kota-stone-outdoor-courtyard.jpg"
     ]
+  },
+  {
+    id: 3001,
+    name: "Arnia Leaf Blanco",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "200x200mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 200x200mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 45.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1irk8135r1h0n7fstlo17fnula.webp",
+    images: [
+      "/static/lakshmi/o_1irk8135r1h0n7fstlo17fnula.webp",
+      "/static/lakshmi/o_1irml0mahget14oi11oa195r16qqh.webp",
+      "/static/lakshmi/o_1irml0mahdo9c2t1m5r1u7am0ki.webp",
+      "/static/lakshmi/o_1irml0mahpce93r102h1ocd1141j.webp"
+]
+  },
+  {
+    id: 3002,
+    name: "Brando Lava",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "200x200mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 200x200mm format from Sharma Ceramic Division collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 45.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1irml35lqbbalo71s94b1419dqa.webp",
+    images: [
+      "/static/lakshmi/o_1irml35lqbbalo71s94b1419dqa.webp",
+      "/static/lakshmi/o_1irml9fep1c2910938ti1s7s1uedh.webp",
+      "/static/lakshmi/o_1irml9feph9f1n1f13g716fo1a7ni.webp",
+      "/static/lakshmi/o_1irml9feqs61rd21n821r82kodj.webp"
+]
+  },
+  {
+    id: 3003,
+    name: "Livarno Pearla",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "200x200mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 200x200mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 45.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1irml38aevagm3g1kaf4be1iqld.webp",
+    images: [
+      "/static/lakshmi/o_1irml38aevagm3g1kaf4be1iqld.webp",
+      "/static/lakshmi/o_1irmlaa0sak3gsogcd1ebuiqi12.webp",
+      "/static/lakshmi/o_1irmlaa0ss44100t76r40gvmq13.webp",
+      "/static/lakshmi/o_1irmlaa0s1d121nbk1jlfgi3fgp14.webp"
+]
+  },
+  {
+    id: 3004,
+    name: "Menorca Cotto",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "200x200mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 200x200mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 45.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1irml3amu1jo21kjo1u1mvmj15lkg.webp",
+    images: [
+      "/static/lakshmi/o_1irml3amu1jo21kjo1u1mvmj15lkg.webp",
+      "/static/lakshmi/o_1irmld3ij16qc3l71ts11ffo1kich.webp",
+      "/static/lakshmi/o_1irmld3ijbid6hm1o3i1c1t1ieci.webp",
+      "/static/lakshmi/o_1irmld3ijgtiqor2h0153h1011j.webp"
+]
+  },
+  {
+    id: 3005,
+    name: "Omega Cotto",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "200x200mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 200x200mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 45.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1irk815ri193b8v8otfbnmeq0d.webp",
+    images: [
+      "/static/lakshmi/o_1irk815ri193b8v8otfbnmeq0d.webp",
+      "/static/lakshmi/o_1irm7g9hnhgjbhs17u4n95u69m.webp",
+      "/static/lakshmi/o_1irm7g9hn19gk1bn31vml2sqh8nn.webp",
+      "/static/lakshmi/o_1irm7g9hndn815b21msh18tm1e82o.webp"
+]
+  },
+  {
+    id: 3006,
+    name: "Soft Bianco",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "200x200mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 200x200mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 45.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1irml3fej5fe1s9e1qqgm2lh6aj.webp",
+    images: [
+      "/static/lakshmi/o_1irml3fej5fe1s9e1qqgm2lh6aj.webp",
+      "/static/lakshmi/o_1irmma8ir9gaftpq81i8p1l7uh.webp",
+      "/static/lakshmi/o_1irmma8irk8q7c5b00j31n12i.webp",
+      "/static/lakshmi/o_1irmma8ir1r0f1k3610mpfh71mrjj.webp"
+]
+  },
+  {
+    id: 3007,
+    name: "Soft Oro Blue",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "200x200mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 200x200mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 45.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1irml3ial1e2f2kqmjab5qrp1m.webp",
+    images: [
+      "/static/lakshmi/o_1irml3ial1e2f2kqmjab5qrp1m.webp",
+      "/static/lakshmi/o_1irmmb7711kr85lqe0cf7d18e5s.webp",
+      "/static/lakshmi/o_1irmmb7711jne16ngp5sfhk1gljt.webp",
+      "/static/lakshmi/o_1irmmb771mkl17bjplnkpfr81u.webp"
+]
+  },
+  {
+    id: 3008,
+    name: "Spectral German Blue",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "200x200mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 200x200mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 45.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1irk7hihb9om1i3d1l2g1t0g18pda.webp",
+    images: [
+      "/static/lakshmi/o_1irk7hihb9om1i3d1l2g1t0g18pda.webp",
+      "/static/lakshmi/o_1irm7mkbe1mja19u4k1916n7tc6u.webp",
+      "/static/lakshmi/o_1irm7mkbe11qk3kn95s1ljg1vjdv.webp",
+      "/static/lakshmi/o_1irm7mkbek031bj11851knq8di10.webp"
+]
+  },
+  {
+    id: 3009,
+    name: "Terra Art Dove",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "200x200mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 200x200mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 45.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1irml3vt71qs1lg7183s19u2endp.webp",
+    images: [
+      "/static/lakshmi/o_1irml3vt71qs1lg7183s19u2endp.webp"
+]
+  },
+  {
+    id: 3010,
+    name: "Terra Art Mint",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "200x200mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 200x200mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 45.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1irk7hkledbkhvcspi15361nikd.webp",
+    images: [
+      "/static/lakshmi/o_1irk7hkledbkhvcspi15361nikd.webp"
+]
+  },
+  {
+    id: 3011,
+    name: "Vintage Copper",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "200x200mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 200x200mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 45.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1irmhgmq5149f1hb42pc8pd1gk7d.webp",
+    images: [
+      "/static/lakshmi/o_1irmhgmq5149f1hb42pc8pd1gk7d.webp",
+      "/static/lakshmi/o_1irmhhuv216g4eun3co37q1kj3g.webp",
+      "/static/lakshmi/o_1irmhhuv2sk6bpo1hnd1gob1u0hh.webp",
+      "/static/lakshmi/o_1irmhhuv21rrlqkj1i5nmsi1cqmi.webp"
+]
+  },
+  {
+    id: 3012,
+    name: "15083",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "300x300mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 300x300mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 65.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1iru9bhqc1dko1e16038hgcpr4i.webp",
+    images: [
+      "/static/lakshmi/o_1iru9bhqc1dko1e16038hgcpr4i.webp"
+]
+  },
+  {
+    id: 3013,
+    name: "15367",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "300x300mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 300x300mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 65.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1iru9bhqcv7hoii1411qt2uuj4j.webp",
+    images: [
+      "/static/lakshmi/o_1iru9bhqcv7hoii1411qt2uuj4j.webp"
+]
+  },
+  {
+    id: 3014,
+    name: "15412",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "300x300mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 300x300mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 65.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1iru9bhqc1aj16ncvluje91lu14k.webp",
+    images: [
+      "/static/lakshmi/o_1iru9bhqc1aj16ncvluje91lu14k.webp"
+]
+  },
+  {
+    id: 3015,
+    name: "3825",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "300x300mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 300x300mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 65.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1iru80ibr12k71511j8gkl1dhba.webp",
+    images: [
+      "/static/lakshmi/o_1iru80ibr12k71511j8gkl1dhba.webp",
+      "/static/lakshmi/o_1is0d1ts91hck1520dfa1supo9fb.webp",
+      "/static/lakshmi/o_1is0d1ts91c9r1r2iae511arhdfc.webp"
+]
+  },
+  {
+    id: 3016,
+    name: "6064",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "300x300mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 300x300mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 65.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1iru9bhqbjid16hr1dob135klcn42.webp",
+    images: [
+      "/static/lakshmi/o_1iru9bhqbjid16hr1dob135klcn42.webp"
+]
+  },
+  {
+    id: 3017,
+    name: "6089",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "300x300mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 300x300mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 65.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1iru9bhqb26b1qt71lgd1o9q1ef944.webp",
+    images: [
+      "/static/lakshmi/o_1iru9bhqb26b1qt71lgd1o9q1ef944.webp"
+]
+  },
+  {
+    id: 3018,
+    name: "6090",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "300x300mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 300x300mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 65.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1iru9bhqb15eorjd1io21d67r8e45.webp",
+    images: [
+      "/static/lakshmi/o_1iru9bhqb15eorjd1io21d67r8e45.webp"
+]
+  },
+  {
+    id: 3019,
+    name: "6102",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "300x300mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 300x300mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 65.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1iru9bhqb1ntq18gasre1ce1fhi46.webp",
+    images: [
+      "/static/lakshmi/o_1iru9bhqb1ntq18gasre1ce1fhi46.webp"
+]
+  },
+  {
+    id: 3020,
+    name: "6143",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "300x300mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 300x300mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 65.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1iru9bhqb1rlk1kan4ne1ea2ne44b.webp",
+    images: [
+      "/static/lakshmi/o_1iru9bhqb1rlk1kan4ne1ea2ne44b.webp"
+]
+  },
+  {
+    id: 3021,
+    name: "6144",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "300x300mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 300x300mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 65.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1iru9bhqb1len191ls3i7o197v4c.webp",
+    images: [
+      "/static/lakshmi/o_1iru9bhqb1len191ls3i7o197v4c.webp"
+]
+  },
+  {
+    id: 3022,
+    name: "6145",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "300x300mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 300x300mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 65.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1iru9bhqc1161j4s119rl9chis4d.webp",
+    images: [
+      "/static/lakshmi/o_1iru9bhqc1161j4s119rl9chis4d.webp"
+]
+  },
+  {
+    id: 3023,
+    name: "6146",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "300x300mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 300x300mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 65.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1iru9bhqc8d2tto7fl1h811m304e.webp",
+    images: [
+      "/static/lakshmi/o_1iru9bhqc8d2tto7fl1h811m304e.webp"
+]
+  },
+  {
+    id: 3024,
+    name: "717_D2",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "300x300mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 300x300mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 65.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1iru9bhqb1afs196h198p1fbrl3g3r.webp",
+    images: [
+      "/static/lakshmi/o_1iru9bhqb1afs196h198p1fbrl3g3r.webp"
+]
+  },
+  {
+    id: 3025,
+    name: "7607",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "300x300mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 300x300mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 65.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1iru88rjs1i081nma15kmmd1o79g.webp",
+    images: [
+      "/static/lakshmi/o_1iru88rjs1i081nma15kmmd1o79g.webp",
+      "/static/lakshmi/o_1is0d7jg613vl118nmb410qsas3b.webp",
+      "/static/lakshmi/o_1is0d7jg661i1gq518rg1741uedc.webp"
+]
+  },
+  {
+    id: 3026,
+    name: "AFFON DK",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "300x300mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 300x300mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 65.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1iru9bhqci6k1mmd15185i14ks4l.webp",
+    images: [
+      "/static/lakshmi/o_1iru9bhqci6k1mmd15185i14ks4l.webp"
+]
+  },
+  {
+    id: 3027,
+    name: "CLASSIC WOOD GREY",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "300x300mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 300x300mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 65.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1iru9bhqc53882ejd018ih2i94m.webp",
+    images: [
+      "/static/lakshmi/o_1iru9bhqc53882ejd018ih2i94m.webp"
+]
+  },
+  {
+    id: 3028,
+    name: "COTTO ASH GREY",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "300x300mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 300x300mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 65.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1iru9bhqc3kqlvi1gjltllsa4n.webp",
+    images: [
+      "/static/lakshmi/o_1iru9bhqc3kqlvi1gjltllsa4n.webp"
+]
+  },
+  {
+    id: 3029,
+    name: "COTTO BEIGE",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "300x300mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 300x300mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 65.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1iru9bhqc5vl1a60192i1466dk64o.webp",
+    images: [
+      "/static/lakshmi/o_1iru9bhqc5vl1a60192i1466dk64o.webp"
+]
+  },
+  {
+    id: 3030,
+    name: "COTTO BIANCO",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "300x300mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 300x300mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 65.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1iru9bhqc19skest1mairsq142j4p.webp",
+    images: [
+      "/static/lakshmi/o_1iru9bhqc19skest1mairsq142j4p.webp"
+]
+  },
+  {
+    id: 3031,
+    name: "COTTO CHARCOAL",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "300x300mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 300x300mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 65.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1iru9bhqc1qam128rhh118io1fk94q.webp",
+    images: [
+      "/static/lakshmi/o_1iru9bhqc1qam128rhh118io1fk94q.webp"
+]
+  },
+  {
+    id: 3032,
+    name: "COTTO M  YELLOW",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "300x300mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 300x300mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 65.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1iru9bhqcb1oko81gssvkmvtn4r.webp",
+    images: [
+      "/static/lakshmi/o_1iru9bhqcb1oko81gssvkmvtn4r.webp"
+]
+  },
+  {
+    id: 3033,
+    name: "COTTO MOCHA",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "300x300mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 300x300mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 65.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1iru9bhqc1gqhdj2b8n1p4d17b84s.webp",
+    images: [
+      "/static/lakshmi/o_1iru9bhqc1gqhdj2b8n1p4d17b84s.webp"
+]
+  },
+  {
+    id: 3034,
+    name: "COTTO OCEAN GREEN",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "300x300mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 300x300mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 65.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1iru9bhqc1hd1qbqvkd1b8i73c4t.webp",
+    images: [
+      "/static/lakshmi/o_1iru9bhqc1hd1qbqvkd1b8i73c4t.webp"
+]
+  },
+  {
+    id: 3035,
+    name: "COTTO STEEL GREY",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "300x300mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 300x300mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 65.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1iru9bhqcamat7icq5iike14u.webp",
+    images: [
+      "/static/lakshmi/o_1iru9bhqcamat7icq5iike14u.webp"
+]
+  },
+  {
+    id: 3036,
+    name: "COTTO TERRACOTTA",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "300x300mm",
+    applications: "Living Room, Wall, Feature Wall, Bedroom, Wall, Accent Wall",
+    description: "Premium polished wall tile in 300x300mm format from Harsha collection. Ideal for luxury living room, wall, feature wall, bedroom, wall, accent wall installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 65.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1iru9bhqcvss155l1em51210q54v.webp",
+    images: [
+      "/static/lakshmi/o_1iru9bhqcvss155l1em51210q54v.webp"
+]
+  },
+  {
+    id: 3037,
+    name: "12080PN",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5h1lso1aab189j1u7tlfb14gbd.webp",
+    images: [
+      "/static/lakshmi/o_1is5h1lso1aab189j1u7tlfb14gbd.webp",
+      "/static/lakshmi/o_1is5ievr71nt9akop2e1o9d1cjnc.webp",
+      "/static/lakshmi/o_1is5ievr762e1gi214g01nr5713b.webp"
+]
+  },
+  {
+    id: 3038,
+    name: "12129P",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5h1o6iom1nfuqjq1jc1a0qg.webp",
+    images: [
+      "/static/lakshmi/o_1is5h1o6iom1nfuqjq1jc1a0qg.webp",
+      "/static/lakshmi/o_1is5ifkvlvtb1kol1imr1j2o15d7b.webp",
+      "/static/lakshmi/o_1is5ifkvlhjq1lf1567p66111bc.webp"
+]
+  },
+  {
+    id: 3039,
+    name: "12185P",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5h1qa8rtb170afgfm0h1ktsj.webp",
+    images: [
+      "/static/lakshmi/o_1is5h1qa8rtb170afgfm0h1ktsj.webp",
+      "/static/lakshmi/o_1is5igi4laah1mol1knj13t814b8c.webp",
+      "/static/lakshmi/o_1is5igi4l13unk68kcqqcs1cveb.webp"
+]
+  },
+  {
+    id: 3040,
+    name: "12198P",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5h1sjnqdgvp4j8o18tm9pdm.webp",
+    images: [
+      "/static/lakshmi/o_1is5h1sjnqdgvp4j8o18tm9pdm.webp",
+      "/static/lakshmi/o_1is5ih7lte201chku295jd14enc.webp",
+      "/static/lakshmi/o_1is5ih7lthrdkea71412vlgisd.webp",
+      "/static/lakshmi/o_1is5ih7lt17qg82vko61ngnleqe.webp"
+]
+  },
+  {
+    id: 3041,
+    name: "4001 SEVELLIA CREMA",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5h1ji412qjjt51lloac91dda.webp",
+    images: [
+      "/static/lakshmi/o_1is5h1ji412qjjt51lloac91dda.webp",
+      "/static/lakshmi/o_1is5i5ol613ge19c41p671ct616sbc.webp",
+      "/static/lakshmi/o_1is5i5ol61s8g17os1m5pv16ul9d.webp",
+      "/static/lakshmi/o_1is5i5ol61kvpquro1dvemblpe.webp"
+]
+  },
+  {
+    id: 3042,
+    name: "Acron Crema",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5h1ur0s6jb7vr9c163r12m2p.webp",
+    images: [
+      "/static/lakshmi/o_1is5h1ur0s6jb7vr9c163r12m2p.webp",
+      "/static/lakshmi/o_1is5ihr2lifk1cbc1aui1dgp66sc.webp",
+      "/static/lakshmi/o_1is5ihr2lv0b1a2815r7176jsimd.webp",
+      "/static/lakshmi/o_1is5ihr2l15ej1mtn1jcgah21o24e.webp"
+]
+  },
+  {
+    id: 3043,
+    name: "Alonza Grey",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5h215o1r2k1o836d1e031lbbs.webp",
+    images: [
+      "/static/lakshmi/o_1is5h215o1r2k1o836d1e031lbbs.webp",
+      "/static/lakshmi/o_1is5iif9e1l9u101abue1kbf7opc.webp",
+      "/static/lakshmi/o_1is5iif9e1gs2ai51f9j6aj1t80d.webp",
+      "/static/lakshmi/o_1is5iif9e1bpn12vcmjg1ttc1d5me.webp"
+]
+  },
+  {
+    id: 3044,
+    name: "Alonza Grey Decor",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5hmkn04mkf25if1t441t45a.webp",
+    images: [
+      "/static/lakshmi/o_1is5hmkn04mkf25if1t441t45a.webp"
+]
+  },
+  {
+    id: 3045,
+    name: "Armani Beige",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5h23dsftj13dv1etv1eg6m56v.webp",
+    images: [
+      "/static/lakshmi/o_1is5h23dsftj13dv1etv1eg6m56v.webp"
+]
+  },
+  {
+    id: 3046,
+    name: "Armani Bianco",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5h25qo1r7v1e78rlmgg6bn612.webp",
+    images: [
+      "/static/lakshmi/o_1is5h25qo1r7v1e78rlmgg6bn612.webp",
+      "/static/lakshmi/o_1is5ijd6d1uut1hiv5rscb0ftnd.webp",
+      "/static/lakshmi/o_1is5ijd6d125e6tt1mjh1natdrse.webp",
+      "/static/lakshmi/o_1is5ijd6d1q33hnr1o41507gt3c.webp"
+]
+  },
+  {
+    id: 3047,
+    name: "Armani Blue",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5h28c167f1hl7qli11ra1qr115.webp",
+    images: [
+      "/static/lakshmi/o_1is5h28c167f1hl7qli11ra1qr115.webp",
+      "/static/lakshmi/o_1is5ik3vp1cnd1j0u1ll618op3fcd.webp",
+      "/static/lakshmi/o_1is5ik3vpq491f7cpbg17bm1v0le.webp",
+      "/static/lakshmi/o_1is5ik3vp1ja8767lq113p11m0gc.webp"
+]
+  },
+  {
+    id: 3048,
+    name: "Armani Brown",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5h2ai21ind1i0i29t108q3uk18.webp",
+    images: [
+      "/static/lakshmi/o_1is5h2ai21ind1i0i29t108q3uk18.webp"
+]
+  },
+  {
+    id: 3049,
+    name: "Astana White",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5h2d2gvph1b11d71ktc1bnd1b.webp",
+    images: [
+      "/static/lakshmi/o_1is5h2d2gvph1b11d71ktc1bnd1b.webp",
+      "/static/lakshmi/o_1is5ilgg61fnc7d11ef1b8v2hkd.webp",
+      "/static/lakshmi/o_1is5ilgg61kdqrk31nebnk6180le.webp",
+      "/static/lakshmi/o_1is5ilgg61stc292lurd3d177oc.webp"
+]
+  },
+  {
+    id: 3050,
+    name: "Avenue Bianco",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5h2fig1l346ih1h0qnam18ih1e.webp",
+    images: [
+      "/static/lakshmi/o_1is5h2fig1l346ih1h0qnam18ih1e.webp",
+      "/static/lakshmi/o_1is5im7f767vk31ld2g641917c.webp",
+      "/static/lakshmi/o_1is5im7f712e11296lu1lrt1kf9b.webp"
+]
+  },
+  {
+    id: 3051,
+    name: "Avenue Bianco Decor",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5hmmt71b4vlav1ml110ltrbhd.webp",
+    images: [
+      "/static/lakshmi/o_1is5hmmt71b4vlav1ml110ltrbhd.webp"
+]
+  },
+  {
+    id: 3052,
+    name: "Blossam Beige",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5h2ii113ul1sbm66g6l135a1h.webp",
+    images: [
+      "/static/lakshmi/o_1is5h2ii113ul1sbm66g6l135a1h.webp",
+      "/static/lakshmi/o_1is5imt6718la1apejiginul0vd.webp",
+      "/static/lakshmi/o_1is5imt6718ua1pb2om31s791upue.webp",
+      "/static/lakshmi/o_1is5imt67m0v18etjh1p4tdmec.webp"
+]
+  },
+  {
+    id: 3053,
+    name: "Bottocino Ultra",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5h2l7815211imm8m01pigq1v1k.webp",
+    images: [
+      "/static/lakshmi/o_1is5h2l7815211imm8m01pigq1v1k.webp",
+      "/static/lakshmi/o_1is5inm3em4n14mr1aa01m546hd.webp",
+      "/static/lakshmi/o_1is5inm3ev8916gje4718b56mae.webp",
+      "/static/lakshmi/o_1is5inm3e79cgpp1g6v5481elfc.webp"
+]
+  },
+  {
+    id: 3054,
+    name: "Carnico Beige",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5h2nup1089c6kb6jvutjbg1n.webp",
+    images: [
+      "/static/lakshmi/o_1is5h2nup1089c6kb6jvutjbg1n.webp",
+      "/static/lakshmi/o_1is5iol5t1brc1ekue7e1gsjl27d.webp",
+      "/static/lakshmi/o_1is5iol5tm8t1dfq1t3p18on1true.webp",
+      "/static/lakshmi/o_1is5iol5t1u171kdl1e9vbs81r8vc.webp"
+]
+  },
+  {
+    id: 3055,
+    name: "Cremilo Beige",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5h2qj81lm81ns419mqkcb1irn1q.webp",
+    images: [
+      "/static/lakshmi/o_1is5h2qj81lm81ns419mqkcb1irn1q.webp",
+      "/static/lakshmi/o_1is5ipf841pv8177q1etg1m0v1q9bc.webp",
+      "/static/lakshmi/o_1is5ipf849eiden125ecep9ed.webp",
+      "/static/lakshmi/o_1is5ipf8412uvfe1fb17jgjfe.webp"
+]
+  },
+  {
+    id: 3056,
+    name: "Estela Gold",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5h2uvqhi01ghl1auj125n1kkd1t.webp",
+    images: [
+      "/static/lakshmi/o_1is5h2uvqhi01ghl1auj125n1kkd1t.webp",
+      "/static/lakshmi/o_1is5iq684ijfld19bunvc10gad.webp",
+      "/static/lakshmi/o_1is5iq6841cuqi9tg7k155r1dsoe.webp",
+      "/static/lakshmi/o_1is5iq684r341n481b7vsk21bhfc.webp"
+]
+  },
+  {
+    id: 3057,
+    name: "Faline Beige",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5h32j01l81bjh5bn1pnlhl620.webp",
+    images: [
+      "/static/lakshmi/o_1is5h32j01l81bjh5bn1pnlhl620.webp",
+      "/static/lakshmi/o_1is5iqtt51gc1183bfrj135l1vbuf.webp",
+      "/static/lakshmi/o_1is5iqtt5ba8lphev71gh05u6g.webp",
+      "/static/lakshmi/o_1is5iqtt51gd2p9ddohoe74ifd.webp"
+]
+  },
+  {
+    id: 3058,
+    name: "Faline Beige",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1iv5cj0a6b81g0m1kmvorvrb9a.webp",
+    images: [
+      "/static/lakshmi/o_1iv5cj0a6b81g0m1kmvorvrb9a.webp"
+]
+  },
+  {
+    id: 3059,
+    name: "Filita Crema",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5h371r1osrkrlsaqne5pba23.webp",
+    images: [
+      "/static/lakshmi/o_1is5h371r1osrkrlsaqne5pba23.webp",
+      "/static/lakshmi/o_1is5irfac1oei1sor1csv10mv1o2vd.webp",
+      "/static/lakshmi/o_1is5irfac1pmieg72ed2jjqtue.webp",
+      "/static/lakshmi/o_1is5irfac1al61aigue1h0hu0fc.webp"
+]
+  },
+  {
+    id: 3060,
+    name: "Filita Crema Decor",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5hmome3lvuia1i7611r9185gg.webp",
+    images: [
+      "/static/lakshmi/o_1is5hmome3lvuia1i7611r9185gg.webp"
+]
+  },
+  {
+    id: 3061,
+    name: "Forestwood Beige",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5h39eseupd057njvqp1pmj26.webp",
+    images: [
+      "/static/lakshmi/o_1is5h39eseupd057njvqp1pmj26.webp"
+]
+  },
+  {
+    id: 3062,
+    name: "Fresh Brown CV HT-7009 Random Design",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1iu6fl18qjov1kdlkvq1smb1nu8l.webp",
+    images: [
+      "/static/lakshmi/o_1iu6fl18qjov1kdlkvq1smb1nu8l.webp",
+      "/static/lakshmi/o_1iug6i5d81h2adl0nh4a5em27g.webp",
+      "/static/lakshmi/o_1iug6i5d8u7v39goul1ihb1q4kf.webp",
+      "/static/lakshmi/o_1iug6i5d8si5pifm061hiijche.webp"
+]
+  },
+  {
+    id: 3063,
+    name: "HG Monaco Gold HT-7011 Random Design",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1iu6fl18qa4g170rc9v1pld1j0on.webp",
+    images: [
+      "/static/lakshmi/o_1iu6fl18qa4g170rc9v1pld1j0on.webp",
+      "/static/lakshmi/o_1iug6vjhp1q8r3k810o7a1i1qr3k.webp",
+      "/static/lakshmi/o_1iug6vjhp1v6kr7pmda79310csj.webp",
+      "/static/lakshmi/o_1iug6vjhosfsl3p1f3i1nlndchi.webp"
+]
+  },
+  {
+    id: 3064,
+    name: "HT-7001",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5h44vv1c2r6qa1rdu5qeirl29.webp",
+    images: [
+      "/static/lakshmi/o_1is5h44vv1c2r6qa1rdu5qeirl29.webp",
+      "/static/lakshmi/o_1is5isgim16917ut1b6c1g4btp1i.webp",
+      "/static/lakshmi/o_1is5isgim1vcvmoe19ss17ei701j.webp",
+      "/static/lakshmi/o_1is5isgimpokjg6faqv6t5u8k.webp"
+]
+  },
+  {
+    id: 3065,
+    name: "HT-7002",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5h47kf11vcj1pgko19k21in52c.webp",
+    images: [
+      "/static/lakshmi/o_1is5h47kf11vcj1pgko19k21in52c.webp",
+      "/static/lakshmi/o_1is5it34c9fj1ldq12ob1ah7dplh.webp",
+      "/static/lakshmi/o_1is5it34ci5810pr1jcv1gorgr7i.webp",
+      "/static/lakshmi/o_1is5it34c139edbt14v91mh31go5j.webp"
+]
+  },
+  {
+    id: 3066,
+    name: "HT-7003",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5h4c6cdsbpagerl14dloig2f.webp",
+    images: [
+      "/static/lakshmi/o_1is5h4c6cdsbpagerl14dloig2f.webp",
+      "/static/lakshmi/o_1is5iu2pd1v831fergq1188p1da4k.webp",
+      "/static/lakshmi/o_1is5iu2pc1mlsesd1b8m3j6liaf.webp",
+      "/static/lakshmi/o_1is5iu2pdfdl6tu5j14ro1vgog.webp"
+]
+  },
+  {
+    id: 3067,
+    name: "HT-7007",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5h4eq8q9jdu212oepf3psg2i.webp",
+    images: [
+      "/static/lakshmi/o_1is5h4eq8q9jdu212oepf3psg2i.webp",
+      "/static/lakshmi/o_1is5iuh3mpa81pif2s0coue9ti.webp",
+      "/static/lakshmi/o_1is5iuh3mobc1ie0dg11cs1ra4e.webp",
+      "/static/lakshmi/o_1is5iuh3m7f96ut44f10df1ekdf.webp"
+]
+  },
+  {
+    id: 3068,
+    name: "HT-7009",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5h4hm81hob18t6q8son711ni2l.webp",
+    images: [
+      "/static/lakshmi/o_1is5h4hm81hob18t6q8son711ni2l.webp",
+      "/static/lakshmi/o_1is5iv64l15g51v3g12fs1aiv1lih.webp",
+      "/static/lakshmi/o_1is5iv64ld2rak16f1vg0m24i.webp",
+      "/static/lakshmi/o_1is5iv64ln5g2l4oq7knj35ue.webp"
+]
+  },
+  {
+    id: 3069,
+    name: "HT-7010",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5h4kig1gkb19oc1qh011v915uq2o.webp",
+    images: [
+      "/static/lakshmi/o_1is5h4kig1gkb19oc1qh011v915uq2o.webp",
+      "/static/lakshmi/o_1is5ivudm1kkcsup19pr1n4sf3qe.webp",
+      "/static/lakshmi/o_1is5ivudmb84f8ihe6kofr4mf.webp",
+      "/static/lakshmi/o_1is5ivudm14k3mp31eqg1cqgon8g.webp"
+]
+  },
+  {
+    id: 3070,
+    name: "HT-7011",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5h4ncoir81u211qjlc2cub2r.webp",
+    images: [
+      "/static/lakshmi/o_1is5h4ncoir81u211qjlc2cub2r.webp",
+      "/static/lakshmi/o_1is5j0fpf1e655bh1vuv1o3nplbh.webp",
+      "/static/lakshmi/o_1is5j0fpf94vffe1sve8egpnji.webp",
+      "/static/lakshmi/o_1is5j0fpfj2h1789igqkjb15hse.webp"
+]
+  },
+  {
+    id: 3071,
+    name: "HT-7012",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5h4q5ugo01k1liect4j5sf2u.webp",
+    images: [
+      "/static/lakshmi/o_1is5h4q5ugo01k1liect4j5sf2u.webp",
+      "/static/lakshmi/o_1is5j1455ne29th67117he1iioh.webp",
+      "/static/lakshmi/o_1is5j1455odr8621jts1d5kegci.webp",
+      "/static/lakshmi/o_1is5j1454g3e15hrkflqhqrjue.webp"
+]
+  },
+  {
+    id: 3072,
+    name: "HT-7020",
+    category: "Wall Tiles",
+    origin: "India",
+    finish: "Polished",
+    thickness: "1200x600mm",
+    applications: "Kitchen, Bathroom, Wall, Backsplash",
+    description: "Premium polished wall tile in 1200x600mm format from Harsha collection. Ideal for luxury kitchen, bathroom, wall, backsplash installations with superior water resistance, stain resistance, and sleek contemporary aesthetics.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/lakshmi/o_1is5h4tae3l01dp61eb91jn511u931.webp",
+    images: [
+      "/static/lakshmi/o_1is5h4tae3l01dp61eb91jn511u931.webp",
+      "/static/lakshmi/o_1is5j1lvj1hqeo1n12ikmp41iuqi.webp",
+      "/static/lakshmi/o_1is5j1lvjuk2vh11t4sa8g29e.webp",
+      "/static/lakshmi/o_1is5j1lvj1g1jbuo1r311ruqndaf.webp"
+]
   }
 ];
-
-export function mergeWithFallbackProducts(products: Product[]): Product[] {
-  const deletedIds = new Set(getDeletedAdminProductIds());
-  return dedupeProducts([...products, ...fallbackProducts]).filter((product) => !deletedIds.has(product.id));
-}
-
-export function mergeWithAdminProducts(products: Product[]): Product[] {
-  return mergeWithFallbackProducts([...getStoredAdminProducts(), ...products]);
-}

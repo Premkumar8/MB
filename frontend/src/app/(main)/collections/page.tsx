@@ -1,20 +1,18 @@
 "use client";
 
 import React, { useState, useEffect, Suspense } from "react";
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Search, Heart, RefreshCw, Layers, MapPin, Check, Plus, Trash2, ArrowUpRight } from "lucide-react";
+import { Search, Heart, RefreshCw, Layers, Plus, Trash2, Loader2 } from "lucide-react";
 import { useApp, Product } from "@/context/AppContext";
 import { mergeWithAdminProducts } from "@/data/products";
-
-// Load 3D slab viewer dynamically - Removed as requested to keep 3D Showroom as the only 3D section.
+import CollectionsLoading from "./loading";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export default function CollectionsPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<CollectionsLoading />}>
       <CollectionsContent />
     </Suspense>
   );
@@ -30,9 +28,6 @@ function CollectionsContent() {
     compareList,
     addToCompare,
     removeFromCompare,
-    isInCompareList,
-    addToSampleCart,
-    isInSampleCart,
   } = useApp();
 
   const [products, setProducts] = useState<Product[]>([]);
@@ -46,6 +41,14 @@ function CollectionsContent() {
   const [selectedThickness, setSelectedThickness] = useState("All");
   const selectedApplication = searchParams.get("application") || "All";
 
+  useEffect(() => {
+    const categoryParam = searchParams.get("category");
+    if (categoryParam) {
+      setSelectedCategory(categoryParam);
+    } else {
+      setSelectedCategory("All");
+    }
+  }, [searchParams]);
 
   // Active 3D preview item
   const [active3dProduct, setActive3dProduct] = useState<Product | null>(null);
@@ -58,7 +61,6 @@ function CollectionsContent() {
         const res = await fetch(`${API_URL}/api/products`);
         if (res.ok) {
           const data: Product[] = await res.json();
-          // Map local paths to absolute backend URL if needed
           const processed = data.map((item) => ({
             ...item,
             image_url: item.image_url,
@@ -164,7 +166,7 @@ function CollectionsContent() {
               </select>
             </div>
 
-            {/* Origin (Mapping to Rooms / Origin depending on data) */}
+            {/* Origin */}
             <div>
               <h3 className="text-sm font-semibold mb-3">Origin</h3>
               <select
@@ -189,14 +191,17 @@ function CollectionsContent() {
                 className="w-full bg-transparent border border-black/10 dark:border-white/10 px-3 py-2 text-xs focus:outline-none focus:border-gold-500 rounded-none text-black dark:text-white"
               >
                 <option value="All">All Sizes</option>
-                <option value="800 X 3000 mm">800 X 3000 mm</option>
+                <option value="200 x 200 mm">200 x 200 mm</option>
+                <option value="300 x 300 mm">300 x 300 mm</option>
+                <option value="1200 x 600 mm">1200 x 600 mm</option>
                 <option value="1200 X 1800 mm">1200 X 1800 mm</option>
+                <option value="800 X 3000 mm">800 X 3000 mm</option>
                 <option value="2cm">2cm</option>
                 <option value="3cm">3cm</option>
               </select>
             </div>
             
-            {/* Dummy Filters for Aesthetic (Matching screenshot) */}
+            {/* Quick Filter Attributes */}
             {['Application', 'Rooms', 'Pattern', 'Colour', 'Innovation', 'Series'].map((filter) => (
                <div key={filter} className="flex items-center justify-between py-2 border-b border-black/5 dark:border-white/5 cursor-pointer hover:text-gold-500 transition-colors">
                  <span className="text-sm">{filter}</span>
@@ -214,18 +219,45 @@ function CollectionsContent() {
           {/* Header */}
           <div className="mb-8 flex flex-col sm:flex-row justify-between items-center bg-[#f9f9f9] dark:bg-[#0c0c0e] p-4 border border-black/5 dark:border-white/5 rounded-2xl">
             <h1 className="font-serif text-3xl font-light">
-              <span className="font-bold text-gold-gradient">Collections</span>
+              <span className="font-bold text-gold-gradient">
+                {selectedCategory !== "All" ? selectedCategory : "Collections"}
+              </span>
             </h1>
             <div className="text-xs text-black/50 dark:text-white/40 mt-2 sm:mt-0">
-              Showing {filteredProducts.length} Products
+              {loading ? "Loading..." : `Showing ${filteredProducts.length} Products`}
             </div>
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-              {[1, 2, 3, 4, 5, 6].map((n) => (
-                <div key={n} className="h-96 shimmer-bg rounded-2xl"></div>
-              ))}
+            <div className="min-h-[450px] w-full flex flex-col items-center justify-center p-12 bg-black/5 dark:bg-white/5 rounded-3xl border border-black/5 dark:border-white/5">
+              <div className="relative flex flex-col items-center space-y-4">
+                <div className="relative flex items-center justify-center">
+                  <div className="w-16 h-16 rounded-full border-2 border-brand-500/20 dark:border-brand-400/20 animate-pulse" />
+                  <Loader2 className="w-9 h-9 text-brand-500 animate-spin absolute" />
+                </div>
+                <div className="text-center space-y-1">
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-800 dark:text-slate-200">
+                    Loading {selectedCategory !== "All" ? selectedCategory : "Products"}...
+                  </p>
+                  <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">
+                    Sharma Marble Catalog
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : filteredProducts.length === 0 ? (
+            <div className="min-h-[350px] w-full flex flex-col items-center justify-center p-12 bg-black/5 dark:bg-white/5 rounded-3xl border border-black/5 dark:border-white/5 text-center space-y-4">
+              <Layers className="w-12 h-12 text-slate-400 mx-auto" />
+              <div>
+                <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">No Products Found</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Try resetting the category filter or searching for another material.</p>
+              </div>
+              <button
+                onClick={() => { setSelectedCategory("All"); setSelectedOrigin("All"); setSelectedFinish("All"); setSelectedThickness("All"); setSearchTerm(""); }}
+                className="px-5 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-colors"
+              >
+                Reset All Filters
+              </button>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -372,99 +404,6 @@ function CollectionsContent() {
         </div>
       )}
 
-      {/* ==========================================
-          SIDE-BY-SIDE COMPARE MODAL
-         ========================================== */}
-      {showCompareModal && (
-        <div className="fixed inset-0 bg-black/95 backdrop-blur-md z-50 flex items-center justify-center p-4 page-fade-in">
-          <div className="bg-gradient-to-br from-[#0c0c0e] to-[#121215] border border-gold-500/30 max-w-5xl w-full h-[650px] flex flex-col text-white rounded-none shadow-[0_0_80px_rgba(212,175,55,0.08)]">
-            {/* Header */}
-            <div className="p-6 border-b border-white/5 flex justify-between items-center bg-black/30">
-              <div>
-                <span className="text-[9px] text-gold-500 uppercase tracking-[0.25em] font-bold block mb-1">
-                  Atelier Curator Deck
-                </span>
-                <h3 className="font-serif text-2xl text-white tracking-wide">Stone Comparison Dashboard</h3>
-              </div>
-              <button
-                onClick={() => setShowCompareModal(false)}
-                className="text-white/60 hover:text-gold-500 px-4 py-2 border border-white/10 hover:border-gold-500/40 text-[10px] tracking-widest uppercase transition-all duration-300 bg-white/5 hover:bg-gold-500/5"
-              >
-                Exit Dashboard
-              </button>
-            </div>
-
-            {/* Spec Matrix Carousel Wrapper */}
-            <div className="flex-grow overflow-x-auto p-8 flex space-x-6 scrollbar-thin scrollbar-thumb-gold scroll-smooth">
-              {compareList.map((stone) => (
-                <div 
-                  key={stone.id} 
-                  className="w-[300px] shrink-0 border border-white/10 bg-gradient-to-b from-[#18181b]/90 to-[#0e0e10]/95 p-6 flex flex-col justify-between hover:border-gold-500/40 hover:shadow-[0_10px_40px_rgba(212,175,55,0.12)] transition-all duration-500 transform hover:-translate-y-1 group/card"
-                >
-                  <div className="space-y-5">
-                    <div>
-                      <span className="text-[9px] text-gold-500/80 uppercase tracking-widest font-semibold">{stone.category}</span>
-                      <h4 className="font-serif text-lg font-bold mt-1 text-white group-hover/card:text-gold-500 transition-colors duration-300">{stone.name}</h4>
-                    </div>
-
-                    <div className="relative aspect-[4/3] w-full overflow-hidden border border-white/10">
-                      <img 
-                        src={stone.image_url} 
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105" 
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none"></div>
-                    </div>
-
-                    <div className="space-y-2 text-[10px] uppercase tracking-wider text-white/50">
-                      <div className="flex justify-between py-2 border-b border-white/5 hover:text-white transition-colors">
-                        <span>Origin</span>
-                        <span className="font-semibold text-white">{stone.origin}</span>
-                      </div>
-                      <div className="flex justify-between py-2 border-b border-white/5 hover:text-white transition-colors">
-                        <span>Finish</span>
-                        <span className="font-semibold text-white">{stone.finish}</span>
-                      </div>
-                      <div className="flex justify-between py-2 border-b border-white/5 hover:text-white transition-colors">
-                        <span>Thickness</span>
-                        <span className="font-semibold text-white">{stone.thickness}</span>
-                      </div>
-                      <div className="flex justify-between py-2 border-b border-white/5 hover:text-white transition-colors">
-                        <span>Availability</span>
-                        <span className={`font-semibold ${stone.availability === 'In Stock' ? 'text-green-400' : 'text-yellow-500'}`}>{stone.availability}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => removeFromCompare(stone.id)}
-                    className="w-full py-2.5 mt-6 bg-red-950/10 hover:bg-red-650 border border-red-500/20 hover:border-red-500/60 text-red-400 hover:text-white text-[9px] uppercase tracking-widest font-semibold transition-all duration-300"
-                  >
-                    Remove Lot
-                  </button>
-                </div>
-              ))}
-
-              {compareList.length < 3 && (
-                <div className="w-[300px] shrink-0 border border-dashed border-white/10 bg-[#0c0c0e]/40 flex flex-col items-center justify-center p-6 text-center space-y-3 transition-colors hover:border-gold-500/20">
-                  <div className="w-12 h-12 rounded-full border border-white/5 flex items-center justify-center text-white/20">
-                    <Layers className="w-5 h-5 animate-pulse" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] uppercase tracking-[0.15em] text-white/40">Select Another Stone Lot</p>
-                    <p className="text-[8px] text-white/25 mt-1">Add up to 3 stones to compare details</p>
-                  </div>
-                  <button
-                    onClick={() => setShowCompareModal(false)}
-                    className="text-[9px] uppercase tracking-widest font-bold text-gold-500 hover:text-white hover:underline transition-colors mt-2"
-                  >
-                    Browse Yard
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
