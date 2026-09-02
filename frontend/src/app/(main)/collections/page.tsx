@@ -146,6 +146,7 @@ function CollectionsContent() {
                 <option value="Kota Stone">Kota Stone</option>
                 <option value="Full Body Tiles">Full Body Tiles</option>
                 <option value="Wall Tiles">Wall Tiles</option>
+                <option value="Elevation Tiles">Elevation Tiles</option>
                 <option value="PVT">PVT</option>
               </select>
             </div>

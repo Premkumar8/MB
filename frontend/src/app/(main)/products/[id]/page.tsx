@@ -31,17 +31,53 @@ function normalizeImageUrl(imageUrl: string) {
 }
 
 const productSpecificGalleryImages: Record<string, GalleryItem[]> = {
+  "statuario marble": [
+    { label: "Living Hall", src: "/static/real/statuario-marble-living-hall.jpg" },
+    { label: "Kitchen Island", src: "/static/real/kitchen-white-marble-island.jpg" },
+    { label: "Master Suite", src: "/static/real/project-residential-bedroom.jpg" },
+    { label: "Villa Portico", src: "/static/rooms/white-marble/parking.jpg" },
+  ],
+  "flawless white": [
+    { label: "Living Hall", src: "/static/real/hero-marble-hall.jpg" },
+    { label: "Kitchen Island", src: "/static/real/kitchen-white-marble-island.jpg" },
+    { label: "Master Suite", src: "/static/real/project-residential-bedroom.jpg" },
+    { label: "Villa Portico", src: "/static/rooms/white-marble/parking.jpg" },
+  ],
+  "carrara gold": [
+    { label: "Living Hall", src: "/static/real/hero-marble-hall.jpg" },
+    { label: "Kitchen Island", src: "/static/real/kitchen-white-marble-island.jpg" },
+    { label: "Master Suite", src: "/static/real/project-residential-bedroom.jpg" },
+    { label: "Villa Portico", src: "/static/rooms/white-marble/parking.jpg" },
+  ],
   "beige marble": [
-    { label: "Hall", src: "/static/rooms/beige-marble/hall.jpg" },
-    { label: "Kitchen", src: "/static/rooms/beige-marble/kitchen.jpg" },
-    { label: "Bedroom", src: "/static/rooms/beige-marble/bedroom.jpg" },
-    { label: "Parking", src: "/static/rooms/beige-marble/parking.jpg" },
+    { label: "Living Hall", src: "/static/rooms/beige-marble/hall.jpg" },
+    { label: "Kitchen Island", src: "/static/rooms/beige-marble/kitchen.jpg" },
+    { label: "Master Suite", src: "/static/rooms/beige-marble/bedroom.jpg" },
+    { label: "Villa Portico", src: "/static/rooms/beige-marble/parking.jpg" },
+  ],
+  "calacatta viola": [
+    { label: "Living Hall", src: "/static/rooms/viola-pink/hall.jpg" },
+    { label: "Kitchen Island", src: "/static/rooms/viola-pink/kitchen.jpg" },
+    { label: "Master Suite", src: "/static/rooms/viola-pink/bedroom.jpg" },
+    { label: "Villa Portico", src: "/static/rooms/white-marble/parking.jpg" },
+  ],
+  "taj mahal": [
+    { label: "Living Hall", src: "/static/real/quartz-flooring-hall.jpg" },
+    { label: "Kitchen Island", src: "/static/real/quartz-countertop-island.jpg" },
+    { label: "Master Suite", src: "/static/rooms/taj-mahal-gold/bedroom.jpg" },
+    { label: "Villa Portico", src: "/static/real/quartzite-speckled-courtyard-floor.jpg" },
+  ],
+  "fiori di pesco carved marble": [
+    { label: "Carved Slab Texture", src: "/static/real/marble-imported-carved-wall.jpg" },
+    { label: "Grand Feature Wall", src: "/static/real/fiori-di-pesco-living-hall.jpg" },
+    { label: "Peach Vein Detail", src: "/static/real/marble-pink-rosa.jpg" },
+    { label: "Villa Portico", src: "/static/rooms/white-marble/parking.jpg" },
   ],
   "gray marble staircase installation": [
-    { label: "Hall", src: "/static/nh/gray-marble-hall.jpg" },
+    { label: "Living Hall", src: "/static/nh/gray-marble-hall.jpg" },
     { label: "Kitchen", src: "/static/nh/gray-marble-kitchen.jpg" },
-    { label: "Bedroom", src: "/static/nh/gray-marble-bedroom.jpg" },
-    { label: "Parking", src: "/static/nh/gray-marble-parking.jpg" },
+    { label: "Master Suite", src: "/static/nh/gray-marble-bedroom.jpg" },
+    { label: "Driveway", src: "/static/nh/gray-marble-parking.jpg" },
   ],
 };
 
@@ -146,10 +182,10 @@ const materialRoomGalleries: { keywords: string[]; images: RoomGallery }[] = [
 ];
 
 const roomLabels: Record<keyof RoomGallery, string> = {
-  hall: "Hall",
-  kitchen: "Kitchen",
-  bedroom: "Bedroom",
-  parking: "Parking",
+  hall: "Living Hall",
+  kitchen: "Kitchen Island",
+  bedroom: "Master Suite",
+  parking: "Villa Portico",
 };
 
 const getRoomGalleryItems = (productText: string, rooms: (keyof RoomGallery)[]) => {

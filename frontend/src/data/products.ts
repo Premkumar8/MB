@@ -67,11 +67,15 @@ export function saveDeletedAdminProductIds(productIds: number[]) {
 export function mergeWithAdminProducts(serverProducts: Product[]): Product[] {
   const adminProducts = getStoredAdminProducts();
   const deletedIds = new Set(getDeletedAdminProductIds());
-  const base = serverProducts.length > 0 ? serverProducts : fallbackProducts;
-  
   const mergedMap = new Map<number, Product>();
   
-  base.forEach((p) => {
+  fallbackProducts.forEach((p) => {
+    if (!deletedIds.has(p.id)) {
+      mergedMap.set(p.id, p);
+    }
+  });
+
+  serverProducts.forEach((p) => {
     if (!deletedIds.has(p.id)) {
       mergedMap.set(p.id, p);
     }
@@ -79,7 +83,16 @@ export function mergeWithAdminProducts(serverProducts: Product[]): Product[] {
 
   adminProducts.forEach((p) => {
     if (!deletedIds.has(p.id)) {
-      mergedMap.set(p.id, p);
+      const existing = mergedMap.get(p.id);
+      if (existing && p.image_url?.startsWith("data:") && !existing.image_url?.startsWith("data:")) {
+        mergedMap.set(p.id, {
+          ...p,
+          image_url: existing.image_url,
+          images: existing.images || p.images,
+        });
+      } else {
+        mergedMap.set(p.id, p);
+      }
     }
   });
 
@@ -104,7 +117,7 @@ export const fallbackProducts: Product[] = [
     availability: "In Stock",
     image_url: "/static/real/marble-white-carrara.jpg",
     images: [
-      "/static/real/hero-marble-hall.jpg",
+      "/static/real/statuario-marble-living-hall.jpg",
       "/static/real/kitchen-white-marble-island.jpg",
       "/static/real/project-residential-bedroom.jpg",
       "/static/rooms/white-marble/parking.jpg"
@@ -167,7 +180,7 @@ export const fallbackProducts: Product[] = [
     origin: "Brazil",
     finish: "Leathered",
     thickness: "3cm",
-    applications: "Kitchen Countertops, Outdoor Kitchens, Floors",
+    applications: "Kitchen Top, Kitchen Countertop, Island, Flooring, Hall, Living Room, Vanity",
     description: "Offering the look of marble with the structural strength of granite, Taj Mahal Quartzite is quarried in Brazil and exhibits soft white background tones with delicate gold-brown veining.",
     price: 210.00,
     availability: "In Stock",
@@ -190,13 +203,13 @@ export const fallbackProducts: Product[] = [
     origin: "India",
     finish: "Matte",
     thickness: "Varies",
-    applications: "Balcony, Floor",
+    applications: "Floor, Flooring, Parking, Outdoor, Heavy Duty, Living Room, Hall, Balcony",
     description: "Color: Whites. Premium full body tiles.",
     price: 48.00,
     availability: "In Stock",
     image_url: "/static/real/tile-floor-bright-white.jpg",
     images: [
-      "/static/real/hero-marble-hall.jpg",
+      "/static/real/statuario-marble-living-hall.jpg",
       "/static/real/kitchen-white-marble-island.jpg",
       "/static/real/project-residential-bedroom.jpg",
       "/static/rooms/white-marble/parking.jpg"
@@ -213,7 +226,7 @@ export const fallbackProducts: Product[] = [
     origin: "India",
     finish: "Polished",
     thickness: "600x1200 mm",
-    applications: "Floor",
+    applications: "Floor, Flooring, Parking, Outdoor, Heavy Duty, Living Room, Hall, Balcony",
     description: "Premium black full body tiles.",
     price: 76.00,
     availability: "In Stock",
@@ -236,13 +249,13 @@ export const fallbackProducts: Product[] = [
     origin: "India",
     finish: "Matte",
     thickness: "Varies",
-    applications: "Floor Tiles",
+    applications: "Floor, Flooring, Parking, Outdoor, Heavy Duty, Living Room, Hall, Balcony",
     description: "Premium full body slab.",
     price: 150.00,
     availability: "In Stock",
     image_url: "/static/real/marble-white-countertop-gold.jpg",
     images: [
-      "/static/real/hero-marble-hall.jpg",
+      "/static/real/statuario-marble-living-hall.jpg",
       "/static/real/kitchen-white-marble-island.jpg",
       "/static/real/project-residential-bedroom.jpg",
       "/static/rooms/white-marble/parking.jpg"
@@ -259,7 +272,7 @@ export const fallbackProducts: Product[] = [
     origin: "India",
     finish: "Polished",
     thickness: "Varies",
-    applications: "Floor, Wall",
+    applications: "Floor, Flooring, Parking, Outdoor, Heavy Duty, Living Room, Hall, Balcony",
     description: "Color: Blacks. Premium full body tiles.",
     price: 250.00,
     availability: "In Stock",
@@ -282,7 +295,7 @@ export const fallbackProducts: Product[] = [
     origin: "India",
     finish: "Matte",
     thickness: "Varies",
-    applications: "Floor",
+    applications: "Floor, Flooring, Parking, Outdoor, Heavy Duty, Living Room, Hall, Balcony",
     description: "Color: Beige. Premium full body tiles.",
     price: 40.00,
     availability: "In Stock",
@@ -305,7 +318,7 @@ export const fallbackProducts: Product[] = [
     origin: "India",
     finish: "Matte",
     thickness: "Varies",
-    applications: "Floor, Wall",
+    applications: "Floor, Flooring, Parking, Outdoor, Heavy Duty, Living Room, Hall, Balcony",
     description: "Color: Grays. Premium full body tiles.",
     price: 60.00,
     availability: "In Stock",
@@ -328,13 +341,13 @@ export const fallbackProducts: Product[] = [
     origin: "India",
     finish: "Polished",
     thickness: "Varies",
-    applications: "Floor, Wall",
+    applications: "Floor, Flooring, Parking, Outdoor, Heavy Duty, Living Room, Hall, Balcony",
     description: "Color: Grays. Premium full body tiles.",
     price: 93.00,
     availability: "In Stock",
     image_url: "/static/real/marble-white-bold-veins.jpg",
     images: [
-      "/static/real/hero-marble-hall.jpg",
+      "/static/real/statuario-marble-living-hall.jpg",
       "/static/real/kitchen-white-marble-island.jpg",
       "/static/real/project-residential-bedroom.jpg",
       "/static/rooms/white-marble/parking.jpg"
@@ -351,7 +364,7 @@ export const fallbackProducts: Product[] = [
     price: 350,
     image_url: "/static/somany/lyra-white_1.webp",
     images: [
-      "/static/real/hero-marble-hall.jpg",
+      "/static/real/statuario-marble-living-hall.jpg",
       "/static/real/kitchen-white-marble-island.jpg",
       "/static/real/project-residential-bedroom.jpg",
       "/static/rooms/white-marble/parking.jpg"
@@ -360,7 +373,7 @@ export const fallbackProducts: Product[] = [
     finish: "Full Polished",
     thickness: "1200 X 1800 mm",
     availability: "In Stock",
-    applications: "Floor",
+    applications: "Floor, Flooring, Parking, Outdoor, Heavy Duty, Living Room, Hall, Balcony",
     description: "Redefine high-footfall environments with [Tile Name] from the Ultra Charge Collection. Featuring advanced double-layer infusion for enhanced pattern depth and exceptional thickness, this tile is built for longevity and heavy-duty performance. With its anti-stain properties and elegant glossy finish, [Tile Name] provides a resilient, eco-friendly surface that seamlessly blends industrial strength with sophisticated modern style."
   },
   {
@@ -370,7 +383,7 @@ export const fallbackProducts: Product[] = [
     price: 351,
     image_url: "/static/somany/canis-white_1.webp",
     images: [
-      "/static/real/hero-marble-hall.jpg",
+      "/static/real/statuario-marble-living-hall.jpg",
       "/static/real/kitchen-white-marble-island.jpg",
       "/static/real/project-residential-bedroom.jpg",
       "/static/rooms/white-marble/parking.jpg"
@@ -379,7 +392,7 @@ export const fallbackProducts: Product[] = [
     finish: "Full Polished",
     thickness: "1200 X 1800 mm",
     availability: "In Stock",
-    applications: "Floor",
+    applications: "Floor, Flooring, Parking, Outdoor, Heavy Duty, Living Room, Hall, Balcony",
     description: "Redefine high-footfall environments with [Tile Name] from the Ultra Charge Collection. Featuring advanced double-layer infusion for enhanced pattern depth and exceptional thickness, this tile is built for longevity and heavy-duty performance. With its anti-stain properties and elegant glossy finish, [Tile Name] provides a resilient, eco-friendly surface that seamlessly blends industrial strength with sophisticated modern style."
   },
   {
@@ -398,7 +411,7 @@ export const fallbackProducts: Product[] = [
     finish: "Full Polished",
     thickness: "1200 X 1800 mm",
     availability: "In Stock",
-    applications: "Floor",
+    applications: "Floor, Flooring, Parking, Outdoor, Heavy Duty, Living Room, Hall, Balcony",
     description: "Redefine high-footfall environments with [Tile Name] from the Ultra Charge Collection. Featuring advanced double-layer infusion for enhanced pattern depth and exceptional thickness, this tile is built for longevity and heavy-duty performance. With its anti-stain properties and elegant glossy finish, [Tile Name] provides a resilient, eco-friendly surface that seamlessly blends industrial strength with sophisticated modern style."
   },
   {
@@ -408,7 +421,7 @@ export const fallbackProducts: Product[] = [
     price: 353,
     image_url: "/static/somany/nyota-white_1.webp",
     images: [
-      "/static/real/hero-marble-hall.jpg",
+      "/static/real/statuario-marble-living-hall.jpg",
       "/static/real/kitchen-white-marble-island.jpg",
       "/static/real/project-residential-bedroom.jpg",
       "/static/rooms/white-marble/parking.jpg"
@@ -417,7 +430,7 @@ export const fallbackProducts: Product[] = [
     finish: "Full Polished",
     thickness: "1200 X 1800 mm",
     availability: "In Stock",
-    applications: "Floor",
+    applications: "Floor, Flooring, Parking, Outdoor, Heavy Duty, Living Room, Hall, Balcony",
     description: "Redefine high-footfall environments with [Tile Name] from the Ultra Charge Collection. Featuring advanced double-layer infusion for enhanced pattern depth and exceptional thickness, this tile is built for longevity and heavy-duty performance. With its anti-stain properties and elegant glossy finish, [Tile Name] provides a resilient, eco-friendly surface that seamlessly blends industrial strength with sophisticated modern style."
   },
   {
@@ -484,7 +497,7 @@ export const fallbackProducts: Product[] = [
     origin: "Brazil",
     finish: "Leathered",
     thickness: "3cm",
-    applications: "Kitchen Countertops, Flooring",
+    applications: "Kitchen Top, Kitchen Countertop, Island, Flooring, Hall, Living Room, Vanity",
     description: "A silvery-grey quartzite with soft wave-like movement, combining granite-level durability with the elegance of natural stone.",
     price: 195.00,
     availability: "In Stock",
@@ -503,7 +516,7 @@ export const fallbackProducts: Product[] = [
     origin: "India",
     finish: "Honed",
     thickness: "2cm",
-    applications: "Flooring, Outdoor Cladding",
+    applications: "Kitchen Top, Kitchen Countertop, Island, Flooring, Hall, Living Room, Vanity",
     description: "A dense charcoal-grey quartzite with a fine, uniform texture, well suited to both interior floors and exterior cladding.",
     price: 175.00,
     availability: "In Stock",
@@ -522,7 +535,7 @@ export const fallbackProducts: Product[] = [
     origin: "Brazil",
     finish: "Polished",
     thickness: "3cm",
-    applications: "Kitchen Countertops, Vanity Tops",
+    applications: "Kitchen Top, Kitchen Countertop, Island, Flooring, Hall, Living Room, Vanity",
     description: "A soft beige quartzite flecked with natural fossil-like inclusions, giving countertops a warm, organic character.",
     price: 205.00,
     availability: "In Stock",
@@ -541,7 +554,7 @@ export const fallbackProducts: Product[] = [
     origin: "India",
     finish: "Honed",
     thickness: "2cm",
-    applications: "Flooring, Wall Cladding",
+    applications: "Kitchen Top, Kitchen Countertop, Island, Flooring, Hall, Living Room, Vanity",
     description: "Subtle fossil imprints and fine veining run through this earthy quartzite, adding quiet texture to floors and walls.",
     price: 180.00,
     availability: "In Stock",
@@ -560,7 +573,7 @@ export const fallbackProducts: Product[] = [
     origin: "India",
     finish: "Polished",
     thickness: "2cm",
-    applications: "Flooring, Hallways, Foyers",
+    applications: "Kitchen Top, Kitchen Countertop, Island, Flooring, Hall, Living Room, Vanity",
     description: "Quartzite slabs cut and laid in a classic checkerboard pattern, built for heavy-footfall hallways and grand entrances.",
     price: 190.00,
     availability: "In Stock",
@@ -579,13 +592,13 @@ export const fallbackProducts: Product[] = [
     origin: "Italy",
     finish: "Polished",
     thickness: "2cm",
-    applications: "Flooring, Countertops, Feature Walls",
+    applications: "Flooring, Staircase, Steps, Wall Cladding, Wall, Lift Wall, Bathrooms, Countertops",
     description: "Genuine Italian Calacatta marble with soft grey veining on a bright white ground, imported for premium flooring and countertop projects.",
     price: 380.00,
     availability: "In Stock",
     image_url: "/static/real/marble-imported-calacatta.jpg",
     images: [
-      "/static/real/hero-marble-hall.jpg",
+      "/static/real/statuario-marble-living-hall.jpg",
       "/static/real/kitchen-white-marble-island.jpg",
       "/static/real/project-residential-bedroom.jpg",
       "/static/rooms/white-marble/parking.jpg"
@@ -598,7 +611,7 @@ export const fallbackProducts: Product[] = [
     origin: "Italy",
     finish: "Polished",
     thickness: "2cm",
-    applications: "Kitchen Backsplash, Countertops",
+    applications: "Flooring, Staircase, Steps, Wall Cladding, Wall, Lift Wall, Bathrooms, Countertops",
     description: "Classic Statuario marble, quarried in Italy and finished to a bright polish, ideal for kitchen backsplashes and worktops.",
     price: 395.00,
     availability: "In Stock",
@@ -617,7 +630,7 @@ export const fallbackProducts: Product[] = [
     origin: "Italy",
     finish: "Polished",
     thickness: "2cm",
-    applications: "Flooring, Wall Cladding",
+    applications: "Flooring, Staircase, Steps, Wall Cladding, Wall, Lift Wall, Bathrooms, Countertops",
     description: "A warm cream Italian marble threaded with fine golden veining, offering a softer alternative to the classic whites.",
     price: 340.00,
     availability: "In Stock",
@@ -636,13 +649,13 @@ export const fallbackProducts: Product[] = [
     origin: "Italy",
     finish: "Polished",
     thickness: "Varies",
-    applications: "Flooring, Wall Cladding",
+    applications: "Flooring, Staircase, Steps, Wall Cladding, Wall, Lift Wall, Bathrooms, Countertops",
     description: "A curated series of imported marble and natural stone panels displayed together, showcasing the range available for bespoke projects.",
     price: 260.00,
     availability: "In Stock",
     image_url: "/static/real/marble-imported-showroom.jpg",
     images: [
-      "/static/real/hero-marble-hall.jpg",
+      "/static/real/statuario-marble-living-hall.jpg",
       "/static/real/kitchen-white-marble-island.jpg",
       "/static/real/project-residential-bedroom.jpg",
       "/static/rooms/white-marble/parking.jpg"
@@ -655,15 +668,15 @@ export const fallbackProducts: Product[] = [
     origin: "Italy",
     finish: "Carved / CNC Finish",
     thickness: "2cm",
-    applications: "Feature Walls, Decorative Panels",
+    applications: "Flooring, Staircase, Steps, Wall Cladding, Wall, Lift Wall, Bathrooms, Countertops",
     description: "Imported marble CNC-carved into a fine floral relief pattern, designed as a dramatic backlit feature wall for lobbies and hotels.",
     price: 420.00,
     availability: "Limited",
     image_url: "/static/real/marble-imported-carved-wall.jpg",
     images: [
-      "/static/real/hero-marble-hall.jpg",
-      "/static/real/kitchen-white-marble-island.jpg",
-      "/static/real/project-residential-bedroom.jpg",
+      "/static/real/marble-imported-carved-wall.jpg",
+      "/static/real/fiori-di-pesco-living-hall.jpg",
+      "/static/real/marble-pink-rosa.jpg",
       "/static/rooms/white-marble/parking.jpg"
     ]
   },
@@ -674,7 +687,7 @@ export const fallbackProducts: Product[] = [
     origin: "Italy",
     finish: "Polished",
     thickness: "2cm",
-    applications: "Flooring, Hallways",
+    applications: "Flooring, Staircase, Steps, Wall Cladding, Wall, Lift Wall, Bathrooms, Countertops",
     description: "A bright white imported marble with soft grey veining, finished to a high gloss for luminous hallways and reception floors.",
     price: 350.00,
     availability: "In Stock",
@@ -699,7 +712,7 @@ export const fallbackProducts: Product[] = [
     availability: "In Stock",
     image_url: "/static/real/tile-wall-white-square.jpg",
     images: [
-      "/static/real/hero-marble-hall.jpg",
+      "/static/real/statuario-marble-living-hall.jpg",
       "/static/real/tile-glossy-white-kitchen-wall.jpg",
       "/static/real/project-residential-bedroom.jpg",
       "/static/rooms/decorative/parking.jpg"
@@ -756,7 +769,7 @@ export const fallbackProducts: Product[] = [
     availability: "In Stock",
     image_url: "/static/real/tile-wall-aqua-glass.jpg",
     images: [
-      "/static/real/hero-marble-hall.jpg",
+      "/static/real/statuario-marble-living-hall.jpg",
       "/static/real/tile-wall-aqua-glass.jpg",
       "/static/real/project-residential-bedroom.jpg",
       "/static/rooms/decorative/parking.jpg"
@@ -775,7 +788,7 @@ export const fallbackProducts: Product[] = [
     availability: "In Stock",
     image_url: "/static/real/tile-wall-azulejo-blue.jpg",
     images: [
-      "/static/real/hero-marble-hall.jpg",
+      "/static/real/statuario-marble-living-hall.jpg",
       "/static/real/tile-wall-azulejo-blue.jpg",
       "/static/real/project-residential-bedroom.jpg",
       "/static/rooms/decorative/parking.jpg"
@@ -794,7 +807,7 @@ export const fallbackProducts: Product[] = [
     availability: "In Stock",
     image_url: "/static/real/tile-wall-patchwork-marble.jpg",
     images: [
-      "/static/real/hero-marble-hall.jpg",
+      "/static/real/statuario-marble-living-hall.jpg",
       "/static/real/tile-wall-patchwork-marble.jpg",
       "/static/real/project-residential-bedroom.jpg",
       "/static/rooms/decorative/parking.jpg"
@@ -1016,7 +1029,7 @@ export const fallbackProducts: Product[] = [
     origin: "India",
     finish: "Leathered",
     thickness: "2cm",
-    applications: "Staircases, Flooring, Outdoor Steps",
+    applications: "Kitchen Top, Kitchen Countertop, Island, Flooring, Hall, Living Room, Vanity",
     description: "A dense charcoal quartzite with a leathered, slip-resistant surface, photographed on an actual staircase installation for durable, heavy-footfall steps.",
     price: 200.00,
     availability: "In Stock",
@@ -1035,7 +1048,7 @@ export const fallbackProducts: Product[] = [
     origin: "India",
     finish: "Matte Wood Look",
     thickness: "10mm",
-    applications: "Bedroom Flooring, Hallways, Residential Floors",
+    applications: "Floor, Flooring, Parking, Outdoor, Heavy Duty, Living Room, Hall, Balcony",
     description: "A warm wood-effect floor tile installed in a residential room, giving the comfort of timber with the durability and easier maintenance of tile.",
     price: 58.00,
     availability: "In Stock",
@@ -1111,7 +1124,7 @@ export const fallbackProducts: Product[] = [
     origin: "India",
     finish: "Natural Splitface",
     thickness: "Varies",
-    applications: "Exterior Walls, Feature Walls, Facades",
+    applications: "Kitchen Top, Kitchen Countertop, Island, Flooring, Hall, Living Room, Vanity",
     description: "A grey splitface quartzite cladding panel with a rugged stacked-stone texture for durable exterior and accent wall use.",
     price: 78.00,
     availability: "In Stock",
@@ -1149,13 +1162,13 @@ export const fallbackProducts: Product[] = [
     origin: "India",
     finish: "Polished",
     thickness: "Large Format",
-    applications: "Flooring, Kitchen Walls, Living Rooms",
+    applications: "Floor, Flooring, Parking, Outdoor, Heavy Duty, Living Room, Hall, Balcony",
     description: "A large-format white marble-look slab tile with soft grey veins, suitable for clean contemporary wall and floor layouts.",
     price: 82.00,
     availability: "In Stock",
     image_url: "/static/real/tile-rak-white-marble-look-slab.jpg",
     images: [
-      "/static/real/hero-marble-hall.jpg",
+      "/static/real/statuario-marble-living-hall.jpg",
       "/static/real/kitchen-white-marble-island.jpg",
       "/static/real/project-residential-bedroom.jpg",
       "/static/rooms/white-marble/parking.jpg"
@@ -1174,7 +1187,7 @@ export const fallbackProducts: Product[] = [
     availability: "In Stock",
     image_url: "/static/real/tile-glossy-white-kitchen-wall.jpg",
     images: [
-      "/static/real/hero-marble-hall.jpg",
+      "/static/real/statuario-marble-living-hall.jpg",
       "/static/real/tile-glossy-white-kitchen-wall.jpg",
       "/static/real/project-residential-bedroom.jpg",
       "/static/rooms/decorative/parking.jpg"
@@ -1225,13 +1238,13 @@ export const fallbackProducts: Product[] = [
     origin: "India",
     finish: "Polished",
     thickness: "Large Format",
-    applications: "Flooring, Wall Cladding, Living Rooms",
+    applications: "Floor, Flooring, Parking, Outdoor, Heavy Duty, Living Room, Hall, Balcony",
     description: "A white marble-look slab tile displayed upright, with fine grey veining and a glossy surface for large-format interiors.",
     price: 84.00,
     availability: "In Stock",
     image_url: "/static/real/tile-white-marble-look-slab-display.jpg",
     images: [
-      "/static/real/hero-marble-hall.jpg",
+      "/static/real/statuario-marble-living-hall.jpg",
       "/static/real/kitchen-white-marble-island.jpg",
       "/static/real/project-residential-bedroom.jpg",
       "/static/rooms/white-marble/parking.jpg"
@@ -1263,7 +1276,7 @@ export const fallbackProducts: Product[] = [
     origin: "India",
     finish: "Matte Patterned",
     thickness: "10mm",
-    applications: "Foyers, Balconies, Accent Floors",
+    applications: "Floor, Flooring, Parking, Outdoor, Heavy Duty, Living Room, Hall, Balcony",
     description: "A display board of decorative patterned floor tiles in neutral tones, suitable for entryways, balconies, and accent flooring.",
     price: 54.00,
     availability: "In Stock",
@@ -1339,7 +1352,7 @@ export const fallbackProducts: Product[] = [
     origin: "India",
     finish: "Textured",
     thickness: "2cm",
-    applications: "Outdoor Walkways, Patios, Utility Areas",
+    applications: "Kitchen Top, Kitchen Countertop, Island, Flooring, Hall, Living Room, Vanity",
     description: "A dark outdoor quartzite walkway with a textured surface for practical exterior circulation areas.",
     price: 95.00,
     availability: "In Stock",
@@ -1535,7 +1548,7 @@ export const fallbackProducts: Product[] = [
     availability: "In Stock",
     image_url: "/static/real/granite-wall-cladding-lobby.jpg",
     images: [
-      "/static/real/hero-marble-hall.jpg",
+      "/static/real/statuario-marble-living-hall.jpg",
       "/static/real/kitchen-white-marble-island.jpg",
       "/static/real/project-residential-bedroom.jpg",
       "/static/rooms/white-marble/parking.jpg"
@@ -1567,7 +1580,7 @@ export const fallbackProducts: Product[] = [
     origin: "India (Rajasthan)",
     finish: "Polished",
     thickness: "20mm",
-    applications: "Hall & Passage Flooring, Verandas",
+    applications: "Flooring, Hall, Passage, Parking, Commercial, Outdoor, Paving, Steps",
     description: "A classic green-toned limestone quarried in Kota, Rajasthan. Naturally slip-resistant and cool underfoot, it's a time-tested choice for Indian home flooring and courtyards.",
     price: 45.00,
     availability: "In Stock",
@@ -1586,7 +1599,7 @@ export const fallbackProducts: Product[] = [
     origin: "India (Rajasthan)",
     finish: "Natural / Sandblasted",
     thickness: "25mm",
-    applications: "Parking, Courtyards, Commercial Complexes",
+    applications: "Flooring, Hall, Passage, Parking, Commercial, Outdoor, Paving, Steps",
     description: "A tougher, textured grey variant of Kota limestone, ideal for outdoor parking areas, courtyards, and high-traffic commercial complexes thanks to its rough-finish grip.",
     price: 38.00,
     availability: "In Stock",
@@ -1803,7 +1816,7 @@ export const fallbackProducts: Product[] = [
   },
   {
     id: 3012,
-    name: "15083",
+    name: "Carrara Mist (15083)",
     category: "Wall Tiles",
     origin: "India",
     finish: "Polished",
@@ -1819,7 +1832,7 @@ export const fallbackProducts: Product[] = [
   },
   {
     id: 3013,
-    name: "15367",
+    name: "Statuario Luxe (15367)",
     category: "Wall Tiles",
     origin: "India",
     finish: "Polished",
@@ -1835,7 +1848,7 @@ export const fallbackProducts: Product[] = [
   },
   {
     id: 3014,
-    name: "15412",
+    name: "Calacatta Gold (15412)",
     category: "Wall Tiles",
     origin: "India",
     finish: "Polished",
@@ -1851,7 +1864,7 @@ export const fallbackProducts: Product[] = [
   },
   {
     id: 3015,
-    name: "3825",
+    name: "Modena Travertine (3825)",
     category: "Wall Tiles",
     origin: "India",
     finish: "Polished",
@@ -1869,7 +1882,7 @@ export const fallbackProducts: Product[] = [
   },
   {
     id: 3016,
-    name: "6064",
+    name: "Valencia Crema (6064)",
     category: "Wall Tiles",
     origin: "India",
     finish: "Polished",
@@ -1885,7 +1898,7 @@ export const fallbackProducts: Product[] = [
   },
   {
     id: 3017,
-    name: "6089",
+    name: "Siena Almond (6089)",
     category: "Wall Tiles",
     origin: "India",
     finish: "Polished",
@@ -1901,7 +1914,7 @@ export const fallbackProducts: Product[] = [
   },
   {
     id: 3018,
-    name: "6090",
+    name: "Milano Grey (6090)",
     category: "Wall Tiles",
     origin: "India",
     finish: "Polished",
@@ -1917,7 +1930,7 @@ export const fallbackProducts: Product[] = [
   },
   {
     id: 3019,
-    name: "6102",
+    name: "Verona Beige (6102)",
     category: "Wall Tiles",
     origin: "India",
     finish: "Polished",
@@ -1933,7 +1946,7 @@ export const fallbackProducts: Product[] = [
   },
   {
     id: 3020,
-    name: "6143",
+    name: "Tivoli Bianco (6143)",
     category: "Wall Tiles",
     origin: "India",
     finish: "Polished",
@@ -1949,7 +1962,7 @@ export const fallbackProducts: Product[] = [
   },
   {
     id: 3021,
-    name: "6144",
+    name: "Tivoli Crema (6144)",
     category: "Wall Tiles",
     origin: "India",
     finish: "Polished",
@@ -1965,7 +1978,7 @@ export const fallbackProducts: Product[] = [
   },
   {
     id: 3022,
-    name: "6145",
+    name: "Tivoli Gris (6145)",
     category: "Wall Tiles",
     origin: "India",
     finish: "Polished",
@@ -1981,7 +1994,7 @@ export const fallbackProducts: Product[] = [
   },
   {
     id: 3023,
-    name: "6146",
+    name: "Tivoli Ash (6146)",
     category: "Wall Tiles",
     origin: "India",
     finish: "Polished",
@@ -1997,7 +2010,7 @@ export const fallbackProducts: Product[] = [
   },
   {
     id: 3024,
-    name: "717_D2",
+    name: "Palermo Mosaic (717_D2)",
     category: "Wall Tiles",
     origin: "India",
     finish: "Polished",
@@ -2013,7 +2026,7 @@ export const fallbackProducts: Product[] = [
   },
   {
     id: 3025,
-    name: "7607",
+    name: "Ravello Slate (7607)",
     category: "Wall Tiles",
     origin: "India",
     finish: "Polished",
@@ -2207,7 +2220,7 @@ export const fallbackProducts: Product[] = [
   },
   {
     id: 3037,
-    name: "12080PN",
+    name: "Imperiale Onyx (12080PN)",
     category: "Wall Tiles",
     origin: "India",
     finish: "Polished",
@@ -2225,7 +2238,7 @@ export const fallbackProducts: Product[] = [
   },
   {
     id: 3038,
-    name: "12129P",
+    name: "Royal Statuario (12129P)",
     category: "Wall Tiles",
     origin: "India",
     finish: "Polished",
@@ -2243,7 +2256,7 @@ export const fallbackProducts: Product[] = [
   },
   {
     id: 3039,
-    name: "12185P",
+    name: "Armani Marfil (12185P)",
     category: "Wall Tiles",
     origin: "India",
     finish: "Polished",
@@ -2261,7 +2274,7 @@ export const fallbackProducts: Product[] = [
   },
   {
     id: 3040,
-    name: "12198P",
+    name: "Pietra Grey (12198P)",
     category: "Wall Tiles",
     origin: "India",
     finish: "Polished",
@@ -2695,7 +2708,7 @@ export const fallbackProducts: Product[] = [
   },
   {
     id: 3064,
-    name: "HT-7001",
+    name: "Monaco Bianco (HT-7001)",
     category: "Wall Tiles",
     origin: "India",
     finish: "Polished",
@@ -2714,7 +2727,7 @@ export const fallbackProducts: Product[] = [
   },
   {
     id: 3065,
-    name: "HT-7002",
+    name: "Monaco Crema (HT-7002)",
     category: "Wall Tiles",
     origin: "India",
     finish: "Polished",
@@ -2733,7 +2746,7 @@ export const fallbackProducts: Product[] = [
   },
   {
     id: 3066,
-    name: "HT-7003",
+    name: "Monaco Gris (HT-7003)",
     category: "Wall Tiles",
     origin: "India",
     finish: "Polished",
@@ -2752,7 +2765,7 @@ export const fallbackProducts: Product[] = [
   },
   {
     id: 3067,
-    name: "HT-7007",
+    name: "Florenza Beige (HT-7007)",
     category: "Wall Tiles",
     origin: "India",
     finish: "Polished",
@@ -2771,7 +2784,7 @@ export const fallbackProducts: Product[] = [
   },
   {
     id: 3068,
-    name: "HT-7009",
+    name: "Fresh Brown Royale (HT-7009)",
     category: "Wall Tiles",
     origin: "India",
     finish: "Polished",
@@ -2790,7 +2803,7 @@ export const fallbackProducts: Product[] = [
   },
   {
     id: 3069,
-    name: "HT-7010",
+    name: "Florenza Nero (HT-7010)",
     category: "Wall Tiles",
     origin: "India",
     finish: "Polished",
@@ -2809,7 +2822,7 @@ export const fallbackProducts: Product[] = [
   },
   {
     id: 3070,
-    name: "HT-7011",
+    name: "HG Monaco Gold (HT-7011)",
     category: "Wall Tiles",
     origin: "India",
     finish: "Polished",
@@ -2828,7 +2841,7 @@ export const fallbackProducts: Product[] = [
   },
   {
     id: 3071,
-    name: "HT-7012",
+    name: "Venezia Statuario (HT-7012)",
     category: "Wall Tiles",
     origin: "India",
     finish: "Polished",
@@ -2847,7 +2860,7 @@ export const fallbackProducts: Product[] = [
   },
   {
     id: 3072,
-    name: "HT-7020",
+    name: "Venezia Crema (HT-7020)",
     category: "Wall Tiles",
     origin: "India",
     finish: "Polished",
@@ -2863,5 +2876,103 @@ export const fallbackProducts: Product[] = [
       "/static/lakshmi/o_1is5j1lvjuk2vh11t4sa8g29e.webp",
       "/static/lakshmi/o_1is5j1lvj1g1jbuo1r311ruqndaf.webp"
 ]
-  }
+  },
+  {
+    id: 3101,
+    name: "Slate Ledger Stone Elevation Tile",
+    category: "Elevation Tiles",
+    origin: "India",
+    finish: "Split Face",
+    thickness: "600x300mm",
+    applications: "Wall, Exterior Cladding, Compound Wall, Facade, Parking Wall, Outdoor",
+    description: "Premium natural slate stacked stone elevation cladding tile with rustic dimensional texture. Ideal for modern villa exterior facades, boundary walls, and parking area accent walls.",
+    price: 85.0,
+    availability: "In Stock",
+    image_url: "/static/real/elevation-stacked-stone-slate.jpg",
+    images: ["/static/real/elevation-stacked-stone-slate.jpg", "/static/real/elevation-tiles-facade.jpg"]
+  },
+  {
+    id: 3102,
+    name: "Fluted Travertine Architectural Cladding",
+    category: "Elevation Tiles",
+    origin: "India",
+    finish: "Grooved Matte",
+    thickness: "1200x600mm",
+    applications: "Wall, Exterior Cladding, Pillar Cladding, Facade, Outdoor",
+    description: "Architectural grade linear fluted groove travertine elevation slab. Delivers sophisticated contemporary texture for entrance pillars, building facades, and exterior feature walls.",
+    price: 140.0,
+    availability: "In Stock",
+    image_url: "/static/real/elevation-travertine-fluted-groove.jpg",
+    images: ["/static/real/elevation-travertine-fluted-groove.jpg", "/static/real/tile-travertine-exterior-cladding.jpg"]
+  },
+  {
+    id: 3103,
+    name: "Tuscan Terracotta Brick Elevation Tile",
+    category: "Elevation Tiles",
+    origin: "India",
+    finish: "Rustic Textured",
+    thickness: "240x60mm",
+    applications: "Wall, Compound Wall, Exterior Wall, Porch, Outdoor",
+    description: "Authentic weathered terracotta exposed brick slip tile for exterior boundary walls, heritage villa facades, and portico pillars. Weatherproof and enduring.",
+    price: 65.0,
+    availability: "In Stock",
+    image_url: "/static/real/elevation-terracotta-brick-cladding.jpg",
+    images: ["/static/real/elevation-terracotta-brick-cladding.jpg"]
+  },
+  {
+    id: 3104,
+    name: "Modern Villa Facade Elevation Tile",
+    category: "Elevation Tiles",
+    origin: "India",
+    finish: "Textured",
+    thickness: "600x300mm",
+    applications: "Wall, Exterior Cladding, Parking Wall, Outdoor",
+    description: "Contemporary multi-panel exterior elevation tile engineered for extreme weather resilience. Perfect for compound walls, parking area walls, and exterior balconies.",
+    price: 78.0,
+    availability: "In Stock",
+    image_url: "/static/real/elevation-tiles-facade.jpg",
+    images: ["/static/real/elevation-tiles-facade.jpg", "/static/real/elevation-tile-exterior.jpg"]
+  },
+  {
+    id: 3105,
+    name: "Rustic Multi-Stone Exterior Cladding",
+    category: "Elevation Tiles",
+    origin: "India",
+    finish: "Natural Rock",
+    thickness: "600x300mm",
+    applications: "Wall, Compound Wall, Exterior Wall, Facade, Outdoor",
+    description: "Multi-hued natural stone look exterior wall tile. Blends warm earth tones with chiseled rock relief to elevate front elevations and boundary walls.",
+    price: 72.0,
+    availability: "In Stock",
+    image_url: "/static/real/elevation-tile-exterior.jpg",
+    images: ["/static/real/elevation-tile-exterior.jpg", "/static/real/elevation-tiles-facade.jpg"]
+  },
+  {
+    id: 3106,
+    name: "Alpine Quartzite Split-Face Cladding",
+    category: "Elevation Tiles",
+    origin: "India",
+    finish: "Chiseled Rock",
+    thickness: "600x150mm",
+    applications: "Wall, Boundary Wall, Entrance Pillar, Outdoor",
+    description: "High-relief quartzite split-face rock wall cladding tile. Offers unmatched architectural depth and weather resistance for perimeter walls and gate pillars.",
+    price: 95.0,
+    availability: "In Stock",
+    image_url: "/static/real/quartzite-splitface-wall-cladding.jpg",
+    images: ["/static/real/quartzite-splitface-wall-cladding.jpg"]
+  },
+  {
+    id: 3107,
+    name: "Roman Travertine Exterior Wall Tile",
+    category: "Elevation Tiles",
+    origin: "India",
+    finish: "Honed Matte",
+    thickness: "600x300mm",
+    applications: "Wall, Exterior Cladding, Facade, Compound Wall, Outdoor",
+    description: "Classic Roman travertine textured exterior porcelain tile. Smooth matte tactile feel with natural stone veining, suitable for facade cladding and exterior balconies.",
+    price: 82.0,
+    availability: "In Stock",
+    image_url: "/static/real/tile-travertine-exterior-cladding.jpg",
+    images: ["/static/real/tile-travertine-exterior-cladding.jpg"]
+  },
 ];

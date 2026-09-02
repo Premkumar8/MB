@@ -33,7 +33,7 @@ const collection = (categoryName: string, application?: string) => {
 const tilesDropdown: SubLink[] = [
   { name: "Floor Tiles", href: collection("Full Body Tiles", "Flooring"), desc: "Hall, Bedroom, Kitchen & Dining floors", image: "/static/real/floor-tiles-living-hall.jpg" },
   { name: "Wall Tiles", href: collection("Wall Tiles", "Wall"), desc: "Bathroom wall & kitchen wall finishes", image: "/static/real/wall-tiles-bathroom-kitchen.jpg" },
-  { name: "Elevation Tiles", href: "/quote", desc: "Parking wall, exterior & compound wall cladding", image: "/static/real/elevation-tiles-facade.jpg" },
+  { name: "Elevation Tiles", href: collection("Elevation Tiles", "Wall"), desc: "Parking wall, exterior & compound wall cladding", image: "/static/real/elevation-tiles-facade.jpg" },
   { name: "Parking Tiles", href: collection("Full Body Tiles", "Flooring"), desc: "Parking floor & Full Body vitrified tiles", image: "/static/real/parking-tiles-driveway.jpg" },
 ];
 
