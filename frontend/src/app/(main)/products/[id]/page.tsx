@@ -185,20 +185,61 @@ function uniqueGalleryItems(items: GalleryItem[]) {
   });
 }
 
-function getProductGalleryItems(product: Product) {
+function getProductGalleryItems(product: Product): GalleryItem[] {
+  // 1. Explicit specific product gallery overrides
   const productSpecificImages = productSpecificGalleryImages[product.name.toLowerCase()];
   if (productSpecificImages) {
     return uniqueGalleryItems(productSpecificImages).slice(0, 4);
   }
 
-  if (Array.isArray(product.images) && product.images.length === 4) {
-    const labels = ["Hall", "Kitchen", "Bedroom", "Parking"];
-    return product.images.map((src, idx) => ({
-      label: labels[idx],
-      src: normalizeImageUrl(src)
-    }));
+  // 2. Parse and normalize custom images
+  let customImages: string[] = [];
+  if (Array.isArray(product.images) && product.images.length > 0) {
+    customImages = product.images.map(normalizeImageUrl).filter(Boolean);
+  } else if (typeof (product as any).images === "string" && (product as any).images.trim()) {
+    try {
+      const parsed = JSON.parse((product as any).images);
+      if (Array.isArray(parsed)) {
+        customImages = parsed.map(normalizeImageUrl).filter(Boolean);
+      }
+    } catch {
+      // not json
+    }
   }
 
+  const isWallTileOrExternal = 
+    product.category?.toLowerCase().includes("wall tile") || 
+    product.category?.toLowerCase().includes("tile") ||
+    product.image_url?.includes("/static/lakshmi/") ||
+    customImages.some((img) => img.includes("/static/lakshmi/"));
+
+  // 3. If product has its own photos (from scrape or uploaded), use ONLY these photos!
+  if (customImages.length > 0) {
+    const isMarbleRoomSuite = !isWallTileOrExternal && customImages.length === 4 && 
+      customImages.some((img) => img.includes("/rooms/"));
+
+    return uniqueGalleryItems(
+      customImages.map((src, idx) => {
+        if (isMarbleRoomSuite) {
+          const roomLabels = ["Hall", "Kitchen", "Bedroom", "Parking"];
+          return { label: roomLabels[idx] || `View ${idx + 1}`, src };
+        }
+        
+        if (customImages.length === 1) {
+          return { label: "Tile View", src };
+        }
+        const tileLabels = ["Tile Face", "Pattern Detail", "Room Layout", "Texture View"];
+        return { label: tileLabels[idx] || `View ${idx + 1}`, src };
+      })
+    );
+  }
+
+  // 4. For Wall Tiles or any product with an image, NEVER inject generic hall/kitchen/bedroom/parking rooms!
+  if (isWallTileOrExternal || product.image_url) {
+    return [{ label: "Tile View", src: normalizeImageUrl(product.image_url || "/static/real/elevation-tiles-facade.jpg") }];
+  }
+
+  // 5. Fallback only for general marble stone slabs with no photos
   const productText = `${product.name} ${product.category} ${product.applications} ${product.description || ""}`.toLowerCase();
   return uniqueGalleryItems(getCompleteRoomGalleryItems(productText)).slice(0, 4);
 }
@@ -228,32 +269,79 @@ export default function ProductDetailPage() {
         const res = await fetch(`${API_URL}/api/products/${id}`, { signal: controller.signal });
         if (res.ok) {
           const data = await res.json();
+          const rawImages: any = data.images;
+          let imageList: string[] = [];
+          if (Array.isArray(rawImages)) {
+            imageList = rawImages;
+          } else if (typeof rawImages === "string") {
+            try {
+              const parsed = JSON.parse(rawImages);
+              imageList = Array.isArray(parsed) ? parsed : [rawImages];
+            } catch {
+              imageList = [rawImages];
+            }
+          }
           const processed: Product = {
             ...data,
+            images: imageList,
             image_url: normalizeImageUrl(data.image_url),
           };
           const nextGalleryItems = getProductGalleryItems(processed);
           if (!cancelled) {
             setProduct({ ...processed, images: nextGalleryItems.map((item) => item.src) });
             setGalleryItems(nextGalleryItems);
-            setMainImage(nextGalleryItems[0].src);
+            setMainImage(nextGalleryItems[0]?.src || processed.image_url);
           }
         } else {
           const found = mergeWithAdminProducts([]).find(p => p.id === Number(id));
           if (found && !cancelled) {
-            const nextGalleryItems = getProductGalleryItems(found);
-            setProduct({ ...found, images: nextGalleryItems.map((item) => item.src) });
+            const rawImages: any = found.images;
+            let imageList: string[] = [];
+            if (Array.isArray(rawImages)) {
+              imageList = rawImages;
+            } else if (typeof rawImages === "string") {
+              try {
+                const parsed = JSON.parse(rawImages);
+                imageList = Array.isArray(parsed) ? parsed : [rawImages];
+              } catch {
+                imageList = [rawImages];
+              }
+            }
+            const processed: Product = {
+              ...found,
+              images: imageList,
+              image_url: normalizeImageUrl(found.image_url),
+            };
+            const nextGalleryItems = getProductGalleryItems(processed);
+            setProduct({ ...processed, images: nextGalleryItems.map((item) => item.src) });
             setGalleryItems(nextGalleryItems);
-            setMainImage(nextGalleryItems[0].src);
+            setMainImage(nextGalleryItems[0]?.src || processed.image_url);
           }
         }
       } catch {
         const found = mergeWithAdminProducts([]).find(p => p.id === Number(id));
         if (found && !cancelled) {
-          const nextGalleryItems = getProductGalleryItems(found);
-          setProduct({ ...found, images: nextGalleryItems.map((item) => item.src) });
+          const rawImages: any = found.images;
+          let imageList: string[] = [];
+          if (Array.isArray(rawImages)) {
+            imageList = rawImages;
+          } else if (typeof rawImages === "string") {
+            try {
+              const parsed = JSON.parse(rawImages);
+              imageList = Array.isArray(parsed) ? parsed : [rawImages];
+            } catch {
+              imageList = [rawImages];
+            }
+          }
+          const processed: Product = {
+            ...found,
+            images: imageList,
+            image_url: normalizeImageUrl(found.image_url),
+          };
+          const nextGalleryItems = getProductGalleryItems(processed);
+          setProduct({ ...processed, images: nextGalleryItems.map((item) => item.src) });
           setGalleryItems(nextGalleryItems);
-          setMainImage(nextGalleryItems[0].src);
+          setMainImage(nextGalleryItems[0]?.src || processed.image_url);
         }
       } finally {
         if (!cancelled) {
