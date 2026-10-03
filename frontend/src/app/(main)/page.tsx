@@ -45,7 +45,7 @@ const heroScenes = [
 ];
 
 const categories = [
-  { name: "Full Body Tiles", icon: LayoutGrid, image: "/static/real/tile-cream-polished-floor-installation.jpg", secondary: "/static/real/tile-wood-look-bedroom-floor.jpg", desc: "Hall, dining & bedroom floors built for heavy-traffic." },
+  { name: "Full Body Tiles", icon: LayoutGrid, image: "/static/real/tile-cream-polished-floor-installation.jpg", secondary: "/static/real/indian-marble-hall-flooring.jpg", desc: "Hall, dining & bedroom floors built for heavy-traffic." },
   { name: "Wall Tiles", icon: Layers, image: "/static/real/tile-glossy-white-kitchen-wall.jpg", secondary: "/static/real/tile-gray-shower-suite.jpg", desc: "Elegant finishes for kitchen & bathroom walls." },
   { name: "PVT", icon: Hexagon, image: "/static/real/tile-pvt-elevator-lobby.jpg", secondary: "/static/real/tile-pvt-diamond-gloss.jpg", desc: "Polished vitrified tiles, glass-like shine." },
   { name: "Marble", icon: Gem, image: "/static/real/marble-gray-herringbone-floor.jpg", secondary: "/static/real/marble-gray-stair-tread-installation.jpg", desc: "Indian marble for floors & staircase steps." },
@@ -517,7 +517,7 @@ export default function HomePage() {
           >
             <div className="absolute left-0 top-0 w-[70%] h-full rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 shadow-[0_30px_80px_rgba(15,23,42,0.18)] bg-black">
               <video ref={videoRef} autoPlay muted={videoMuted} loop playsInline preload="metadata" className="absolute inset-0 w-full h-full object-cover">
-                <source src="/videos/showroom-storefront.mp4" type="video/mp4" />
+                <source src="/videos/showroom-brand-frontage.mp4" type="video/mp4" />
               </video>
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
               <div className="absolute bottom-4 left-4 flex items-center gap-2">
@@ -730,17 +730,17 @@ export default function HomePage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           <div className="lg:col-span-7 relative h-[560px] w-full hidden md:block">
             <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.7 }} className="absolute left-0 top-0 w-[65%] h-[460px] rounded-xl overflow-hidden shadow-xl z-10">
-              <img src="/static/real/hero-marble-hall.jpg" alt="Sharma Marble Heritage" className="w-full h-full object-cover" />
+              <img src="/static/showroom/marble-display-corridor.jpg" alt="Sharma Marble showroom display corridor" className="w-full h-full object-cover" />
             </motion.div>
             <motion.div initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.7, delay: 0.15 }} className="absolute right-0 bottom-0 w-[58%] h-[320px] rounded-xl overflow-hidden z-20 border-8 border-white dark:border-[#070708] shadow-xl">
-              <img src="/static/real/tile-floor-light-herringbone.jpg" alt="Master Craftsmanship" className="w-full h-full object-cover" />
+              <img src="/static/showroom/sharma-marble-trading-signboard.jpg" alt="Sharma Marble Trading Company signboard" className="w-full h-full object-cover" />
             </motion.div>
             <motion.div initial={{ opacity: 0, scale: 0.85 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.3 }} className="absolute left-[65%] top-[14%] -translate-x-1/2 -translate-y-1/2 z-30 w-28 h-28 rounded-full bg-brand-500 text-white flex items-center justify-center p-4 text-center shadow-lg">
               <p className="font-sans text-sm font-bold leading-tight">Serving Since 1986</p>
             </motion.div>
           </div>
           <div className="md:hidden aspect-[4/5] w-full relative mb-8 rounded-xl overflow-hidden">
-            <img src="/static/real/hero-marble-hall.jpg" alt="Sharma Marble Heritage" className="w-full h-full object-cover" />
+            <img src="/static/showroom/marble-display-corridor.jpg" alt="Sharma Marble showroom display corridor" className="w-full h-full object-cover" />
           </div>
           <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.7, delay: 0.2 }} className="lg:col-span-5 space-y-6 lg:pl-8">
             <span className="flex items-center gap-3 text-[10px] tracking-[0.3em] uppercase text-brand-600 font-bold">

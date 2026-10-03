@@ -6,6 +6,7 @@ import re
 from fastapi import FastAPI, Depends, HTTPException, status, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy import inspect, text
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
@@ -14,6 +15,23 @@ from database import engine, get_db
 
 # Initialize database tables
 database.Base.metadata.create_all(bind=engine)
+
+def add_missing_columns():
+    """create_all() never alters existing tables, so add any model columns the live DB lacks."""
+    inspector = inspect(engine)
+    with engine.begin() as conn:
+        for table in database.Base.metadata.sorted_tables:
+            if not inspector.has_table(table.name):
+                continue
+            existing = {col["name"] for col in inspector.get_columns(table.name)}
+            for column in table.columns:
+                if column.name in existing:
+                    continue
+                col_type = column.type.compile(dialect=engine.dialect)
+                conn.execute(text(f'ALTER TABLE "{table.name}" ADD COLUMN "{column.name}" {col_type}'))
+                print(f"Added missing column {table.name}.{column.name}")
+
+add_missing_columns()
 
 app = FastAPI(
     title="Aurelia Marmi - Luxury Natural Stone Backend API",

@@ -7,6 +7,7 @@ import { Search, Heart, RefreshCw, Layers, Plus, Trash2, Loader2 } from "lucide-
 import { useApp, Product } from "@/context/AppContext";
 import { mergeWithAdminProducts } from "@/data/products";
 import CollectionsLoading from "./loading";
+import { resolveMediaUrl } from "@/lib/media";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -340,7 +341,7 @@ function CollectionsContent() {
             {/* Main Interactive Image Area */}
             <div className="flex-grow relative bg-black flex items-center justify-center overflow-hidden p-4">
               <img
-                src={active3dProduct.image_url}
+                src={resolveMediaUrl(active3dProduct.image_url)}
                 alt={active3dProduct.name}
                 className="max-w-full max-h-full object-contain"
               />

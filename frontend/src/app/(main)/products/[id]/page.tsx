@@ -6,6 +6,7 @@ import Link from "next/link";
 import { mergeWithAdminProducts } from "@/data/products";
 import { Product, useApp } from "@/context/AppContext";
 import { ArrowLeft, Heart, Loader2, MessageSquareText, Store } from "lucide-react";
+import { resolveMediaUrl } from "@/lib/media";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -26,8 +27,7 @@ const includesAny = (text: string, keywords: string[]) => (
 );
 
 function normalizeImageUrl(imageUrl: string) {
-  if (!imageUrl) return "";
-  return imageUrl;
+  return resolveMediaUrl(imageUrl);
 }
 
 const productSpecificGalleryImages: Record<string, GalleryItem[]> = {
@@ -221,7 +221,7 @@ function uniqueGalleryItems(items: GalleryItem[]) {
   });
 }
 
-function getProductGalleryItems(product: Product): GalleryItem[] {
+function getBaseGalleryItems(product: Product): GalleryItem[] {
   // 1. Explicit specific product gallery overrides
   const productSpecificImages = productSpecificGalleryImages[product.name.toLowerCase()];
   if (productSpecificImages) {
@@ -278,6 +278,25 @@ function getProductGalleryItems(product: Product): GalleryItem[] {
   // 5. Fallback only for general marble stone slabs with no photos
   const productText = `${product.name} ${product.category} ${product.applications} ${product.description || ""}`.toLowerCase();
   return uniqueGalleryItems(getCompleteRoomGalleryItems(productText)).slice(0, 4);
+}
+
+// Real slab photos from our showroom, matched by product name (first match wins)
+const showroomSlabPhotos: { keywords: string[]; exclude?: string[]; src: string }[] = [
+  { keywords: ["travertin"], src: "/static/showroom/travertine-look-slab-display.jpg" },
+  { keywords: ["onyx"], src: "/static/showroom/onyx-look-slab-display.jpg" },
+  { keywords: ["calacatta"], exclude: ["viola"], src: "/static/showroom/calacatta-look-slab-display.jpg" },
+  { keywords: ["statuario", "carrara", "white marble"], src: "/static/showroom/statuario-look-slab-display.jpg" },
+  { keywords: ["crema", "botticino", "beige"], exclude: ["granite", "kota", "cotto", "wood"], src: "/static/showroom/crema-marble-look-slab.jpg" },
+  { keywords: ["grey", "gray"], exclude: ["granite", "kota", "cotto", "wood"], src: "/static/showroom/grey-beige-slab-panels.jpg" },
+];
+
+function getProductGalleryItems(product: Product): GalleryItem[] {
+  const base = getBaseGalleryItems(product);
+  const productText = `${product.name} ${product.category}`.toLowerCase();
+  const showroomPhoto = showroomSlabPhotos.find(
+    (photo) => includesAny(productText, photo.keywords) && !includesAny(productText, photo.exclude || [])
+  );
+  return showroomPhoto ? uniqueGalleryItems([...base, { label: "In Our Showroom", src: showroomPhoto.src }]) : base;
 }
 
 export default function ProductDetailPage() {

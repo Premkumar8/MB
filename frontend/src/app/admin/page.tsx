@@ -7,6 +7,7 @@ import { Product } from "@/context/AppContext";
 import { useAuth } from "@/context/AuthContext";
 import { getDeletedAdminProductIds, getStoredAdminProducts, mergeWithAdminProducts, saveDeletedAdminProductIds, saveStoredAdminProducts } from "@/data/products";
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Cell } from "recharts";
+import { resolveMediaUrl } from "@/lib/media";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -102,13 +103,7 @@ const CATEGORY_ICONS: Record<string, string> = {
   "Limestone": "⛰️",
 };
 
-const getAdminImageSrc = (imageUrl: string | null) => {
-  if (!imageUrl) {
-    return "";
-  }
-
-  return imageUrl.startsWith("http") || imageUrl.startsWith("data:") ? imageUrl : imageUrl;
-};
+const getAdminImageSrc = (imageUrl: string | null) => resolveMediaUrl(imageUrl);
 
 const readFileAsDataUrl = (file: File, maxWidth = 1000, quality = 0.8): Promise<string> => (
   new Promise<string>((resolve, reject) => {

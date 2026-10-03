@@ -235,9 +235,12 @@ export default function ContactPage() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
           {[
-            { src: "/static/real/showroom-interior-corridor.jpg", label: "Showroom Corridor" },
-            { src: "/static/real/showroom-interior-tiles-1.jpg", label: "Tile Display Wall" },
-            { src: "/static/real/showroom-interior-tiles-2.jpg", label: "Sanitaryware & Tile Range" },
+            { src: "/static/real/showroom-exterior-entrance.jpg", label: "Showroom Entrance" },
+            { src: "/static/showroom/marble-display-corridor.jpg", label: "Marble Display Corridor" },
+            { src: "/static/showroom/designer-tile-wall.jpg", label: "Designer Tile Wall" },
+            { src: "/static/showroom/rak-large-format-slab.jpg", label: "Large-Format Slab Tiles" },
+            { src: "/static/showroom/stone-cladding-wall.jpg", label: "Stone Cladding Wall" },
+            { src: "/static/showroom/stockyard-granite-slabs.jpg", label: "Granite Stockyard" },
           ].map((item) => (
             <div key={item.src} className="group relative aspect-[4/5] overflow-hidden">
               <img

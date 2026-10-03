@@ -6,6 +6,7 @@ import { ArrowUpRight, Heart } from "lucide-react";
 import { fallbackProducts, mergeWithFallbackProducts } from "@/data/products";
 import { Product } from "@/context/AppContext";
 import { useApp } from "@/context/AppContext";
+import { resolveMediaUrl } from "@/lib/media";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -78,7 +79,7 @@ export function ProductCard({ product }: { product: Product }) {
     <Link href={`/products/${product.id}`} className="group relative bg-white dark:bg-[#111] rounded-lg shadow-sm border border-black/5 dark:border-white/5 overflow-hidden hover:shadow-2xl hover:border-brand-500/30 hover:-translate-y-1 transition-all duration-500 flex flex-col h-full cursor-pointer">
       <div className="relative aspect-square overflow-hidden bg-black/5 dark:bg-white/5">
         <img
-          src={product.image_url}
+          src={resolveMediaUrl(product.image_url)}
           alt={product.name}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
         />

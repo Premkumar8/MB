@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useTransition } from "react";
+import React, { useEffect, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, Sparkles } from "lucide-react";
@@ -32,6 +32,7 @@ export default function RouteLoadingIndicator() {
         href.startsWith("mailto:") ||
         href.startsWith("tel:") ||
         target.getAttribute("target") === "_blank" ||
+        target.hasAttribute("download") ||
         e.ctrlKey ||
         e.metaKey ||
         e.shiftKey ||
@@ -46,12 +47,16 @@ export default function RouteLoadingIndicator() {
         const destinationUrl = new URL(href, window.location.href);
 
         if (destinationUrl.origin === currentUrl.origin) {
-          // If clicking exact same URL and hash, ignore
+          // Same page (including hash-only jumps) never changes pathname/searchParams, so the loader would hang
           if (
             destinationUrl.pathname === currentUrl.pathname &&
-            destinationUrl.search === currentUrl.search &&
-            destinationUrl.hash === currentUrl.hash
+            destinationUrl.search === currentUrl.search
           ) {
+            return;
+          }
+
+          // Direct links to static assets/files are not route navigations
+          if (destinationUrl.pathname.startsWith("/static/") || /\.[a-z0-9]+$/i.test(destinationUrl.pathname)) {
             return;
           }
 
