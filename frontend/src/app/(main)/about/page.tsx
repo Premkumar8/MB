@@ -8,10 +8,8 @@ import {
   Phone, 
   Mail, 
   Play, 
-  Sparkles, 
   Award, 
   CheckCircle2, 
-  Layers, 
   Compass, 
   ShieldCheck, 
   ArrowRight,
@@ -37,7 +35,7 @@ const SHOWROOM_VIDEOS: VideoTour[] = [
     id: "brand-frontage",
     title: "Brand Showroom Frontage: Orientbell, Bonzer7 & Sharma Tiles",
     category: "Frontage",
-    src: "/videos/showroom-brand-frontage-promo.mp4",
+    src: "/videos/showroom-brand-frontage-panorama.mp4",
     thumbnail: "/static/showroom/brand-frontage-bonzer7.jpg",
     duration: "0:14",
   },
@@ -234,55 +232,17 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#070709] text-slate-900 dark:text-white font-sans transition-colors duration-300">
       
-      {/* 1. HERO BANNER */}
-      <section className="relative pt-28 pb-24 lg:pt-40 lg:pb-36 overflow-hidden bg-[#070b18] text-white">
+      {/* 1. HERO BANNER: storefront panorama only */}
+      <section className="relative w-full aspect-[2400/850] min-h-[240px] overflow-hidden bg-[#070b18]">
+        <h1 className="sr-only">About Sharma Marble</h1>
         <motion.img
           src="/static/showroom/sharma-storefront-panorama.jpg"
-          alt=""
-          aria-hidden="true"
-          initial={{ scale: 1.12 }}
+          alt="Sharma Tiles & Granites storefront on Thadagam Main Road, Coimbatore"
+          initial={{ scale: 1.08 }}
           animate={{ scale: 1 }}
           transition={{ duration: 9, ease: "easeOut" }}
-          className="absolute inset-0 w-full h-full object-cover object-[80%_center]"
+          className="absolute inset-0 w-full h-full object-cover object-[75%_center]"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#070b18]/95 via-[#0b1530]/70 to-[#0b1530]/10 pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#070b18]/50 via-transparent to-[#070b18]/25 pointer-events-none" />
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#eab308_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none" />
-        
-        <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
-          <div className="max-w-3xl space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/20 border border-brand-400/30 text-brand-300 text-xs font-semibold uppercase tracking-[0.2em]">
-              <Sparkles className="w-3.5 h-3.5 text-brand-400" />
-              <span>Established in 1986 • Coimbatore, Tamil Nadu</span>
-            </div>
-            
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-bold tracking-tight text-white leading-tight">
-              About <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-brand-400 to-amber-200">Sharma Marble</span>
-            </h1>
-            
-            <p className="text-base sm:text-lg text-slate-300 leading-relaxed font-light">
-              Sharma Marble Trading Company is Coimbatore’s leading wholesale dealer of premium Tiles, Granites, Italian Marbles, and Natural Stones. For four decades, we have been the trusted partner for top architects, civil engineers, builders, and homeowners.
-            </p>
-
-            <div className="flex flex-wrap gap-4 pt-4">
-              <button
-                onClick={scrollToFooterContact}
-                className="px-6 py-3.5 bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold uppercase tracking-[0.2em] rounded-xl shadow-lg shadow-brand-500/30 hover:shadow-brand-500/50 transition-all flex items-center gap-2"
-              >
-                <Phone className="w-4 h-4" />
-                <span>Contact Our Coimbatore Shop</span>
-              </button>
-
-              <Link
-                href="/collections"
-                className="px-6 py-3.5 bg-white/10 hover:bg-white/20 text-white text-xs font-bold uppercase tracking-[0.2em] rounded-xl border border-white/20 backdrop-blur-md transition-all flex items-center gap-2"
-              >
-                <Layers className="w-4 h-4" />
-                <span>Explore Slabs</span>
-              </Link>
-            </div>
-          </div>
-        </div>
       </section>
 
       {/* 2. COIMBATORE SHOP HIGHLIGHT & STATS */}
@@ -401,8 +361,8 @@ export default function AboutPage() {
           </div>
 
           {/* Main Video Display Player */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-black/60 rounded-3xl p-4 sm:p-6 border border-white/10 shadow-2xl backdrop-blur-xl">
-            <div className="lg:col-span-8 overflow-hidden rounded-2xl bg-black aspect-video relative shadow-inner">
+          <div className="bg-black/60 rounded-3xl p-3 sm:p-5 border border-white/10 shadow-2xl backdrop-blur-xl space-y-6">
+            <div className="overflow-hidden rounded-2xl bg-black aspect-video relative shadow-inner">
               <video
                 key={selectedVideo.src}
                 src={selectedVideo.src}
@@ -415,16 +375,18 @@ export default function AboutPage() {
               />
             </div>
 
-            <div className="lg:col-span-4 space-y-4 pr-2">
-              <span className="px-3 py-1 bg-brand-500/20 text-brand-300 border border-brand-500/30 rounded-full text-[11px] font-bold uppercase tracking-wider inline-block">
-                {selectedVideo.category}
-              </span>
-              <h3 className="text-xl font-bold text-white">{selectedVideo.title}</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Take an interactive look at our physical warehouse and slab displays located on Thadagam Main Road, Coimbatore.
-              </p>
-              
-              <div className="space-y-2 pt-2 border-t border-white/10">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center px-2 sm:px-3 pb-2">
+              <div className="lg:col-span-5 space-y-2">
+                <span className="px-3 py-1 bg-brand-500/20 text-brand-300 border border-brand-500/30 rounded-full text-[11px] font-bold uppercase tracking-wider inline-block">
+                  {selectedVideo.category}
+                </span>
+                <h3 className="text-xl font-bold text-white">{selectedVideo.title}</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Take an interactive look at our physical warehouse and slab displays located on Thadagam Main Road, Coimbatore.
+                </p>
+              </div>
+
+              <div className="lg:col-span-4 space-y-2 lg:border-l lg:border-white/10 lg:pl-6">
                 <div className="text-xs text-slate-300 flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                   <span>High-definition physical slab inspection</span>
@@ -439,7 +401,7 @@ export default function AboutPage() {
                 </div>
               </div>
 
-              <div className="pt-4">
+              <div className="lg:col-span-3">
                 <button
                   onClick={scrollToFooterContact}
                   className="w-full py-3 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
